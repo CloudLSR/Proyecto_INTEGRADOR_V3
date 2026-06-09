@@ -33,7 +33,7 @@ public class OrdenDAOImpl implements OrdenDAO {
     @Override
     public List<Orden> historialPorUsuario(Integer usuarioId) {
         log.debug("Consultando historial para usuarioId: {}", usuarioId);
-        return repo.findByUsuarioIdOrderByFechaDesc(usuarioId);
+        return repo.findByUsuario_IdOrderByFechaDesc(usuarioId);
     }
 
     @Override

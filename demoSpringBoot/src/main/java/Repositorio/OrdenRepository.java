@@ -2,15 +2,18 @@ package Repositorio;
 
 import Modelo.Orden;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Repositorio Orden — base del historial de pedidos del cliente.
- */
-@Repository
 public interface OrdenRepository extends JpaRepository<Orden, Integer> {
-    /** Historial de un usuario ordenado del más reciente al más antiguo */
-    List<Orden> findByUsuarioIdOrderByFechaDesc(Integer usuarioId);
+
+    // Usado en Dashboard, Ventas y Reportes
+    List<Orden> findByOrdFechaBetween(LocalDateTime inicio, LocalDateTime fin);
+
+    // Usado en AdminPedidosController
+    List<Orden> findByOrdEstado(String estado);
+
+    // Usado en OrdenDAOImpl — referencia campo Java 'fecha' y relación 'usuario.id'
+    List<Orden> findByUsuario_IdOrderByFechaDesc(Integer usuarioId);
 }

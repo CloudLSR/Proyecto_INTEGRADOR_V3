@@ -23,13 +23,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 /**
- * Configuración de seguridad Spring Security + JWT.
+ * SecurityConfig ACTUALIZADA — incluye rutas del panel de administrador.
  *
- * Rutas públicas  → sin token requerido (registro, login, catálogo público).
- * Rutas de cliente → token válido + rol CLIENTE.
- * Rutas de admin  → token válido + rol ADMIN.
+ * NUEVAS RUTAS PÚBLICAS:
+ *   POST /api/admin/auth/verificar-admin  → paso 1 del login admin (solo verifica credenciales)
+ *   POST /api/admin/auth/pin              → paso 2 del login admin (valida PIN y emite JWT)
+ *   GET  /api/ofertas/vigentes            → ofertas públicas para el frontend de clientes
  *
- * Sesiones: STATELESS (sin cookies de sesión, todo vía JWT).
+ * NUEVAS RUTAS ADMIN:
+ *   /api/admin/**                         → protegidas con hasRole('ADMIN')
  */
 @Configuration
 @EnableWebSecurity
@@ -67,29 +69,39 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
 
-                // ── Rutas completamente públicas ────────────────────────
+                // ── Rutas completamente públicas ─────────────────────────────
                 .requestMatchers(HttpMethod.POST,
                         "/api/auth/registro",
                         "/api/auth/login",
                         "/api/auth/olvide-contrasena",
-                        "/api/auth/restablecer-contrasena").permitAll()
+                        "/api/auth/restablecer-contrasena",
+                        // NUEVO: autenticación de 2 pasos del admin (no requiere JWT previo)
+                        "/api/admin/auth/verificar-admin",
+                        "/api/admin/auth/pin"
+                ).permitAll()
 
                 // Catálogo de productos y comentarios aprobados (público)
                 .requestMatchers(HttpMethod.GET,
                         "/api/productos/**",
-                        "/api/comentarios/aprobados/**").permitAll()
+                        "/api/comentarios/aprobados/**",
+                        // NUEVO: ofertas vigentes para el frontend de clientes
+                        "/api/ofertas/vigentes"
+                ).permitAll()
 
                 // Archivos estáticos (imágenes subidas)
                 .requestMatchers("/uploads/**").permitAll()
 
-                // ── Solo ADMIN ─────────────────────────────────────────
+                // ── Solo ADMIN ────────────────────────────────────────────────
+                // Todas las rutas /api/admin/** (excepto las de auth ya definidas arriba)
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                // Operaciones de escritura sobre productos también requieren ADMIN
                 .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST,   "/api/productos/guardar").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,    "/api/productos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,    "/api/comentarios/*/aprobar").hasRole("ADMIN")
 
-                // ── CLIENTE autenticado ────────────────────────────────
+                // ── CLIENTE autenticado ───────────────────────────────────────
                 .requestMatchers("/api/perfil/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/direcciones/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/metodos-pago/**").hasAnyRole("CLIENTE", "ADMIN")
