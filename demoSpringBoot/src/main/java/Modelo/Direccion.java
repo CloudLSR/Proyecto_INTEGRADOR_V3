@@ -1,51 +1,49 @@
 package Modelo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+/**
+ * Entidad Direccion — un usuario puede registrar N direcciones de envío.
+ * Cada dirección pertenece exclusivamente a ese usuario (clave foránea).
+ *
+ * Tabla nueva: usuario_direccion
+ */
 @Entity
-@Table(name = "direcciones")
+@Table(name = "usuario_direccion")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Direccion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombreDireccion;
-    private String direccion;
-    private String referencia;
-    private String distrito;
-    private String provincia;
-    private String departamento;
-    private String codigoPostal;
-    private String telefonoContacto;
-    
-    @Column(name = "es_principal")
-    private boolean esPrincipal;
-
-    @ManyToOne
-    @JoinColumn(name = "usuId_fk")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuId_fk", nullable = false)
     private Usuario usuario;
 
-    // Getters y Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getNombreDireccion() { return nombreDireccion; }
-    public void setNombreDireccion(String nombreDireccion) { this.nombreDireccion = nombreDireccion; }
-    public String getDireccion() { return direccion; }
-    public void setDireccion(String direccion) { this.direccion = direccion; }
-    public String getReferencia() { return referencia; }
-    public void setReferencia(String referencia) { this.referencia = referencia; }
-    public String getDistrito() { return distrito; }
-    public void setDistrito(String distrito) { this.distrito = distrito; }
-    public String getProvincia() { return provincia; }
-    public void setProvincia(String provincia) { this.provincia = provincia; }
-    public String getDepartamento() { return departamento; }
-    public void setDepartamento(String departamento) { this.departamento = departamento; }
-    public String getCodigoPostal() { return codigoPostal; }
-    public void setCodigoPostal(String codigoPostal) { this.codigoPostal = codigoPostal; }
-    public String getTelefonoContacto() { return telefonoContacto; }
-    public void setTelefonoContacto(String telefonoContacto) { this.telefonoContacto = telefonoContacto; }
-    public boolean isEsPrincipal() { return esPrincipal; }
-    public void setEsPrincipal(boolean esPrincipal) { this.esPrincipal = esPrincipal; }
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    @NotBlank(message = "La dirección no puede estar vacía")
+    @Column(nullable = false, length = 255)
+    private String direccion;
+
+    @Column(length = 100)
+    private String distrito;
+
+    @Column(length = 100)
+    private String ciudad;
+
+    @Column(length = 20)
+    private String codigoPostal;
+
+    /** Marca si es la dirección predeterminada del usuario */
+    @Column(nullable = false)
+    private boolean esPrincipal = false;
+
+    @Column(length = 100)
+    private String referencia;
 }

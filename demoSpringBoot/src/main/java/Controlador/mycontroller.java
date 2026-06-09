@@ -1,14 +1,17 @@
 package Controlador;
 
 import Modelo.Comentario;
+import Modelo.Rol;
 import Repositorio.ComentarioRepository;
 import Repositorio.ProductoRepository;
 import Modelo.Usuario;
 import Repositorio.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,6 +27,10 @@ public class mycontroller {
 
     @Autowired
     private ComentarioRepository comentarioRepo;
+
+    // FIX: se inyecta PasswordEncoder para hashear y verificar contraseñas correctamente
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/")
     public String inicio(Model model) {
@@ -41,14 +48,18 @@ public class mycontroller {
     }
 
     @PostMapping("/ingresar")
-    public String procesarLogin(@RequestParam String correo, 
-                               @RequestParam String password, 
-                               Model model) {
+    public String procesarLogin(@RequestParam String correo,
+                                @RequestParam String password,
+                                Model model) {
         Optional<Usuario> userOpt = usuarioRepo.findByCorreo(correo);
 
-        if (userOpt.isPresent() && userOpt.get().getPassword().equals(password)) {
-            // Corregido: Comparación con Integer rolId (1 = ADMIN)
-            return userOpt.get().getRolId() == 1 ? "redirect:/admin" : "redirect:/";
+        // FIX 1: usar getContrasena() en lugar de getPassword() (que no existe)
+        // FIX 2: verificar con BCrypt en vez de comparar texto plano
+        // FIX 3: getRolId() no existe → usar getRol().getId() para comparar el rol
+        if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getContrasena())) {
+            Usuario u = userOpt.get();
+            Integer rolId = (u.getRol() != null) ? u.getRol().getId() : 2;
+            return rolId == 1 ? "redirect:/admin" : "redirect:/";
         } else {
             model.addAttribute("error", "Credenciales incorrectas");
             return "login";
@@ -62,16 +73,24 @@ public class mycontroller {
     }
 
     @PostMapping("/registrar")
-    public String guardarUsuario(@ModelAttribute Usuario usuario, 
-                                 @RequestParam String confirmPassword, 
+    public String guardarUsuario(@ModelAttribute Usuario usuario,
+                                 @RequestParam String confirmPassword,
                                  Model model) {
-        if (!usuario.getPassword().equals(confirmPassword)) {
+        // FIX 1: usar getContrasena() en lugar de getPassword()
+        if (!usuario.getContrasena().equals(confirmPassword)) {
             model.addAttribute("error", "Las contraseñas no coinciden");
             return "registro";
         }
-        
-        usuario.setRolId(2); // Cliente por defecto
-        usuarioRepo.save(usuario); 
+
+        // FIX 2: setRolId() no existe → asignar un objeto Rol con id=2
+        Rol rolCliente = new Rol();
+        rolCliente.setId(2);
+        usuario.setRol(rolCliente);
+
+        // FIX 3: hashear la contraseña antes de guardar (nunca en texto plano)
+        usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
+
+        usuarioRepo.save(usuario);
         return "redirect:/login";
     }
 

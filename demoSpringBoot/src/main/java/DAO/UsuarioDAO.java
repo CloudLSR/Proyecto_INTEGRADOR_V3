@@ -1,10 +1,21 @@
 package DAO;
 
 import Modelo.Usuario;
-import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 import java.util.Optional;
 
-public interface UsuarioDAO extends JpaRepository<Usuario, Long> {
-    // Spring entenderá que debe buscar en la columna mapeada a 'correo' (usuCorreo)
-    Optional<Usuario> findByCorreo(String correo);
+/**
+ * Interfaz DAO para Usuario.
+ * Aplica principio de Inversión de Dependencias (DIP) de SOLID:
+ * los servicios dependen de esta abstracción, no de la implementación concreta.
+ */
+public interface UsuarioDAO {
+    Usuario guardar(Usuario usuario);
+    Optional<Usuario> buscarPorId(Integer id);
+    Optional<Usuario> buscarPorCorreo(String correo);
+    Optional<Usuario> buscarPorResetToken(String token);
+    List<Usuario> listarTodos();
+    void eliminar(Integer id);
+    boolean existePorCorreo(String correo);
 }

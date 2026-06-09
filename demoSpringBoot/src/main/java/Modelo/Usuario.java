@@ -1,83 +1,83 @@
 package Modelo;
 
 import jakarta.persistence.*;
-import java.util.Date;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entidad Usuario — almacena toda la información del cliente:
+ * datos personales, contraseña encriptada, rol, historial de
+ * direcciones y métodos de pago.
+ *
+ * Principio SOLID aplicado:
+ *   SRP — solo contiene estado del usuario.
+ *   OCP — extensible mediante Rol sin modificar esta clase.
+ */
 @Entity
 @Table(name = "usuario")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usuId")
-    private Long id;
+    private Integer id;
 
-    @Column(name = "usuNombre")
+    @NotBlank(message = "El nombre es obligatorio")
+    @Column(name = "usuNombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(name = "usuApellido")
+    @Column(name = "usuApellido", length = 100)
     private String apellido;
 
-    @Column(name = "usuCorreo", unique = true)
+    @NotBlank(message = "El correo es obligatorio")
+    @Email(message = "Formato de correo inválido")
+    @Column(name = "usuCorreo", nullable = false, unique = true, length = 150)
     private String correo;
 
-    @Column(name = "usuContrasena")
-    private String password;
+    /** Siempre almacenada con BCrypt — NUNCA en texto plano */
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Column(name = "usuContrasena", nullable = false)
+    private String contrasena;
 
-    @Column(name = "usuTelefono")
+    @Size(max = 20, message = "Teléfono máximo 20 caracteres")
+    @Column(name = "usuTelefono", length = 20)
     private String telefono;
 
-    @Column(name = "usuDireccion")
-    private String direccion;
+    /** FK al rol (1=Admin, 2=Cliente) */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "rolId_fk")
+    private Rol rol;
 
-    @Column(name = "rolId_fk")
-    private Integer rolId;
-    
+    // ── Campos de recuperación de contraseña ────────────────────
+    @Column(name = "resetToken", length = 200)
+    private String resetToken;
+
+    @Column(name = "resetTokenExpiry")
+    private LocalDateTime resetTokenExpiry;
+
+    // ── Relaciones ───────────────────────────────────────────────
+
+    /** Una cuenta puede tener múltiples direcciones de envío */
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Direccion> direcciones = new ArrayList<>();
+
+    /** Una cuenta puede tener múltiples métodos de pago guardados */
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MetodoPago> metodosPago = new ArrayList<>();
+
+    /** Historial de órdenes del cliente */
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    private List<Direccion> direcciones;
-    
-    @Column(name = "usuFechaNacimiento")
-    @Temporal(TemporalType.DATE)
-    private Date fechaNacimiento;
-
-    @Column(name = "usuGenero")
-    private String genero;
-
-    @Column(name = "usuFechaRegistro", updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaRegistro;
-
-    // Métodos para inicializar la fecha de registro automáticamente
-    @PrePersist
-    protected void onCreate() {
-        fechaRegistro = new Date();
-    }
-    // Constructores
-    public Usuario() {}
-
-    // Getters y Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public String getApellido() { return apellido; }
-    public void setApellido(String apellido) { this.apellido = apellido; }
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
-    public String getDireccion() { return direccion; }
-    public void setDireccion(String direccion) { this.direccion = direccion; }
-    public Integer getRolId() { return rolId; }
-    public void setRolId(Integer rolId) { this.rolId = rolId; }
-    public void setDirecciones(List<Direccion> direcciones) {this.direcciones = direcciones;}
-    public List<Direccion> getDirecciones() {return direcciones;}
-    public Date getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(Date fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
-    public String getGenero() { return genero; }
-    public void setGenero(String genero) { this.genero = genero; }
-    public Date getFechaRegistro() { return fechaRegistro; }
+    private List<Orden> ordenes = new ArrayList<>();
 }

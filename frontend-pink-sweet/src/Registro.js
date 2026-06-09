@@ -30,10 +30,12 @@ function Registro() {
 
     setCargando(true);
     try {
-      const res = await fetch('http://localhost:8081/api/auth/registrar', {
+      // FIX: el endpoint correcto es /api/auth/registro (no /api/auth/registrar)
+      // FIX: el backend espera "contrasena" (no "password")
+      const res = await fetch('http://localhost:8081/api/auth/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, correo, password }),
+        body: JSON.stringify({ nombre, correo, contrasena: password }),
       });
 
       const data = await res.json();
@@ -41,7 +43,7 @@ function Registro() {
       if (res.ok) {
         navigate('/login');
       } else {
-        setError(data.mensaje || 'Error al registrarse. Intenta de nuevo.');
+        setError(data.error || 'Error al registrarse. Intenta de nuevo.');
       }
     } catch (err) {
       setError('No se pudo conectar al servidor.');
