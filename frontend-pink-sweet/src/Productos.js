@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import logoPrincipal from './assets/logo.png';
-import bannerPrincipal from './assets/banner.png';
-import iconUser from './assets/icon-user.png';
-import iconCart from './assets/icon-cart.png';
 import iconShop from './assets/icon-shop.png';
-import iconLupa from './assets/icon-lupa.png';
 import dividerTitle from './assets/divider-title.png';
 import dividerSub from './assets/divider-subtitle.png';
 import dividerProduct from './assets/divider-product.png';
@@ -243,32 +239,8 @@ const Productos = () => {
   const dataActual = CATALOGO[categoriaActiva];
 
   return (
-    <div style={{ backgroundColor: '#FFEFEF', fontFamily: 'sans-serif' }}>
+    <div style={{ backgroundColor: '#FFEFEF', fontFamily: 'sans-serif', minHeight: '100vh', paddingBottom: '80px' }}>
       
-      <header style={{ backgroundColor: '#C6676D', width: '100%' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <img src={bannerPrincipal} alt="Sweet Cream Rose Logo" style={{ height: '45px', objectFit: 'contain', cursor: 'pointer' }} />
-          <nav style={{ display: 'flex', gap: '15px' }}>
-            <button style={{ border: 'none', padding: '8px 20px', backgroundColor: '#EAAFB8', color: '#5A3E41', fontFamily: 'Poppins-SemiBold', fontSize: '14px', cursor: 'pointer' }}>INICIO</button>
-            <button style={{ border: 'none', padding: '8px 20px', backgroundColor: '#FFEFEF', color: '#5A3E41', fontFamily: 'Poppins-SemiBold', fontSize: '14px', cursor: 'pointer' }}>PRODUCTOS</button>
-            <button style={{ border: 'none', padding: '8px 20px', backgroundColor: '#EAAFB8', color: '#5A3E41', fontFamily: 'Poppins-SemiBold', fontSize: '14px', cursor: 'pointer' }}>OFERTAS</button>
-            <button style={{ border: 'none', padding: '8px 20px', backgroundColor: '#EAAFB8', color: '#5A3E41', fontFamily: 'Poppins-SemiBold', fontSize: '14px', cursor: 'pointer' }}>NOSOTROS</button>
-          </nav>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'white', borderRadius: '4px', padding: '0 10px', width: '220px' }}>
-              <input type="text" placeholder="Buscar..." style={{ border: 'none', outline: 'none', width: '100%', padding: '8px 0', backgroundColor: 'transparent', fontFamily: 'sans-serif' }} />
-              <img src={iconLupa} alt="Lupa" style={{ height: '16px', cursor: 'pointer', marginLeft: '5px' }} />
-            </div>
-            <img src={iconUser} alt="Usuario" style={{ height: '32px', cursor: 'pointer' }} />
-            <div style={{ position: 'relative', cursor: 'pointer' }}>
-              <img src={iconCart} alt="Carrito" style={{ height: '32px' }} />
-              <div style={{ position: 'absolute', top: '-4px', right: '-4px', backgroundColor: 'white', color: '#C6676D', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '10px', fontWeight: 'bold' }}>0</div>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <section style={{ textAlign: 'center', padding: '40px 20px' }}>
         <img src={logoPrincipal} alt="Logo Sweet Cream Rose" style={{ width: '230px', objectFit: 'contain', marginBottom: '15px' }} />
         <h2 style={{ color: '#5A3E41', margin: '10 0 25px 30', fontFamily: 'Poppins-Bold', fontSize: '30px' }}>PRODUCTOS</h2>
@@ -281,7 +253,7 @@ const Productos = () => {
               key={cat.id} 
               onClick={() => setCategoriaActiva(cat.id)}
               style={{ 
-                gridColumn: cat.col ? cat.col : 'auto', // Centra los últimos dos si tienen "col"
+                gridColumn: cat.col ? cat.col : 'auto', 
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', height: '90px', 
                 border: '2px solid #DE788E', borderRadius: '10px', padding: '0 15px', 
                 fontFamily: 'Poppins-SemiBold', cursor: 'pointer', fontWeight: 'bold',
@@ -368,7 +340,7 @@ const Productos = () => {
 
       </main>
 
-      <section style={{ backgroundColor: '#FACFD8', padding: '0 70px', margin: '80px auto', maxWidth: '940px', height: '175px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}>
+      <section style={{ backgroundColor: '#FACFD8', padding: '0 70px', margin: '80px auto 0', maxWidth: '940px', height: '175px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
           <div style={{ width: '130px', height: '130px', flexShrink: 0, backgroundColor: 'white', border: '4px solid #EAAFB8', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
             <img src={iconShop} alt="Icono Tienda" style={{ width: '65%', height: 'auto', objectFit: 'contain' }} />
@@ -381,53 +353,6 @@ const Productos = () => {
         <button style={{ backgroundColor: '#C3666D', color: 'white', fontSize: '16px', fontFamily: 'Poppins-Bold', border: 'none', padding: '12px 30px', borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>CONTACTAR <span style={{ fontSize: '18px' }}>›</span></button>
       </section>
 
-      <footer style={{ backgroundColor: '#C2656C', color: 'white', padding: '60px 40px 20px 40px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '160px', alignItems: 'flex-start', width: '100%', marginBottom: '40px', maxWidth: '1100px' }}>
-          <div style={{ textAlign: 'center', maxWidth: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ width: '120px', height: '120px', backgroundColor: 'white', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', margin: '0 auto' }}>
-                <img src={logoPrincipal} alt="Logo Sweet Cream Rose" style={{ width: '80%', height: 'auto', objectFit: 'contain' }} />
-            </div>
-            <p style={{ fontSize: '12px', marginTop: '15px', color: 'white', lineHeight: '1.4', maxWidth: '180px' }}>En un mundo de experiencias duras con un pastel dale dulzura.</p>
-          </div>
-          <div>
-            <h4 style={{ margin: '0 0 15px 0', fontSize: '16px', fontWeight: 'bold', color: 'white' }}>ENLACES</h4>
-            <ul style={{ listStyle: 'none', padding: '0', margin: '0', lineHeight: '2', fontSize: '14px' }}>
-                <li style={{ cursor: 'pointer', color: 'white' }}>Inicio</li>
-                <li style={{ cursor: 'pointer', color: 'white' }}>Productos</li>
-                <li style={{ cursor: 'pointer', color: 'white' }}>Ofertas</li>
-                <li style={{ cursor: 'pointer', color: 'white' }}>Nosotros</li>
-            </ul>
-          </div>
-          <div>
-            <h4 style={{ margin: '0 0 15px 0', fontSize: '16px', fontWeight: 'bold', color: 'white' }}>AYUDA</h4>
-            <ul style={{ listStyle: 'none', padding: '0', margin: '0', lineHeight: '2', fontSize: '14px' }}>
-                <li style={{ cursor: 'pointer', color: 'white' }}>Preguntas frecuentes</li>
-                <li style={{ cursor: 'pointer', color: 'white' }}>Políticas de envío</li>
-                <li style={{ cursor: 'pointer', color: 'white' }}>Términos y condiciones</li>
-                <li style={{ cursor: 'pointer', color: 'white' }}>Políticas de privacidad</li>
-            </ul>
-          </div>
-          <div>
-            <h4 style={{ margin: '0 0 15px 0', fontSize: '16px', fontWeight: 'bold', color: 'white' }}>CONTÁCTANOS</h4>
-            <ul style={{ listStyle: 'none', padding: '0', margin: '0', lineHeight: '2', fontSize: '14px' }}>
-                <li style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white' }}><img src={iconUser} alt="Pin Icon" style={{ width: '16px', height: '16px' }} />Lima, Perú</li>
-                <li style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white' }}><img src={iconUser} alt="Phone Icon" style={{ width: '16px', height: '16px' }} />+51 987654900</li>
-                <li style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white' }}><img src={iconUser} alt="Envelope Icon" style={{ width: '16px', height: '16px' }} />info@SweetCreamRose.com</li>
-                <li style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white' }}><img src={iconUser} alt="Clock Icon" style={{ width: '16px', height: '16px' }} />Lunes a Sábado: 9am - 6pm</li>
-            </ul>
-          </div>
-        </div>
-        <div style={{ width: '100%', borderTop: '1px solid #EAAFB8', marginBottom: '20px' }}></div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <span style={{ fontSize: '15px', fontWeight: 'bold', color: 'white', fontFamily: 'Poppins-Bold' }}>SÍGUENOS</span>
-            <img src={iconUser} alt="Facebook" style={{ width: '25px', height: '25px', cursor: 'pointer' }} />
-            <img src={iconUser} alt="Instagram" style={{ width: '25px', height: '25px', cursor: 'pointer' }} />
-            <img src={iconUser} alt="WhatsApp" style={{ width: '25px', height: '25px', cursor: 'pointer' }} />
-          </div>
-          <p style={{ fontSize: '13px', color: 'white', margin: '0', textAlign: 'right', fontFamily: 'Poppins-Regular' }}>© 2026 Sweet Cream Rose. Todos los derechos reservados.</p>
-        </div>
-      </footer>
     </div>
   );
 };
