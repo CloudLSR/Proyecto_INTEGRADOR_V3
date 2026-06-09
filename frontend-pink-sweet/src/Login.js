@@ -89,7 +89,7 @@ function Login() {
                    value={password} onChange={e => setPassword(e.target.value)}
                    onKeyDown={e => e.key === 'Enter' && handleLogin(e)} />
 
-            <p className="forgot-link">¿Olvidaste tu contraseña?</p>
+            <p className="forgot-link" onClick={() => navigate('/cambiar-password-1')}> ¿Olvidaste tu contraseña?</p>
 
             <button className="btn-main" onClick={handleLogin} disabled={cargando}>
               {cargando ? 'Verificando...' : 'Iniciar sesión'}

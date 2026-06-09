@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App';
 import Login from './Login';
 import Registro from './Registro';
+import CambiarPassword1 from './CambiarPassword1';
 import Perfil from './Perfil';
 // Productos
 import Productos from './Productos';
@@ -18,7 +19,8 @@ root.render(
       <Route path="/login"     element={<Login />} />
       <Route path="/registro"  element={<Registro />} />
       <Route path="/perfil"    element={<Perfil />} />
+      <Route path="/cambiar-password-1" element={<CambiarPassword1 />} />
       <Route path="/productos" element={<Productos />} />
     </Routes>
   </BrowserRouter>
-);
+); 
