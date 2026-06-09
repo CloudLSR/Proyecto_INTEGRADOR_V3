@@ -6,7 +6,7 @@ import footer1Img from './assets/footer_1.png';
 import footer2Img from './assets/footer_2.png';
 import footer3Img from './assets/footer_3.png';
 
-function ConfirmarPedido() {
+function PedidoConfirmado() {
   const navigate = useNavigate();
 
   return (
@@ -19,75 +19,86 @@ function ConfirmarPedido() {
         <div className="cart-welcome-header">
           <img src="/assets/products/logo.png" alt="Sweet Cream Rose" className="cart-circle-logo"
             onError={e => e.target.style.display = 'none'} />
-          <p className="cart-welcome-text">Tu espacio personal para organizar tus pedidos, favoritos y disfrutar de una experiencia más dulce.</p>
+          <p className="cart-welcome-text" style={{ fontStyle: 'italic', color: '#b86b6b' }}>
+            Gracias por tu compra
+          </p>
         </div>
 
         {/* ══ Título ══ */}
-        <h2 className="cart-main-title">CONFIRMA TU PEDIDO</h2>
+        <h2 className="cart-main-title">¡TU PEDIDO HA SIDO CONFIRMADO!</h2>
         <div className="title-divider"><span>--- ♥️ ---</span></div>
-        <p className="direccion-subtitle">Revisa los detalles de tu pedido antes de pagar</p>
+        <p className="direccion-subtitle">Hemos recibido tu pedido correctamente</p>
 
-        {/* ══ 1. Resumen del pedido ══ */}
+        {/* ══ Número de pedido ══ */}
+        <div className="pedido-numero-box">
+          <div className="pedido-numero-icono-placeholder" />
+          <div className="pedido-numero-info">
+            <span className="pedido-numero-label">NÚMERO DE PEDIDO</span>
+            <span className="pedido-numero">#SRC-2026-0158</span>
+            <span className="pedido-numero-fecha">10 de mayo de 2024 · 11:45 a.m.</span>
+          </div>
+        </div>
+        <p className="direccion-subtitle">
+          Te enviaremos actualizaciones a tu correo y número de contacto
+        </p>
+
+        {/* ══ Resumen del pedido ══ */}
         <section className="confirmar-seccion">
           <div className="confirmar-seccion-titulo">
             <div className="confirmar-icono-placeholder" />
-            <span>1. RESUMEN DEL PEDIDO</span>
+            <span>RESUMEN DEL PEDIDO</span>
           </div>
           <div className="confirmar-tabla">
             <div className="confirmar-fila">
-              <span>Torta de Chocolate Intenso</span>
-              <span className="confirmar-qty">x1</span>
-              <span className="confirmar-precio">S/.35,00</span>
-            </div>
-            <div className="confirmar-fila">
-              <span>Cupcake de Arándanos</span>
-              <span className="confirmar-qty">x2</span>
-              <span className="confirmar-precio">S/.18,00</span>
-            </div>
-            <div className="confirmar-fila">
-              <span>Tequeños de queso (caja x6)</span>
-              <span className="confirmar-qty">x1</span>
-              <span className="confirmar-precio">S/.28,00</span>
-            </div>
-            <div className="confirmar-fila confirmar-subtotal">
               <span>Subtotal (3 productos)</span>
               <span></span>
-              <span>S/.81,00</span>
+              <span className="confirmar-precio">S/35.00</span>
+            </div>
+            <div className="confirmar-fila">
+              <span>Envío (Envío express)</span>
+              <span></span>
+              <span className="confirmar-precio">S/18.00</span>
+            </div>
+            <div className="confirmar-fila">
+              <span>IGV (18%)</span>
+              <span></span>
+              <span className="confirmar-precio">S/28.00</span>
+            </div>
+            <div className="confirmar-fila confirmar-total">
+              <span>TOTAL PAGADO</span>
+              <span></span>
+              <span>S/110.82</span>
             </div>
           </div>
         </section>
 
-        {/* ══ 2. Envío ══ */}
+        {/* ══ Detalles de entrega ══ */}
         <section className="confirmar-seccion">
           <div className="confirmar-seccion-titulo">
             <div className="confirmar-icono-placeholder" />
-            <span>2. Envío</span>
+            <span>DETALLES DE ENTREGA</span>
           </div>
           <div className="confirmar-tabla">
             <div className="confirmar-fila-col">
-              <span className="confirmar-label">Dirección de entrega:</span>
+              <span className="confirmar-label">Dirección:</span>
               <span>Av. Los Rosales 123</span>
               <span>San Borja, Lima - Lima</span>
-              <span style={{ color: '#999', fontSize: '0.8rem' }}>Referencia: Frente al parque, casa blanca con reja negra</span>
+              <span style={{ color: '#999', fontSize: '0.8rem' }}>
+                <strong>Referencia:</strong> Frente al parque, casa blanca con reja negra
+              </span>
             </div>
-            <div className="confirmar-fila">
+            <div className="confirmar-fila-col" style={{ marginTop: 8 }}>
               <span className="confirmar-label">Método de envío:</span>
-              <span></span>
-              <span></span>
-            </div>
-            <div className="confirmar-fila">
               <span>Envío express (30-60 minutos)</span>
-              <span></span>
-              <span className="confirmar-precio">S/.12,00</span>
             </div>
           </div>
         </section>
 
-        {/* ══ 3. Comprobante de pago ══ */}
+        {/* ══ Comprobante emitido ══ */}
         <section className="confirmar-seccion">
           <div className="confirmar-seccion-titulo">
             <div className="confirmar-icono-placeholder" />
-            <span>3. Comprobante de pago</span>
+            <span>COMPROBANTE EMITIDO</span>
           </div>
           <div className="confirmar-tabla">
             <div className="confirmar-fila">
@@ -105,62 +116,44 @@ function ConfirmarPedido() {
               <span></span>
               <span>20123456789</span>
             </div>
+            <div className="pedido-factura-aviso">
+              <div className="confirmar-icono-placeholder" style={{ width: 20, height: 20 }} />
+              <span>Tu factura ha sido generada correctamente. Puedes descargarla o también la hemos enviado a tu correo electrónico</span>
+              <button className="btn-descargar-factura">⬇ DESCARGAR FACTURA</button>
+            </div>
           </div>
         </section>
 
-        {/* ══ 4. Método de pago ══ */}
+        {/* ══ Método de pago ══ */}
         <section className="confirmar-seccion">
           <div className="confirmar-seccion-titulo">
             <div className="confirmar-icono-placeholder" />
-            <span>4. Método de pago</span>
+            <span>MÉTODO DE PAGO</span>
           </div>
-          <div className="confirmar-tabla">
-            <div className="confirmar-fila">
-              <span>Yape</span>
-              <span></span>
-              <span style={{ color: '#888', fontSize: '0.85rem' }}>Paga de forma rápida y segura con yape</span>
-            </div>
+          <div className="confirmar-fila">
+            <span>Yape</span>
+            <span></span>
+            <span style={{ color: '#888', fontSize: '0.85rem' }}>Pago realizado de forma rápida y segura.</span>
           </div>
         </section>
 
-        {/* ══ 5. Resumen de pago ══ */}
-        <section className="confirmar-seccion">
-          <div className="confirmar-seccion-titulo">
-            <div className="confirmar-icono-placeholder" />
-            <span>5. Resumen de pago</span>
+        {/* ══ Tu compra protegida ══ */}
+        <div className="pedido-protegido-box">
+          <div className="confirmar-icono-placeholder" style={{ width: 36, height: 36, borderRadius: '50%' }} />
+          <div>
+            <p style={{ fontWeight: 700, fontSize: '0.88rem', color: '#4A3E3F' }}>Tu compra será 100% protegida</p>
+            <p style={{ fontSize: '0.8rem', color: '#888' }}>Usamos tecnología de encriptación avanzada para proteger tu información.</p>
           </div>
-          <div className="confirmar-tabla">
-            <div className="confirmar-fila">
-              <span>Subtotal (3 productos)</span>
-              <span className="confirmar-qty">x1</span>
-              <span className="confirmar-precio">S/.81,00</span>
-            </div>
-            <div className="confirmar-fila">
-              <span>Envío (Envío express)</span>
-              <span className="confirmar-qty">x2</span>
-              <span className="confirmar-precio">S/.12,00</span>
-            </div>
-            <div className="confirmar-fila">
-              <span>IGV (18%)</span>
-              <span className="confirmar-qty">x1</span>
-              <span className="confirmar-precio">S/.17,82</span>
-            </div>
-            <div className="confirmar-fila confirmar-total">
-              <span>TOTAL</span>
-              <span></span>
-              <span>S/.110,82</span>
-            </div>
-          </div>
-        </section>
+        </div>
 
-        {/* ══ Botón confirmar ══ */}
-        <div className="confirmar-botones">
-            <button className="btn-confirmar-pagar" onClick={() => navigate('/pedido-confirmado')}>
-                CONFIRMAR Y PAGAR
-            </button>
-          <p className="confirmar-seguro">
-            🛡️ Tus datos y pagos están 100% protegidos.
-          </p>
+        {/* ══ Botones ══ */}
+        <div className="pedido-botones">
+          <button className="btn-ver-pedidos" onClick={() => navigate('/perfil')}>
+            VER MIS PEDIDOS
+          </button>
+          <button className="btn-ir-inicio" onClick={() => navigate('/')}>
+            IR AL INICIO
+          </button>
         </div>
 
         {/* ══ Footer info ══ */}
@@ -178,6 +171,7 @@ function ConfirmarPedido() {
             <span>Envíos seguros y rápidos</span>
           </div>
           <div className="footer-info-item">
+            {/* icono pendiente */}
             <span>Atención personalizada para ti</span>
           </div>
         </div>
@@ -189,4 +183,4 @@ function ConfirmarPedido() {
   );
 }
 
-export default ConfirmarPedido;
+export default PedidoConfirmado;

@@ -847,3 +847,119 @@
   color: #888;
   text-align: center;
 }
+
+/* ══ PedidoConfirmado ══ */
+.pedido-numero-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fdf0f0;
+  border: 1.5px solid #f0d0d0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  max-width: 700px;
+  margin: 0 auto 12px auto;
+}
+
+.pedido-numero-icono-placeholder {
+  width: 50px;
+  height: 50px;
+  background: #f0d0d0;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.pedido-numero-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pedido-numero-label {
+  font-size: 0.78rem;
+  color: #b86b6b;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.pedido-numero {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #C97C7A;
+}
+
+.pedido-numero-fecha {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.pedido-factura-aviso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fdf0f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-descargar-factura {
+  background: #fff;
+  border: 1.5px solid #C97C7A;
+  color: #C97C7A;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-descargar-factura:hover { background: #fdf0f0; }
+
+.pedido-protegido-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fdf0f0;
+  border: 1.5px solid #f0d0d0;
+  border-radius: 12px;
+  padding: 16px;
+  max-width: 700px;
+  margin: 0 auto 16px auto;
+}
+
+.pedido-botones {
+  display: flex;
+  gap: 12px;
+  max-width: 700px;
+  margin: 0 auto 20px auto;
+}
+
+.btn-ver-pedidos {
+  flex: 1;
+  background: #fff;
+  color: #C97C7A;
+  border: 2px solid #C97C7A;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-ver-pedidos:hover { background: #fdf0f0; }
+
+.btn-ir-inicio {
+  flex: 1;
+  background: #C97C7A;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-ir-inicio:hover { background: #a85f5d; }

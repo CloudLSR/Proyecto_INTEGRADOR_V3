@@ -13,6 +13,7 @@ import Carrito from './Carrito';
 import DireccionEnvio from './DireccionEnvio';
 import OpcionesEnvio from './OpcionesEnvio';
 import ConfirmarPedido from './ConfirmarPedido';
+import PedidoConfirmado from './PedidoConfirmado';
 // Productos
 import Productos from './Productos';
 
@@ -35,6 +36,7 @@ root.render(
       <Route path="/direccion-envio" element={<DireccionEnvio />} />
       <Route path="/opciones-envio" element={<OpcionesEnvio />} />
       <Route path="/confirmar-pedido" element={<ConfirmarPedido />} />
+      <Route path="/pedido-confirmado" element={<PedidoConfirmado />} />
     </Routes>
   </BrowserRouter>
 ); 
