@@ -6,6 +6,7 @@ import Login from './Login';
 import Registro from './Registro';
 import CambiarPassword1 from './CambiarPassword1';
 import CambiarPassword2 from './CambiarPassword2';
+import CambiarPassword3 from './CambiarPassword3';
 import Perfil from './Perfil';
 // Productos
 import Productos from './Productos';
@@ -22,6 +23,7 @@ root.render(
       <Route path="/perfil"    element={<Perfil />} />
       <Route path="/cambiar-password-1" element={<CambiarPassword1 />} />
       <Route path="/cambiar-password-2" element={<CambiarPassword2 />} />
+      <Route path="/cambiar-password-3" element={<CambiarPassword3 />} />
       <Route path="/productos" element={<Productos />} />
     </Routes>
   </BrowserRouter>

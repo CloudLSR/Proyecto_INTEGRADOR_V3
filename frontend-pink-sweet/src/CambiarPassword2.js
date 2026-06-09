@@ -5,117 +5,117 @@ import cupcakeImg from './assets/cupcake_grafico.png';
 import mensajeRosaImg from './assets/mensajeRosa.png';
 
 function CambiarPassword2() {
-  const navigate = useNavigate();
-  const [codigo, setCodigo] = useState(['', '', '', '', '', '']);
-  const [error, setError] = useState('');
-  const [cargando, setCargando] = useState(false);
-  const [segundos, setSegundos] = useState(48);
-  const inputsRef = useRef([]);
+    const navigate = useNavigate();
+    const [codigo, setCodigo] = useState(['', '', '', '', '', '']);
+    const [error, setError] = useState('');
+    const [cargando, setCargando] = useState(false);
+    const [segundos, setSegundos] = useState(48);
+    const inputsRef = useRef([]);
 
-  const correo = localStorage.getItem('correo_recuperacion') || 'user@sweetcreamrose.com';
+    const correo = localStorage.getItem('correo_recuperacion') || 'user@sweetcreamrose.com';
 
-  // ── Temporizador regresivo ──
-  useEffect(() => {
+    // ── Temporizador regresivo ──
+    useEffect(() => {
     if (segundos <= 0) return;
     const timer = setInterval(() => {
-      setSegundos(prev => prev - 1);
+        setSegundos(prev => prev - 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [segundos]);
+    }, [segundos]);
 
-  const formatTiempo = (s) => {
+    const formatTiempo = (s) => {
     const m = Math.floor(s / 60).toString().padStart(2, '0');
     const seg = (s % 60).toString().padStart(2, '0');
     return `(${m}:${seg})`;
-  };
+    };
 
   // ── Manejar entrada en cada cajita ──
-  const handleChange = (value, index) => {
-    if (!/^\d?$/.test(value)) return;
-    const nuevo = [...codigo];
-    nuevo[index] = value;
-    setCodigo(nuevo);
-    if (value && index < 5) {
-      inputsRef.current[index + 1].focus();
-    }
-  };
+    const handleChange = (value, index) => {
+        if (!/^\d?$/.test(value)) return;
+        const nuevo = [...codigo];
+        nuevo[index] = value;
+        setCodigo(nuevo);
+        if (value && index < 5) {
+            inputsRef.current[index + 1].focus();
+        }
+    };
 
   // ── Manejar backspace ──
-  const handleKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && !codigo[index] && index > 0) {
-      inputsRef.current[index - 1].focus();
-    }
-  };
+    const handleKeyDown = (e, index) => {
+        if (e.key === 'Backspace' && !codigo[index] && index > 0) {
+            inputsRef.current[index - 1].focus();
+        }
+    };
 
   // ── Reenviar código ──
-  const handleReenviar = () => {
-    if (segundos > 0) return;
-    setSegundos(48);
-    setCodigo(['', '', '', '', '', '']);
-    fetch('http://localhost:8081/api/auth/recuperar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ correo }),
-    }).catch(() => {});
-  };
+    const handleReenviar = () => {
+        if (segundos > 0) return;
+        setSegundos(48);
+        setCodigo(['', '', '', '', '', '']);
+        fetch('http://localhost:8081/api/auth/recuperar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo }),
+        }).catch(() => {});
+    };
 
   // ── Verificar código ──
-  const handleVerificar = async () => {
-    const codigoCompleto = codigo.join('');
-    if (codigoCompleto.length < 6) {
-      setError('Por favor ingresa el código completo de 6 dígitos.');
-      return;
-    }
-    setError('');
-    setCargando(true);
-    try {
-      const res = await fetch('http://localhost:8081/api/auth/verificar-codigo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ correo, codigo: codigoCompleto }),
-      });
-      if (res.ok) {
-        navigate('/cambiar-password-3');
-      } else {
-        const data = await res.json();
-        setError(data.mensaje || 'Código incorrecto. Intenta nuevamente.');
-      }
-    } catch {
-      setError('No se pudo conectar al servidor.');
-    } finally {
-      setCargando(false);
-    }
-  };
+    const handleVerificar = async () => {
+        const codigoCompleto = codigo.join('');
+        if (codigoCompleto.length < 6) {
+            setError('Por favor ingresa el código completo de 6 dígitos.');
+            return;
+        }
+        setError('');
+        setCargando(true);
+        try {
+            const res = await fetch('http://localhost:8081/api/auth/verificar-codigo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ correo, codigo: codigoCompleto }),
+            });
+            if (res.ok) {
+                navigate('/cambiar-password-3');
+            } else {
+                const data = await res.json();
+                setError(data.mensaje || 'Código incorrecto. Intenta nuevamente.');
+            }
+        } catch {
+            setError('No se pudo conectar al servidor.');
+        } finally {
+            setCargando(false);
+        }
+    };
 
-  return (
+    return (
     <div className="auth-overlay">
-      <div className="auth-card">
+        <div className="auth-card">
 
         {/* ── Panel rosado izquierdo ── */}
         <div className="panel-left">
-          <h2 className="welcome-title">
-            Bienvenido a<br />
+            <h2 className="welcome-title">
+                Bienvenido a<br />
             <span>Sweet Cream Rose</span>
-          </h2>
-          <div className="panel-middle">
-            <img src={cupcakeImg} alt="Postre" className="food-img" />
-            <p className="welcome-desc">
-              Donde Más que una torta, creamos momentos dulces que acompañan
-              tus mejores celebraciones, con sabor, dedicación y un toque de
-              felicidad en cada porción.
-            </p>
-          </div>
-          <button className="btn-outline" onClick={() => navigate('/registro')}>
+            </h2>
+            <div className="panel-middle">
+                <img src={cupcakeImg} alt="Postre" className="food-img" />
+                <p className="welcome-desc">
+                    Donde Más que una torta, creamos momentos dulces que acompañan
+                    tus mejores celebraciones, con sabor, dedicación y un toque de
+                    felicidad en cada porción.
+                </p>
+            </div>
+            <button className="btn-outline" onClick={() => navigate('/registro')}>
             Regístrase
-          </button>
+            </button>
         </div>
 
         {/* ── Panel blanco derecho ── */}
         <div className="panel-right">
-          <div className="form-content">
+            <div className="form-content">
 
             <button className="back-link" onClick={() => navigate('/cambiar-password-1')}>
-              ← Volver
+                ← Volver
             </button>
 
             <img src={mensajeRosaImg} alt="Mensaje" className="recover-icon-img" />
@@ -145,7 +145,7 @@ function CambiarPassword2() {
                     onChange={e => handleChange(e.target.value, i)}
                     onKeyDown={e => handleKeyDown(e, i)}
                 />
-              ))}
+                ))}
             </div>
 
             {/* Reenviar código + temporizador */}
@@ -172,12 +172,12 @@ function CambiarPassword2() {
                 {cargando ? 'Verificando...' : 'Verificar código'}
             </button>
 
-          </div>
+            </div>
         </div>
 
-      </div>
+        </div>
     </div>
-  );
+    );
 }
 
 export default CambiarPassword2;
