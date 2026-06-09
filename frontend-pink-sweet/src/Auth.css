@@ -728,3 +728,122 @@
   font-size: 0.82rem;
   color: #666;
 }
+
+
+/* ══ ConfirmarPedido ══ */
+.confirmar-seccion {
+  background: #fff;
+  border: 1.5px solid #f0d0d0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  max-width: 700px;
+  margin: 0 auto 14px auto;
+}
+
+.confirmar-seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #4A3E3F;
+  background: #fdf0f0;
+  margin: -16px -20px 14px -20px;
+  padding: 12px 20px;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 1px solid #f0d0d0;
+}
+
+.confirmar-icono-placeholder {
+  width: 24px;
+  height: 24px;
+  background: #f0d0d0;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.confirmar-tabla {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.confirmar-fila {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  font-size: 0.88rem;
+  color: #555;
+  padding: 4px 0;
+  border-bottom: 1px solid #f9f0f0;
+}
+
+.confirmar-fila-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.88rem;
+  color: #555;
+  padding: 4px 0;
+  border-bottom: 1px solid #f9f0f0;
+}
+
+.confirmar-label {
+  font-weight: 600;
+  color: #4A3E3F;
+}
+
+.confirmar-qty {
+  color: #999;
+  font-size: 0.82rem;
+}
+
+.confirmar-precio {
+  font-weight: 600;
+  color: #4A3E3F;
+  text-align: right;
+}
+
+.confirmar-subtotal {
+  font-weight: 600;
+  color: #4A3E3F;
+  border-top: 1px solid #f0d0d0;
+  padding-top: 8px;
+}
+
+.confirmar-total {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #C97C7A;
+  border-top: 2px solid #f0d0d0;
+  padding-top: 8px;
+}
+
+.confirmar-botones {
+  max-width: 700px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-confirmar-pagar {
+  width: 100%;
+  background: #C97C7A;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+.btn-confirmar-pagar:hover { background: #a85f5d; }
+
+.confirmar-seguro {
+  font-size: 0.82rem;
+  color: #888;
+  text-align: center;
+}

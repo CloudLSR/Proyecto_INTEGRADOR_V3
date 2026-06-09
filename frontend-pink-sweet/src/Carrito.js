@@ -199,7 +199,7 @@ function Carrito() {
           </div>
 
           <div className="center-btn-container">
-            <button className="btn-submit-pay" onClick={() => alert('¡Procesando pago con Sweet Cream Rose!')}>
+            <button className="btn-submit-pay" onClick={() => navigate('/confirmar-pedido')}>
               IR A PAGAR →
             </button>
           </div>
