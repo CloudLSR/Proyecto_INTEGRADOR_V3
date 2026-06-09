@@ -97,9 +97,9 @@ function Carrito() {
           </div>
 
           <div className="center-btn-container">
-            <a href="#" className="btn-shipping-options">
+            <button className="btn-shipping-options" onClick={() => navigate('/opciones-envio')}>
               <i className="fas fa-truck"></i> ELEGIR OPCIONES DE ENVÍO
-            </a>
+            </button>
           </div>
         </section>
 

@@ -11,6 +11,7 @@ import CambiarPassword4 from './CambiarPassword4';
 import Perfil from './Perfil';
 import Carrito from './Carrito';
 import DireccionEnvio from './DireccionEnvio';
+import OpcionesEnvio from './OpcionesEnvio';
 // Productos
 import Productos from './Productos';
 
@@ -31,6 +32,7 @@ root.render(
       <Route path="/productos" element={<Productos />} />
       <Route path="/carrito" element={<Carrito />} />
       <Route path="/direccion-envio" element={<DireccionEnvio />} />
+      <Route path="/opciones-envio" element={<OpcionesEnvio />} />
     </Routes>
   </BrowserRouter>
 ); 

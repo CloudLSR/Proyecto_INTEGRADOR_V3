@@ -143,7 +143,7 @@ function DireccionEnvio() {
 
         <Footer />
     </div>
-  );
+    );
 }
 
 export default DireccionEnvio;
