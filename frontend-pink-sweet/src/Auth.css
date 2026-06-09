@@ -349,3 +349,39 @@
 .btn-outline-cambiar {
   margin-top: -50px;
 }
+
+/* ── Código de verificación ── */
+.codigo-boxes {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.codigo-input {
+  width: 44px;
+  height: 52px;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #58413B;
+  background: #fff;
+  border: 1.5px solid #d4a0a0;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.codigo-input:focus { border-color: #c47b7b; }
+
+/* ── Reenviar + timer ── */
+.reenviar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.timer-text {
+  font-size: 0.85rem;
+  color: #999;
+}
