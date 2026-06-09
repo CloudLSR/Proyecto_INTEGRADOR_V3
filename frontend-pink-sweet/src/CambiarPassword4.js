@@ -58,7 +58,7 @@ function CambiarPassword4() {
                     <div>
                         <p className="seguridad-titulo">Por tu seguridad</p>
                         <p className="seguridad-texto">
-                            Si solicitaste este cambio, por favor comunícate con el administrador del sistema.
+                            Si no solicitaste este cambio, por favor comunícate con el administrador del sistema.
                         </p>
                     </div>
                 </div>

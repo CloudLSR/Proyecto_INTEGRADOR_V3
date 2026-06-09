@@ -1,183 +1,144 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
 import cupcakeImg from './assets/cupcake_grafico.png';
 import mensajeRosaImg from './assets/mensajeRosa.png';
 
+/**
+ * CambiarPassword2 — Pantalla de confirmación de envío de enlace.
+ *
+ * NOTA TÉCNICA: El backend (AuthController) usa el flujo de TOKEN JWT de
+ * recuperación, NO códigos de 6 dígitos. El enlace que llega al correo
+ * contiene el token y redirige a /cambiar-password-3?token=XXX.
+ *
+ * Esta pantalla informa al usuario que revise su correo y permite reenviar.
+ */
 function CambiarPassword2() {
-    const navigate = useNavigate();
-    const [codigo, setCodigo] = useState(['', '', '', '', '', '']);
-    const [error, setError] = useState('');
-    const [cargando, setCargando] = useState(false);
-    const [segundos, setSegundos] = useState(48);
-    const inputsRef = useRef([]);
+  const navigate = useNavigate();
+  const [segundos, setSegundos] = useState(48);
+  const [reenviando, setReenviando] = useState(false);
+  const [mensajeReenvio, setMensajeReenvio] = useState('');
 
-    const correo = localStorage.getItem('correo_recuperacion') || 'user@sweetcreamrose.com';
+  const correo = localStorage.getItem('correo_recuperacion') || 'tu correo';
 
-    // ── Temporizador regresivo ──
-    useEffect(() => {
+  // ── Temporizador regresivo ──
+  useEffect(() => {
     if (segundos <= 0) return;
     const timer = setInterval(() => {
-        setSegundos(prev => prev - 1);
+      setSegundos(prev => prev - 1);
     }, 1000);
     return () => clearInterval(timer);
-    }, [segundos]);
+  }, [segundos]);
 
-    const formatTiempo = (s) => {
+  const formatTiempo = (s) => {
     const m = Math.floor(s / 60).toString().padStart(2, '0');
     const seg = (s % 60).toString().padStart(2, '0');
     return `(${m}:${seg})`;
-    };
+  };
 
-  // ── Manejar entrada en cada cajita ──
-    const handleChange = (value, index) => {
-        if (!/^\d?$/.test(value)) return;
-        const nuevo = [...codigo];
-        nuevo[index] = value;
-        setCodigo(nuevo);
-        if (value && index < 5) {
-            inputsRef.current[index + 1].focus();
-        }
-    };
+  // ── Reenviar enlace ──
+  const handleReenviar = async () => {
+    if (segundos > 0) return;
+    setReenviando(true);
+    setMensajeReenvio('');
+    try {
+      // FIX: endpoint correcto del backend
+      await fetch('http://localhost:8081/api/auth/olvide-contrasena', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo }),
+      });
+      setSegundos(48);
+      setMensajeReenvio('¡Enlace reenviado! Revisa tu bandeja de entrada.');
+    } catch {
+      setMensajeReenvio('No se pudo reenviar. Intenta de nuevo.');
+    } finally {
+      setReenviando(false);
+    }
+  };
 
-  // ── Manejar backspace ──
-    const handleKeyDown = (e, index) => {
-        if (e.key === 'Backspace' && !codigo[index] && index > 0) {
-            inputsRef.current[index - 1].focus();
-        }
-    };
-
-  // ── Reenviar código ──
-    const handleReenviar = () => {
-        if (segundos > 0) return;
-        setSegundos(48);
-        setCodigo(['', '', '', '', '', '']);
-        fetch('http://localhost:8081/api/auth/recuperar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ correo }),
-        }).catch(() => {});
-    };
-
-  // ── Verificar código ──
-    const handleVerificar = async () => {
-        const codigoCompleto = codigo.join('');
-        if (codigoCompleto.length < 6) {
-            setError('Por favor ingresa el código completo de 6 dígitos.');
-            return;
-        }
-        setError('');
-        setCargando(true);
-        try {
-            const res = await fetch('http://localhost:8081/api/auth/verificar-codigo', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ correo, codigo: codigoCompleto }),
-            });
-            if (res.ok) {
-                navigate('/cambiar-password-3');
-            } else {
-                const data = await res.json();
-                setError(data.mensaje || 'Código incorrecto. Intenta nuevamente.');
-            }
-        } catch {
-            setError('No se pudo conectar al servidor.');
-        } finally {
-            setCargando(false);
-        }
-    };
-
-    return (
+  return (
     <div className="auth-overlay">
-        <div className="auth-card">
+      <div className="auth-card">
 
         {/* ── Panel rosado izquierdo ── */}
         <div className="panel-left">
-            <h2 className="welcome-title">
-                Bienvenido a<br />
+          <h2 className="welcome-title">
+            Bienvenido a<br />
             <span>Sweet Cream Rose</span>
-            </h2>
-            <div className="panel-middle">
-                <img src={cupcakeImg} alt="Postre" className="food-img" />
-                <p className="welcome-desc">
-                    Donde Más que una torta, creamos momentos dulces que acompañan
-                    tus mejores celebraciones, con sabor, dedicación y un toque de
-                    felicidad en cada porción.
-                </p>
-            </div>
-            <button className="btn-outline" onClick={() => navigate('/registro')}>
+          </h2>
+          <div className="panel-middle">
+            <img src={cupcakeImg} alt="Postre" className="food-img" />
+            <p className="welcome-desc">
+              Donde Más que una torta, creamos momentos dulces que acompañan
+              tus mejores celebraciones, con sabor, dedicación y un toque de
+              felicidad en cada porción.
+            </p>
+          </div>
+          <button className="btn-outline" onClick={() => navigate('/registro')}>
             Regístrase
-            </button>
+          </button>
         </div>
 
         {/* ── Panel blanco derecho ── */}
         <div className="panel-right">
-            <div className="form-content">
+          <div className="form-content">
 
             <button className="back-link" onClick={() => navigate('/cambiar-password-1')}>
-                ← Volver
+              ← Volver
             </button>
 
             <img src={mensajeRosaImg} alt="Mensaje" className="recover-icon-img" />
 
-            <h2 className="form-title">Verificar código</h2>
+            <h2 className="form-title">Revisa tu correo</h2>
 
             <p className="hint-text" style={{ color: '#888' }}>
-                Hemos enviado un código de verificación a<br />
-                <span style={{ color: '#b86b6b', fontWeight: '600' }}>{correo}</span>
+              Hemos enviado un enlace de recuperación a<br />
+              <span style={{ color: '#b86b6b', fontWeight: '600' }}>{correo}</span>
             </p>
             <p className="hint-text" style={{ color: '#888' }}>
-                Ingresa el código de 6 dígitos continuar.
+              Haz clic en el enlace del correo para crear<br />
+              tu nueva contraseña.
             </p>
 
-            {error && <div className="error-msg">{error}</div>}
+            {mensajeReenvio && (
+              <div className="error-msg" style={{ background: '#e8f5e9', color: '#2e7d32' }}>
+                {mensajeReenvio}
+              </div>
+            )}
 
-            {/* 6 cajitas del código */}
-            <div className="codigo-boxes">
-                {codigo.map((val, i) => (
-                <input
-                    key={i}
-                    ref={el => inputsRef.current[i] = el}
-                    className="codigo-input"
-                    type="text"
-                    maxLength={1}
-                    value={val}
-                    onChange={e => handleChange(e.target.value, i)}
-                    onKeyDown={e => handleKeyDown(e, i)}
-                />
-                ))}
-            </div>
-
-            {/* Reenviar código + temporizador */}
+            {/* Reenviar enlace + temporizador */}
             <p className="hint-text" style={{ color: '#888', marginTop: '12px' }}>
-                ¿No recibiste el código?
+              ¿No recibiste el correo?
             </p>
             <div className="reenviar-row">
-                <button
+              <button
                 className="link-btn"
                 onClick={handleReenviar}
-                disabled={segundos > 0}
+                disabled={segundos > 0 || reenviando}
                 style={{ opacity: segundos > 0 ? 0.5 : 1 }}
-                >
-                Reenviar código
-                </button>
+              >
+                {reenviando ? 'Reenviando...' : 'Reenviar enlace'}
+              </button>
+              {segundos > 0 && (
                 <span className="timer-text">{formatTiempo(segundos)}</span>
+              )}
             </div>
 
             <button
-                className="btn-main"
-                onClick={handleVerificar}
-                disabled={cargando}
+              className="btn-main"
+              style={{ marginTop: '1rem' }}
+              onClick={() => navigate('/login')}
             >
-                {cargando ? 'Verificando...' : 'Verificar código'}
+              Volver al inicio de sesión
             </button>
 
-            </div>
+          </div>
         </div>
 
-        </div>
+      </div>
     </div>
-    );
+  );
 }
 
 export default CambiarPassword2;

@@ -2,8 +2,12 @@ package Controlador;
 
 import Modelo.Producto;
 import Repositorio.ProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,149 +16,117 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
- * ─────────────────────────────────────────────────────────────────────────────
- * ProductoController — Sweet Cream Rose
- * ─────────────────────────────────────────────────────────────────────────────
- * Controlador REST que gestiona todas las operaciones sobre productos de la
- * repostería artesanal. Se integra con React en http://localhost:3000
+ * Controlador de productos del catálogo.
  *
- * Endpoints:
- *   GET  /api/productos              → Lista todos los productos (para la tienda)
- *   GET  /api/productos/buscar?q=X   → Busca productos por nombre (barra de búsqueda)
- *   POST /api/productos/guardar      → Admin guarda un nuevo producto con imagen
- *   PUT  /api/productos/{id}         → Admin actualiza un producto existente
- *   DELETE /api/productos/{id}       → Admin elimina un producto
- * ─────────────────────────────────────────────────────────────────────────────
+ * ENDPOINTS PÚBLICOS:
+ *   GET /api/productos           → listar todos
+ *   GET /api/productos/{id}      → detalle
+ *   GET /api/productos/buscar?q= → búsqueda por nombre
+ *
+ * ENDPOINTS ADMIN:
+ *   POST   /api/productos/guardar → crear con imagen
+ *   PUT    /api/productos/{id}    → actualizar
+ *   DELETE /api/productos/{id}    → eliminar
  */
 @RestController
 @RequestMapping("/api/productos")
-@CrossOrigin(origins = "http://localhost:3000") // Permite conexión con React
+@CrossOrigin(origins = "${cors.allowed-origins}")
 public class ProductoController {
 
-    @Autowired
-    private ProductoRepository productoRepo;
+    private static final Logger log = LoggerFactory.getLogger(ProductoController.class);
 
-    // Directorio físico donde se guardan las imágenes subidas por el administrador
-    private final String DIRECTORIO_UPLOADS = "src/main/resources/static/uploads/";
+    private final ProductoRepository productoRepo;
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // ENDPOINT 1 — Listar todos los productos
-    // URL: GET http://localhost:8081/api/productos
-    // Usado por la sección "Lo Más Comprado" y la página Productos
-    // ══════════════════════════════════════════════════════════════════════════
+    @Value("${uploads.directory}")
+    private String directorioUploads;
+
+    public ProductoController(ProductoRepository productoRepo) {
+        this.productoRepo = productoRepo;
+    }
+
+    // ── PÚBLICOS ─────────────────────────────────────────────────────────────
     @GetMapping
     public ResponseEntity<List<Producto>> listar() {
-        // Obtiene todos los productos registrados en la base de datos
-        List<Producto> productos = productoRepo.findAll();
+        // Google Guava: Lists.newArrayList para mayor legibilidad
+        List<Producto> productos = Lists.newArrayList(productoRepo.findAll());
         return ResponseEntity.ok(productos);
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // ENDPOINT 2 — BUSCADOR: Filtra productos por nombre desde la barra de búsqueda
-    // URL: GET http://localhost:8081/api/productos/buscar?q=chocolate
-    // El parámetro 'q' viene del input de búsqueda del navbar en React
-    // Ejemplo: Si el usuario escribe "chocolate", devuelve todos los productos
-    //          que contengan "chocolate" en su nombre (sin importar mayúsculas)
-    // ══════════════════════════════════════════════════════════════════════════
+    @GetMapping("/{id}")
+    public ResponseEntity<?> detalle(@PathVariable Integer id) {
+        return productoRepo.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/buscar")
-    public ResponseEntity<List<Producto>> buscarPorNombre(@RequestParam("q") String query) {
-
-        // Si el query está vacío, devolver lista completa
-        if (query == null || query.isBlank()) {
-            return ResponseEntity.ok(productoRepo.findAll());
-        }
-
-        // Convertir a minúsculas para búsqueda sin distinción de mayúsculas/minúsculas
-        String termino = query.toLowerCase().trim();
-
-        // Filtrar en Java: busca si el nombre del producto contiene el texto buscado
-        // Esto busca en el campo 'nombre' del producto usando Java Streams
-        List<Producto> resultados = productoRepo.findAll()
-            .stream()
-            .filter(p -> p.getNombre() != null &&
-                         p.getNombre().toLowerCase().contains(termino))
-            .collect(Collectors.toList());
-
-        // Devolver la lista filtrada (puede estar vacía si no hay coincidencias)
+    public ResponseEntity<List<Producto>> buscar(@RequestParam String q) {
+        List<Producto> resultados = productoRepo.findByNombreContainingIgnoreCase(q.trim());
         return ResponseEntity.ok(resultados);
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // ENDPOINT 3 — Admin guarda un nuevo producto con su imagen
-    // URL: POST http://localhost:8081/api/productos/guardar
-    // Recibe los datos como multipart/form-data (nombre, precio, descripcion, archivo)
-    // ══════════════════════════════════════════════════════════════════════════
+    @GetMapping("/categoria/{catId}")
+    public ResponseEntity<List<Producto>> porCategoria(@PathVariable Integer catId) {
+        return ResponseEntity.ok(productoRepo.findByCategoriaId(catId));
+    }
+
+    // ── ADMIN ─────────────────────────────────────────────────────────────────
     @PostMapping("/guardar")
-    public ResponseEntity<Producto> guardar(
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> guardar(
             @RequestParam("nombre")      String nombre,
             @RequestParam("precio")      Double precio,
             @RequestParam("descripcion") String descripcion,
-            @RequestParam(value = "archivo", required = false) MultipartFile archivo) throws IOException {
+            @RequestParam(value = "archivo", required = false) MultipartFile archivo)
+            throws IOException {
 
-        // Crear el objeto Producto con los datos básicos del formulario
         Producto p = new Producto();
         p.setNombre(nombre);
         p.setPrecio(precio);
         p.setDescripcion(descripcion);
 
-        // Procesar la imagen si fue enviada por el administrador
         if (archivo != null && !archivo.isEmpty()) {
-            // Asegurar que el directorio de uploads exista en el servidor
-            Path directorioPath = Paths.get(DIRECTORIO_UPLOADS);
-            if (!Files.exists(directorioPath)) {
-                Files.createDirectories(directorioPath);
+            Path dirPath = Paths.get(directorioUploads);
+            if (!Files.exists(dirPath)) {
+                Files.createDirectories(dirPath);
             }
-
-            // Generar un nombre único con timestamp para evitar colisiones de nombres
             String nombreArchivo = System.currentTimeMillis() + "_" + archivo.getOriginalFilename();
-            Path rutaCompleta = directorioPath.resolve(nombreArchivo);
-
-            // Guardar el archivo físicamente en el servidor
-            Files.copy(archivo.getInputStream(), rutaCompleta);
-
-            // Guardar la URL relativa accesible desde el navegador
+            Files.copy(archivo.getInputStream(), dirPath.resolve(nombreArchivo));
             p.setImagenUrl("/uploads/" + nombreArchivo);
         } else {
-            // Imagen por defecto si el admin no sube ninguna foto
             p.setImagenUrl("/uploads/default.png");
         }
 
-        // Persistir el producto completo en la base de datos y devolverlo
         Producto guardado = productoRepo.save(p);
+        log.info("Producto '{}' guardado por admin", nombre);
         return ResponseEntity.ok(guardado);
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // ENDPOINT 4 — Admin actualiza datos de un producto existente
-    // URL: PUT http://localhost:8081/api/productos/{id}
-    // ══════════════════════════════════════════════════════════════════════════
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody Producto datosActualizados) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> actualizar(@PathVariable Integer id,
+                                        @RequestBody Producto datos) {
         return productoRepo.findById(id).map(p -> {
-            // Actualizar solo los campos enviados
-            if (datosActualizados.getNombre()      != null) p.setNombre(datosActualizados.getNombre());
-            if (datosActualizados.getPrecio()      != null) p.setPrecio(datosActualizados.getPrecio());
-            if (datosActualizados.getDescripcion() != null) p.setDescripcion(datosActualizados.getDescripcion());
-            // Guardar cambios en la base de datos
+            if (datos.getNombre()      != null) p.setNombre(datos.getNombre());
+            if (datos.getPrecio()      != null) p.setPrecio(datos.getPrecio());
+            if (datos.getDescripcion() != null) p.setDescripcion(datos.getDescripcion());
             productoRepo.save(p);
+            log.info("Producto #{} actualizado", id);
             return ResponseEntity.ok(p);
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // ENDPOINT 5 — Admin elimina un producto por su ID
-    // URL: DELETE http://localhost:8081/api/productos/{id}
-    // ══════════════════════════════════════════════════════════════════════════
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminar(@PathVariable Long id) {
-        // Verificar existencia antes de eliminar
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> eliminar(@PathVariable Integer id) {
         if (!productoRepo.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
         productoRepo.deleteById(id);
-        return ResponseEntity.ok("Producto eliminado correctamente.");
+        log.warn("Producto #{} eliminado por admin", id);
+        return ResponseEntity.ok(Map.of("mensaje", "Producto eliminado correctamente."));
     }
 }

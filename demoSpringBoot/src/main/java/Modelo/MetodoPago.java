@@ -1,41 +1,66 @@
 package Modelo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+/**
+ * Entidad MetodoPago — guarda los métodos de pago del usuario.
+ * Tipos soportados: VISA, BANCO, YAPE.
+ *
+ * NOTA DE SEGURIDAD: Nunca guardar número de tarjeta completo.
+ * Solo se almacena los últimos 4 dígitos (para Visa) o el
+ * número de celular (para Yape).
+ *
+ * Tabla nueva: usuario_metodo_pago
+ */
 @Entity
-@Table(name = "metodos_pago")
+@Table(name = "usuario_metodo_pago")
+@Getter
+@Setter
+@NoArgsConstructor
 public class MetodoPago {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String tipoMetodo; 
-    private String numeroTarjeta; 
-    private String nombreTitular;
-    private String fechaVencimiento;
-    private String cvv;
-
-    @Column(name = "es_principal")
-    private boolean esPrincipal;
-
-    @ManyToOne
-    @JoinColumn(name = "usuId_fk")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuId_fk", nullable = false)
     private Usuario usuario;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getTipoMetodo() { return tipoMetodo; }
-    public void setTipoMetodo(String tipoMetodo) { this.tipoMetodo = tipoMetodo; }
-    public String getNumeroTarjeta() { return numeroTarjeta; }
-    public void setNumeroTarjeta(String numeroTarjeta) { this.numeroTarjeta = numeroTarjeta; }
-    public String getNombreTitular() { return nombreTitular; }
-    public void setNombreTitular(String nombreTitular) { this.nombreTitular = nombreTitular; }
-    public String getFechaVencimiento() { return fechaVencimiento; }
-    public void setFechaVencimiento(String fechaVencimiento) { this.fechaVencimiento = fechaVencimiento; }
-    public String getCvv() { return cvv; }
-    public void setCvv(String cvv) { this.cvv = cvv; }
-    public boolean isEsPrincipal() { return esPrincipal; }
-    public void setEsPrincipal(boolean esPrincipal) { this.esPrincipal = esPrincipal; }
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    @NotNull(message = "El tipo de pago es obligatorio")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TipoPago tipo;
+
+    /** Alias o apodo: "Mi Visa Personal", "Yape Principal" */
+    @NotBlank(message = "El alias es obligatorio")
+    @Column(length = 80)
+    private String alias;
+
+    /**
+     * Para VISA: últimos 4 dígitos ("**** **** **** 4321").
+     * Para YAPE / BANCO: número de celular o cuenta (últimos 4 dígitos).
+     */
+    @Column(length = 10)
+    private String ultimosDigitos;
+
+    /** Nombre del titular impreso en la tarjeta (solo para VISA) */
+    @Column(length = 100)
+    private String titular;
+
+    /** Nombre del banco (BCP, Interbank, BBVA...) — para BANCO y VISA */
+    @Column(length = 80)
+    private String banco;
+
+    @Column(nullable = false)
+    private boolean esPrincipal = false;
+
+    public enum TipoPago {
+        VISA, BANCO, YAPE
+    }
 }

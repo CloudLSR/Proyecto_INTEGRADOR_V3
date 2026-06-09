@@ -2,8 +2,20 @@ package Repositorio;
 
 import Modelo.Direccion;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Repositorio Direccion — busca solo las direcciones del usuario autenticado.
+ * Principio SOLID ISP: interfaz pequeña y específica.
+ */
+@Repository
 public interface DireccionRepository extends JpaRepository<Direccion, Long> {
-    List<Direccion> findByUsuarioId(Long usuId);
+    /** Todas las direcciones de un usuario */
+    List<Direccion> findByUsuarioId(Integer usuarioId);
+
+    /** Dirección principal del usuario */
+    Optional<Direccion> findByUsuarioIdAndEsPrincipalTrue(Integer usuarioId);
 }

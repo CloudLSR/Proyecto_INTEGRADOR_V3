@@ -22,18 +22,21 @@ function CambiarPassword1() {
 
     setCargando(true);
     try {
-      const res = await fetch('http://localhost:8081/api/auth/recuperar', {
+      // FIX: el endpoint correcto es /api/auth/olvide-contrasena (no /api/auth/recuperar)
+      const res = await fetch('http://localhost:8081/api/auth/olvide-contrasena', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo }),
       });
 
+      // FIX: el backend SIEMPRE responde 200 OK por seguridad (no revela si el correo existe)
+      // Por eso siempre avanzamos al paso 2 si la respuesta fue ok
       if (res.ok) {
         localStorage.setItem('correo_recuperacion', correo);
         navigate('/cambiar-password-2');
       } else {
         const data = await res.json();
-        setError(data.mensaje || 'No se encontró una cuenta con ese correo.');
+        setError(data.error || 'Ocurrió un error. Intenta de nuevo.');
       }
     } catch (err) {
       setError('No se pudo conectar al servidor.');
@@ -88,7 +91,7 @@ function CambiarPassword1() {
             <p className="hint-text">
               ¿Olvidaste tu contraseña?<br />
               Ingresa el correo asociado a tu cuenta.<br />
-              Te enviaremos un código de verificación.
+              Te enviaremos un enlace de recuperación.
             </p>
 
             {error && <div className="error-msg">{error}</div>}
@@ -113,7 +116,7 @@ function CambiarPassword1() {
               onClick={handleEnviar}
               disabled={cargando}
             >
-              {cargando ? 'Enviando...' : 'Enviar código'}
+              {cargando ? 'Enviando...' : 'Enviar enlace de recuperación'}
             </button>
 
             <p className="hint-text" style={{ marginTop: '1.5rem' }}>

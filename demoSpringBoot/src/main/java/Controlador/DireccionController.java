@@ -1,45 +1,85 @@
 package Controlador;
 
 import Modelo.Direccion;
-import Repositorio.DireccionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import service.DireccionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Controlador de direcciones de envío.
+ *
+ * ENDPOINTS:
+ *   GET    /api/direcciones/usuario/{usuarioId}       → listar mis direcciones
+ *   POST   /api/direcciones/usuario/{usuarioId}       → agregar dirección
+ *   PUT    /api/direcciones/{id}/usuario/{usuarioId}  → editar dirección
+ *   DELETE /api/direcciones/{id}/usuario/{usuarioId}  → eliminar dirección
+ */
 @RestController
 @RequestMapping("/api/direcciones")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "${cors.allowed-origins}")
 public class DireccionController {
 
-    @Autowired
-    private DireccionRepository direccionRepo;
+    private final DireccionService service;
 
-    @GetMapping("/usuario/{usuId}")
-    public List<Direccion> listarPorUsuario(@PathVariable Long usuId) {
-        return direccionRepo.findByUsuarioId(usuId);
+    public DireccionController(DireccionService service) {
+        this.service = service;
     }
 
-    @PostMapping("/guardar")
-    public ResponseEntity<?> guardarDireccion(@RequestBody Direccion nuevaDireccion) {
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<Direccion>> listar(@PathVariable Integer usuarioId) {
+        return ResponseEntity.ok(service.listar(usuarioId));
+    }
+
+    @PostMapping("/usuario/{usuarioId}")
+    public ResponseEntity<?> agregar(@PathVariable Integer usuarioId,
+                                     @RequestBody Map<String, Object> body) {
         try {
-            if (nuevaDireccion.isEsPrincipal()) {
-                List<Direccion> actuales = direccionRepo.findByUsuarioId(nuevaDireccion.getUsuario().getId());
-                actuales.forEach(d -> d.setEsPrincipal(false));
-                direccionRepo.saveAll(actuales);
-            }
-            
-            Direccion guardada = direccionRepo.save(nuevaDireccion);
-            return ResponseEntity.ok(guardada);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al guardar: " + e.getMessage());
+            Direccion nueva = service.agregar(
+                    usuarioId,
+                    (String)  body.get("direccion"),
+                    (String)  body.get("distrito"),
+                    (String)  body.get("ciudad"),
+                    (String)  body.get("codigoPostal"),
+                    (String)  body.get("referencia"),
+                    Boolean.TRUE.equals(body.get("esPrincipal"))
+            );
+            return ResponseEntity.ok(nueva);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
-    @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminar(@PathVariable Long id) {
-        direccionRepo.deleteById(id);
-        return ResponseEntity.ok().build();
+    @PutMapping("/{id}/usuario/{usuarioId}")
+    public ResponseEntity<?> actualizar(@PathVariable Long id,
+                                        @PathVariable Integer usuarioId,
+                                        @RequestBody Map<String, Object> body) {
+        try {
+            Direccion actualizada = service.actualizar(
+                    id, usuarioId,
+                    (String) body.get("direccion"),
+                    (String) body.get("distrito"),
+                    (String) body.get("ciudad"),
+                    (String) body.get("codigoPostal"),
+                    (String) body.get("referencia"),
+                    Boolean.TRUE.equals(body.get("esPrincipal"))
+            );
+            return ResponseEntity.ok(actualizada);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}/usuario/{usuarioId}")
+    public ResponseEntity<?> eliminar(@PathVariable Long id,
+                                      @PathVariable Integer usuarioId) {
+        try {
+            service.eliminar(id, usuarioId);
+            return ResponseEntity.ok(Map.of("mensaje", "Dirección eliminada correctamente."));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

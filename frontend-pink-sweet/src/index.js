@@ -24,9 +24,10 @@ root.render(
       <Route path="/perfil"    element={<Perfil />} />
       <Route path="/cambiar-password-1" element={<CambiarPassword1 />} />
       <Route path="/cambiar-password-2" element={<CambiarPassword2 />} />
+      {/* FIX: CambiarPassword3 acepta ?token=XXX en la URL (enlace del correo) */}
       <Route path="/cambiar-password-3" element={<CambiarPassword3 />} />
       <Route path="/cambiar-password-4" element={<CambiarPassword4 />} />
       <Route path="/productos" element={<Productos />} />
     </Routes>
   </BrowserRouter>
-); 
+);

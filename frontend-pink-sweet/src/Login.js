@@ -23,16 +23,24 @@ function Login() {
       const res = await fetch('http://localhost:8081/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ correo, password }),
+        // FIX: el backend espera "contrasena", no "password"
+        body: JSON.stringify({ correo, contrasena: password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem('usuario', JSON.stringify(data));
+        // FIX: el backend devuelve { token: "..." }, guardar el JWT correctamente
+        localStorage.setItem('token', data.token);
+        // Decodificar el payload del JWT para saber nombre/rol sin llamada extra
+        try {
+          const payload = JSON.parse(atob(data.token.split('.')[1]));
+          localStorage.setItem('correo', payload.sub || correo);
+          localStorage.setItem('rol', payload.rol || '');
+        } catch (_) { /* si el decode falla, no es crítico */ }
         navigate('/');
       } else {
-        setError(data.mensaje || 'Correo o contraseña incorrectos.');
+        setError(data.error || 'Correo o contraseña incorrectos.');
       }
     } catch (err) {
       setError('No se pudo conectar al servidor.');
