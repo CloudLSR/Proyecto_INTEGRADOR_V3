@@ -42,7 +42,7 @@ function Carrito() {
         {/* ══ Bienvenida ══ */}
         <div className="cart-welcome-header">
           <img src="/assets/products/logo.png" alt="Sweet Cream Rose" className="cart-circle-logo"
-               onError={e => e.target.style.display='none'} />
+              onError={e => e.target.style.display='none'} />
           <p className="cart-welcome-text">Tu espacio personal para organizar tus pedidos, favoritos y disfrutar de una experiencia más dulce.</p>
         </div>
 
@@ -91,7 +91,9 @@ function Carrito() {
                 <span className="delivery-address">Av. Los Rosales 123, San Borja, Lima - Lima</span>
               </div>
             </div>
-            <a href="#" className="btn-change-address">Cambiar →</a>
+            <span className="btn-change-address" onClick={() => navigate('/direccion-envio')} style={{ cursor: 'pointer' }}>
+              Cambiar →
+            </span>
           </div>
 
           <div className="center-btn-container">
