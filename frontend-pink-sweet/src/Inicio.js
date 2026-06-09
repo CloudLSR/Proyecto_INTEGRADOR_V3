@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import logoPrincipal from './assets/logo.png';
 
 // Imágenes de Inicio
 import torta from "./assets/products/torta_principal.jpg";
@@ -13,9 +14,9 @@ import pastelImposible from "./assets/products/pastel_imposible.jpg";
 
 // Datos de Inicio
 const slides = [
-  { img: torta,     title: "Nuestros Especiales",  text: "Especiales para cualquier ocasión y disfrutar con las personas que más quieres" },
-  { img: navidad,   title: "Postres Navideños",    text: "Celebra la navidad con los mejores postres artesanales para compartir en familia" },
-  { img: halloween, title: "Postres de Halloween",  text: "Sorprende a todos con postres espeluznantes y deliciosos para Halloween" },
+  { img: torta,     title: "Nuestros\nEspeciales",  text: "Especiales para cualquier ocasión y disfrutar con las personas que más quieres" },
+  { img: navidad,   title: "Postres\nNavideños",    text: "Celebra la navidad con los mejores postres artesanales para compartir en familia" },
+  { img: halloween, title: "Postres de\nHalloween",  text: "Sorprende a todos con postres espeluznantes y deliciosos para Halloween" },
 ];
 
 const homeProducts = [
@@ -24,7 +25,7 @@ const homeProducts = [
   { img: flan,           label: "Flan de vainilla" },
   { img: galletas,       label: "Galletas de fresa" },
   { img: gelatina,       label: "Gelatina" },
-  { img: pastelImposible,label: "Pastel de Flan con Chocolate" },
+  { img: pastelImposible,label: "Pastel Imposible" },
 ];
 
 const testimonials = [
@@ -42,7 +43,7 @@ const Inicio = ({ setPage }) => {
 
   const startSlider = () => {
     clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => setCurrentSlide(s => (s + 1) % slides.length), 4000);
+    timerRef.current = setInterval(() => setCurrentSlide(s => (s + 1) % slides.length), 5000);
   };
   
   useEffect(() => { 
@@ -64,97 +65,159 @@ const Inicio = ({ setPage }) => {
   };
 
   return (
-    <>
-      <section style={{ position:"relative", background:"#fdf2f4", overflow:"hidden" }}>
-        {slides.map((slide, i) => (
-          <div key={i} className={`hero-slide${currentSlide === i ? " active" : ""}`} style={{ alignItems:"stretch", minHeight:420 }}>
-            <div style={{ flex:"0 0 55%", overflow:"hidden", maxHeight:480 }}>
-              <img src={slide.img} alt={slide.title} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-            </div>
-            <div className="hero-text-block" style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center", padding:"40px 56px", background:"#fdf2f4" }}>
-              <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:700, color:"#2d1a10", marginBottom:16, lineHeight:1.25 }}>{slide.title}</h2>
-              <p style={{ fontFamily:"'Lato',sans-serif", fontSize:16, color:"#7a4055", marginBottom:32, lineHeight:1.7 }}>{slide.text}</p>
-              <button className="scr-btn-primary" onClick={() => setPage("productos")}>Ver más</button>
-            </div>
-          </div>
-        ))}
-        <div style={{ position:"absolute", bottom:18, left:"50%", transform:"translateX(-50%)", display:"flex", gap:8 }}>
-          {slides.map((_, i) => (
-            <span key={i} className="dot" style={{ background: currentSlide === i ? "#c8506a" : "rgba(200,80,106,.3)" }} onClick={() => goToSlide(i)} />
-          ))}
-        </div>
-      </section>
-
-      <main style={{ maxWidth:1100, margin:"0 auto", padding:"60px 24px 40px" }}>
-        <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:700, textAlign:"center", color:"#2d1a10", letterSpacing:2, marginBottom:36, textTransform:"uppercase" }}>Lo más comprado</h2>
-        <div className="home-products-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:24 }}>
-          {homeProducts.map((p, i) => (
-            <div key={i} className="product-card-wrap" onClick={() => setPage("productos")}>
-              <div style={{ overflow:"hidden" }}>
-                <img src={p.img} alt={p.label} className="product-card-img" />
+    <div style={{ backgroundColor: '#FFEFEF', fontFamily: 'sans-serif', minHeight: '100vh', paddingBottom: '80px' }}>
+      
+      {/* SECCIÓN HERO (BANNER PRINCIPAL) */}
+      <section style={{ textAlign: 'center', padding: '30px 20px' }}>
+        
+        <img src={logoPrincipal} alt="Logo Sweet Cream Rose" style={{ width: '150px', objectFit: 'contain', marginBottom: '35px' }} />
+        
+        <div style={{ position: 'relative', maxWidth: '850px', margin: '0 auto', overflow: 'hidden' }}>
+          {slides.map((slide, i) => (
+            <div key={i} style={{ display: currentSlide === i ? 'flex' : 'none', height: '300px' }}>
+              <div style={{ flex: '1' }}>
+                <img src={slide.img} alt="Torta" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
-              <div style={{ padding:"12px 16px", fontFamily:"'Lato',sans-serif", fontSize:14, fontWeight:700, color:"#2d1a10", letterSpacing:.5 }}>{p.label}</div>
+              <div style={{ flex: '1', backgroundColor: '#FCAEBA', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', padding: '0 40px', textAlign: 'left' }}>
+                <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '38px', color: '#000', margin: '0 0 10px 0', lineHeight: '1.1', whiteSpace: 'pre-line' }}>{slide.title}</h2>
+                <p style={{ fontFamily: 'Poppins-Medium', fontSize: '15px', color: '#000', margin: '0 0 20px 0', lineHeight: '1.4' }}>{slide.text}</p>
+                <button onClick={() => setPage('productos')} style={{ backgroundColor: 'white', color: '#000', border: 'none', padding: '6px 20px', fontFamily: 'Poppins-SemiBold', fontSize: '14px', cursor: 'pointer' }}>
+                  Ver más
+                </button>
+              </div>
             </div>
           ))}
         </div>
-        <div style={{ textAlign:"center", marginTop:36 }}>
-          <button className="scr-btn-outline" onClick={() => setPage("productos")}>Ver más</button>
-        </div>
-      </main>
-
-      <section style={{ background:"#fdf2f4", padding:"60px 24px" }}>
-        <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:700, textAlign:"center", color:"#2d1a10", letterSpacing:2, marginBottom:40, textTransform:"uppercase" }}>Promociones de Festividad</h2>
-        <div className="festi-row" style={{ display:"flex", borderRadius:14, overflow:"hidden", maxWidth:960, margin:"0 auto 28px", background:"linear-gradient(135deg,#1a3c2e 0%,#2d6647 100%)", boxShadow:"0 4px 24px rgba(0,0,0,.13)" }}>
-          <div style={{ flex:1, padding:"40px 44px", display:"flex", flexDirection:"column", justifyContent:"center" }}>
-            <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, color:"#fff", marginBottom:14, lineHeight:1.3 }}>POSTRES para acompañar esta <span style={{ color:"#f5d76e" }}>NAVIDAD</span></h3>
-            <p style={{ fontFamily:"'Lato',sans-serif", fontSize:15, color:"rgba(255,255,255,.85)", marginBottom:28, lineHeight:1.7 }}>Mira los mejores postres para esta navidad y pasar tiempo en familia inolvidable.</p>
-            <button className="scr-btn-white" style={{ alignSelf:"flex-start" }} onClick={() => setPage("ofertas")}>Ver más</button>
-          </div>
-          <div style={{ flex:"0 0 42%", overflow:"hidden", maxHeight:280 }}>
-            <img src={navidad} alt="Postres Navideños" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-          </div>
-        </div>
-        <div className="festi-row" style={{ display:"flex", borderRadius:14, overflow:"hidden", maxWidth:960, margin:"0 auto", background:"linear-gradient(135deg,#2b1a0e 0%,#5c3010 100%)", boxShadow:"0 4px 24px rgba(0,0,0,.13)" }}>
-          <div style={{ flex:1, padding:"40px 44px", display:"flex", flexDirection:"column", justifyContent:"center" }}>
-            <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:24, color:"#fff", marginBottom:14, lineHeight:1.3 }}>POSTRES para disfrutar en <span style={{ color:"#ff8c00" }}>HALLOWEEN</span></h3>
-            <p style={{ fontFamily:"'Lato',sans-serif", fontSize:15, color:"rgba(255,255,255,.85)", marginBottom:28, lineHeight:1.7 }}>Descubre nuestros deliciosos postres para Halloween y organiza una fiesta espeluznante.</p>
-            <button className="scr-btn-white" style={{ alignSelf:"flex-start" }} onClick={() => setPage("ofertas")}>Ver más</button>
-          </div>
-          <div style={{ flex:"0 0 42%", overflow:"hidden", maxHeight:280 }}>
-            <img src={halloween} alt="Postres Halloween" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-          </div>
-        </div>
-        <div style={{ textAlign:"center", marginTop:36 }}>
-          <button className="scr-btn-outline" onClick={() => setPage("ofertas")}>Ver más</button>
+        
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '40px' }}>
+          {slides.map((_, i) => (
+            <span key={i} onClick={() => goToSlide(i)} style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: currentSlide === i ? '#C6676D' : '#EAAFB8', cursor: 'pointer' }} />
+          ))}
         </div>
       </section>
 
-      <section style={{ maxWidth:900, margin:"0 auto", padding:"60px 24px" }}>
-        <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:700, textAlign:"center", color:"#2d1a10", letterSpacing:2, marginBottom:36, textTransform:"uppercase" }}>Deja tu comentario</h2>
-        <form onSubmit={handleComment} style={{ background:"#fdf2f4", borderRadius:12, padding:"30px 36px", marginBottom:40, border:"1px solid #f0d0d8" }}>
-          <div style={{ marginBottom:16 }}>
-            <label style={{ display:"block", fontFamily:"'Lato',sans-serif", fontSize:12, fontWeight:700, letterSpacing:1.5, color:"#7a4055", marginBottom:6, textTransform:"uppercase" }}>Nombre</label>
-            <input type="text" value={commentName} onChange={e => setCommentName(e.target.value)} placeholder="Escribe tu nombre completo"
-              style={{ width:"100%", border:"1px solid #f0d0d8", borderRadius:6, padding:"10px 14px", fontSize:14, outline:"none", fontFamily:"'Lato',sans-serif", background:"#fff", color:"#2d1a10" }} />
+      {/* SECCIÓN LO MÁS COMPRADO */}
+      <section style={{ maxWidth: '900px', margin: '40px auto 0' }}>
+        <h2 style={{ fontFamily: 'Poppins-SemiBold', fontSize: '26px', textAlign: 'center', color: '#5A3E41', marginBottom: '30px' }}>LO MÁS COMPRADO</h2>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+          {homeProducts.map((p, i) => (
+            <div key={i} onClick={() => setPage("productos")} style={{ position: 'relative', height: '280px', cursor: 'pointer', overflow: 'hidden' }}>
+              <img src={p.img} alt={p.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ position: 'absolute', bottom: '0', width: '100%', backgroundColor: 'rgba(231, 199, 200, 0.8)', padding: '20px 0', textAlign: 'center' }}>
+                <span style={{ fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#5A3E41' }}>{p.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <button onClick={() => setPage("productos")} style={{ backgroundColor: '#FACFD8', color: '#5A3E41', border: 'none', padding: '8px 40px', fontFamily: 'Poppins-SemiBold', fontSize: '15px', cursor: 'pointer' }}>
+            Ver más
+          </button>
+        </div>
+      </section>
+
+      {/* SECCIÓN FESTIVIDADES */}
+      <section style={{ maxWidth: '900px', margin: '60px auto 0' }}>
+        <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '26px', textAlign: 'center', color: '#5A3E41', marginBottom: '30px' }}>Promociones de Festividad</h2>
+        
+        {/* BANNER NAVIDAD */}
+        <div style={{ display: 'flex', height: '310px', marginBottom: '20px', backgroundColor: '#B26459' }}>
+          <div style={{ flex: '1', padding: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+            <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5F2222', margin: '0 0 15px 0', lineHeight: '1.1' }}>
+              POSTRES para<br/>acompañar<br/>esta NAVIDAD
+            </h3>
+            <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: 'white', margin: '0 0 25px 0', maxWidth: '300px', lineHeight: '1.5' }}>
+              Mira los mejores postres para esta navidad y pasar tiempo en familia inolvidable.
+            </p>
+            <button onClick={() => setPage("ofertas")} style={{ backgroundColor: 'white', color: '#000', border: 'none', padding: '8px 30px', fontFamily: 'Poppins-Bold', fontSize: '14px', cursor: 'pointer' }}>
+              Ver más
+            </button>
           </div>
-          <div style={{ marginBottom:20 }}>
-            <textarea value={commentText} onChange={e => setCommentText(e.target.value)} rows={4} placeholder="Deja un comentario"
-              style={{ width:"100%", border:"1px solid #f0d0d8", borderRadius:6, padding:"10px 14px", fontSize:14, outline:"none", resize:"vertical", fontFamily:"'Lato',sans-serif", background:"#fff", color:"#2d1a10" }} />
+          <div style={{ flex: '1.2' }}>
+            <img src={navidad} alt="Navidad" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-          <div style={{ textAlign:"right" }}>
-            <button type="submit" className="scr-btn-primary">COMENTAR</button>
+        </div>
+
+        {/* BANNER HALLOWEEN */}
+        <div style={{ display: 'flex', height: '310px', backgroundColor: '#DD7C32' }}>
+          <div style={{ flex: '1', padding: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+            <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5F2222', margin: '0 0 15px 0', lineHeight: '1.1' }}>
+              POSTRES para<br/>disfrutar en<br/>HALLOWEEN
+            </h3>
+            <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: 'white', margin: '0 0 25px 0', maxWidth: '300px', lineHeight: '1.5' }}>
+              Descubre nuestros deliciosos postres para Halloween y organiza una fiesta espeluznante.
+            </p>
+            <button onClick={() => setPage("ofertas")} style={{ backgroundColor: 'white', color: '#000', border: 'none', padding: '8px 30px', fontFamily: 'Poppins-Bold', fontSize: '14px', cursor: 'pointer' }}>
+              Ver más
+            </button>
+          </div>
+          <div style={{ flex: '1.2' }}>
+            <img src={halloween} alt="Halloween" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <button onClick={() => setPage("ofertas")} style={{ backgroundColor: '#FACFD8', color: '#5A3E41', border: 'none', padding: '8px 40px', fontFamily: 'Poppins-SemiBold', fontSize: '15px', cursor: 'pointer' }}>
+            Ver más
+          </button>
+        </div>
+      </section>
+
+      {/* SECCIÓN COMENTARIOS */}
+      <section style={{ maxWidth: '850px', margin: '60px auto 0' }}>
+        <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '26px', textAlign: 'center', color: '#5A3E41', marginBottom: '40px' }}>Deja tu comentario</h2>
+        
+        <form onSubmit={handleComment} style={{ maxWidth: '700px', margin: '0 auto 50px auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          
+          {/* FILA 1: NOMBRE e Input */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <label style={{ fontFamily: 'Poppins-Bold', fontSize: '14px', color: '#5A3E41', width: '80px', textAlign: 'left' }}>
+              NOMBRE
+            </label>
+            <input 
+              type="text" 
+              value={commentName} 
+              onChange={e => setCommentName(e.target.value)} 
+              placeholder="Escribe tu nombre completo" 
+              style={{ width: '300px', backgroundColor: '#FBD0D9', border: 'none', padding: '12px 15px', fontFamily: 'Poppins-Medium', fontSize: '14px', outline: 'none', color: '#5A3E41' }} 
+            />
+          </div>
+
+          {/* FILA 2: Textarea */}
+          <textarea 
+            value={commentText} 
+            onChange={e => setCommentText(e.target.value)} 
+            rows={4} 
+            placeholder="Deja un comentario" 
+            style={{ width: '100%', backgroundColor: '#FBD0D9', border: 'none', padding: '15px', fontFamily: 'Poppins-Medium', fontSize: '14px', outline: 'none', resize: 'vertical', color: '#5A3E41' }} 
+          />
+
+          {/* FILA 3: Botón */}
+          <div style={{ textAlign: 'right' }}>
+            <button type="submit" style={{ backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '10px 40px', fontFamily: 'Poppins-SemiBold', fontSize: '14px', cursor: 'pointer' }}>
+              COMENTAR
+            </button>
           </div>
         </form>
-        <div className="testimonials-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:20 }}>
-          {comments.slice(0,6).map((t,i) => (
-            <div key={i} className="testimonial-card">
-              <div style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:15, color:"#c8506a", marginBottom:10 }}>{t.name}</div>
-              <div style={{ fontFamily:"'Lato',sans-serif", fontSize:14, color:"#5a3040", lineHeight:1.6 }}>{t.text}</div>
+
+        {/* TARJETAS DE TESTIMONIOS */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', maxWidth: '850px', margin: '0 auto' }}>
+          {comments.slice(0,3).map((t,i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+              <div style={{ backgroundColor: '#C6676D', padding: '12px', textAlign: 'center', color: 'white', fontFamily: 'Poppins-SemiBold', fontSize: '15px' }}>
+                {t.name}
+              </div>
+              <div style={{ backgroundColor: '#FBD0D9', padding: '32px 20px', textAlign: 'center', color: '#5A3E41', fontFamily: 'Poppins-Medium', fontSize: '14px', flexGrow: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {t.text}
+              </div>
             </div>
           ))}
         </div>
       </section>
-    </>
+
+    </div>
   );
 };
 
