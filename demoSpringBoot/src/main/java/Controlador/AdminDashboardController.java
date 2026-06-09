@@ -32,26 +32,22 @@ public class AdminDashboardController {
     public ResponseEntity<AdminDTOs.DashboardResumen> getDashboard() {
         AdminDTOs.DashboardResumen resumen = new AdminDTOs.DashboardResumen();
 
-        YearMonth mesActual = YearMonth.now();
+        YearMonth mesActual  = YearMonth.now();
         LocalDateTime inicio = mesActual.atDay(1).atStartOfDay();
         LocalDateTime fin    = mesActual.atEndOfMonth().atTime(23, 59, 59);
 
-        List<Orden> ordenesMes = ordenRepository.findByOrdFechaBetween(inicio, fin);
+        // ✅ findByFechaBetween
+        List<Orden> ordenesMes = ordenRepository.findByFechaBetween(inicio, fin);
 
         resumen.setTotalOrdenesMes(ordenesMes.size());
-
         resumen.setOrdenesPendientes(
-            ordenesMes.stream()
-                .filter(o -> Orden.EstadoOrden.Pendiente == o.getEstado()).count());
+            ordenesMes.stream().filter(o -> Orden.EstadoOrden.Pendiente  == o.getEstado()).count());
         resumen.setOrdenesPreparando(
-            ordenesMes.stream()
-                .filter(o -> Orden.EstadoOrden.Preparando == o.getEstado()).count());
+            ordenesMes.stream().filter(o -> Orden.EstadoOrden.Preparando == o.getEstado()).count());
         resumen.setOrdenesEntregadas(
-            ordenesMes.stream()
-                .filter(o -> Orden.EstadoOrden.Entregado == o.getEstado()).count());
+            ordenesMes.stream().filter(o -> Orden.EstadoOrden.Entregado  == o.getEstado()).count());
         resumen.setOrdenesCanceladas(
-            ordenesMes.stream()
-                .filter(o -> Orden.EstadoOrden.Cancelado == o.getEstado()).count());
+            ordenesMes.stream().filter(o -> Orden.EstadoOrden.Cancelado  == o.getEstado()).count());
 
         BigDecimal ingresos = ordenesMes.stream()
             .filter(o -> Orden.EstadoOrden.Cancelado != o.getEstado())

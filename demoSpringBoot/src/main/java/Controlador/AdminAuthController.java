@@ -20,10 +20,8 @@ public class AdminAuthController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -32,61 +30,51 @@ public class AdminAuthController {
 
     @PostMapping("/verificar-admin")
     public ResponseEntity<?> verificarAdmin(@RequestBody Map<String, String> body) {
-        String correo     = body.get("correo");
+        String correo = body.get("correo");
         String contrasena = body.get("contrasena");
 
         Optional<Usuario> usuOpt = usuarioRepository.findByCorreo(correo);
-
-        if (usuOpt.isEmpty()) {
+        if (usuOpt.isEmpty())
             return ResponseEntity.status(401).body(Map.of("mensaje", "Credenciales incorrectas"));
-        }
 
         Usuario u = usuOpt.get();
 
-        if (!passwordEncoder.matches(contrasena, u.getContrasena())) {
+        if (!passwordEncoder.matches(contrasena, u.getContrasena()))
             return ResponseEntity.status(401).body(Map.of("mensaje", "Credenciales incorrectas"));
-        }
 
-        if (u.getRol() == null || u.getRol().getId() != 1) {
+        if (u.getRol() == null || u.getRol().getId() != 1)
             return ResponseEntity.status(403).body(Map.of("mensaje", "Acceso denegado: no eres administrador"));
-        }
 
         return ResponseEntity.ok(Map.of(
-            "paso",    2,
-            "correo",  correo,
-            "mensaje", "Credenciales correctas. Ingresa el código PIN de administrador."
-        ));
+                "paso", 2,
+                "correo", correo,
+                "mensaje", "Credenciales correctas. Ingresa el código PIN de administrador."));
     }
 
     @PostMapping("/pin")
     public ResponseEntity<?> validarPin(@RequestBody AdminDTOs.AdminPinRequest request) {
         String correo = request.getCorreo();
-        String pin    = request.getPin();
+        String pin = request.getPin();
 
         Optional<Usuario> usuOpt = usuarioRepository.findByCorreo(correo);
-
-        if (usuOpt.isEmpty()) {
+        if (usuOpt.isEmpty())
             return ResponseEntity.status(401).body(Map.of("mensaje", "Sesión inválida"));
-        }
 
         Usuario u = usuOpt.get();
 
-        if (u.getRol() == null || u.getRol().getId() != 1) {
+        if (u.getRol() == null || u.getRol().getId() != 1)
             return ResponseEntity.status(403).body(Map.of("mensaje", "Acceso denegado"));
-        }
 
-        if (!adminPin.equals(pin)) {
+        if (!adminPin.equals(pin))
             return ResponseEntity.status(401).body(Map.of("mensaje", "Código PIN incorrecto"));
-        }
 
-        String token = jwtUtil.generateToken(u.getCorreo());
+        String token = jwtUtil.generarToken(u.getCorreo(), "ADMIN");
 
         return ResponseEntity.ok(Map.of(
-            "token",   token,
-            "nombre",  u.getNombre() != null ? u.getNombre() : "Admin",
-            "correo",  u.getCorreo(),
-            "rol",     "ADMIN",
-            "mensaje", "Bienvenido al panel de administrador"
-        ));
+                "token", token,
+                "nombre", u.getNombre() != null ? u.getNombre() : "Admin",
+                "correo", u.getCorreo(),
+                "rol", "ADMIN",
+                "mensaje", "Bienvenido al panel de administrador"));
     }
 }

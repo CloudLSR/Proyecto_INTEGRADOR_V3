@@ -14,28 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Gestión de Ofertas para el administrador.
- *
- * GET    /api/admin/ofertas             → listar todas
- * GET    /api/admin/ofertas/activas     → listar vigentes (activas y con fecha válida)
- * GET    /api/admin/ofertas/{id}        → obtener una
- * POST   /api/admin/ofertas             → crear oferta
- * PUT    /api/admin/ofertas/{id}        → editar oferta
- * DELETE /api/admin/ofertas/{id}        → eliminar oferta
- * PUT    /api/admin/ofertas/{id}/toggle → activar/desactivar
- *
- * Acceso público (clientes del frontend):
- * GET    /api/ofertas/vigentes          → ver ofertas activas (sin token)
- */
 @RestController
 @CrossOrigin(origins = "${cors.allowed-origins}")
 public class AdminOfertasController {
 
     @Autowired private OfertaRepository   ofertaRepository;
     @Autowired private ProductoRepository productoRepository;
-
-    // ══════════════════ ENDPOINTS ADMIN (requieren ADMIN) ═════════════════════
 
     @GetMapping("/api/admin/ofertas")
     @PreAuthorize("hasRole('ADMIN')")
@@ -54,24 +38,19 @@ public class AdminOfertasController {
     @PostMapping("/api/admin/ofertas")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> crear(@RequestBody Oferta oferta) {
-        // Validaciones
-        if (oferta.getOferTitulo() == null || oferta.getOferTitulo().isBlank()) {
+        if (oferta.getOferTitulo() == null || oferta.getOferTitulo().isBlank())
             return ResponseEntity.badRequest().body(Map.of("mensaje", "El título es requerido"));
-        }
-        if (oferta.getOferDescuento() == null) {
+        if (oferta.getOferDescuento() == null)
             return ResponseEntity.badRequest().body(Map.of("mensaje", "El descuento es requerido"));
-        }
-        if (oferta.getOferFechaInicio() == null || oferta.getOferFechaFin() == null) {
+        if (oferta.getOferFechaInicio() == null || oferta.getOferFechaFin() == null)
             return ResponseEntity.badRequest().body(Map.of("mensaje", "Las fechas son requeridas"));
-        }
-        if (oferta.getOferFechaFin().isBefore(oferta.getOferFechaInicio())) {
+        if (oferta.getOferFechaFin().isBefore(oferta.getOferFechaInicio()))
             return ResponseEntity.badRequest()
                 .body(Map.of("mensaje", "La fecha de fin no puede ser anterior a la de inicio"));
-        }
 
-        // Vincular producto si viene en el body
-        if (oferta.getProducto() != null && oferta.getProducto().getProId() != null) {
-            Optional<Producto> prodOpt = productoRepository.findById(oferta.getProducto().getProId());
+        // ✅ Producto.id se llama getId() porque Lombok usa el campo 'id'
+        if (oferta.getProducto() != null && oferta.getProducto().getId() != null) {
+            Optional<Producto> prodOpt = productoRepository.findById(oferta.getProducto().getId());
             prodOpt.ifPresent(oferta::setProducto);
         }
 
@@ -93,8 +72,9 @@ public class AdminOfertasController {
         if (datos.getOferFechaFin()    != null) o.setOferFechaFin(datos.getOferFechaFin());
         if (datos.getOferActiva()      != null) o.setOferActiva(datos.getOferActiva());
 
-        if (datos.getProducto() != null && datos.getProducto().getProId() != null) {
-            productoRepository.findById(datos.getProducto().getProId()).ifPresent(o::setProducto);
+        // ✅ getId() en lugar de getProId()
+        if (datos.getProducto() != null && datos.getProducto().getId() != null) {
+            productoRepository.findById(datos.getProducto().getId()).ifPresent(o::setProducto);
         }
 
         return ResponseEntity.ok(Map.of("mensaje", "Oferta actualizada", "oferta", ofertaRepository.save(o)));
@@ -121,8 +101,6 @@ public class AdminOfertasController {
         ofertaRepository.deleteById(id);
         return ResponseEntity.ok(Map.of("mensaje", "Oferta eliminada correctamente"));
     }
-
-    // ══════════════════ ENDPOINT PÚBLICO (para el frontend de clientes) ════════
 
     @GetMapping("/api/ofertas/vigentes")
     public ResponseEntity<List<Oferta>> ofertasVigentesPublico() {

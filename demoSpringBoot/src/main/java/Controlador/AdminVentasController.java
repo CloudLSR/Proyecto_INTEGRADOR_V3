@@ -25,7 +25,7 @@ public class AdminVentasController {
 
     @GetMapping("/mes")
     public ResponseEntity<?> ventasMes() {
-        YearMonth mes = YearMonth.now();
+        YearMonth mes        = YearMonth.now();
         LocalDateTime inicio = mes.atDay(1).atStartOfDay();
         LocalDateTime fin    = mes.atEndOfMonth().atTime(23, 59, 59);
         return ResponseEntity.ok(construirResumen(inicio, fin, "mes"));
@@ -42,7 +42,7 @@ public class AdminVentasController {
 
     @GetMapping("/anio")
     public ResponseEntity<?> ventasAnio() {
-        int anio = LocalDateTime.now().getYear();
+        int anio             = LocalDateTime.now().getYear();
         LocalDateTime inicio = LocalDateTime.of(anio, 1, 1, 0, 0, 0);
         LocalDateTime fin    = LocalDateTime.of(anio, 12, 31, 23, 59, 59);
         return ResponseEntity.ok(construirResumen(inicio, fin, "año"));
@@ -75,7 +75,8 @@ public class AdminVentasController {
     }
 
     private Map<String, Object> construirResumen(LocalDateTime inicio, LocalDateTime fin, String tipo) {
-        List<Orden> ordenes = ordenRepository.findByOrdFechaBetween(inicio, fin);
+        // ✅ findByFechaBetween
+        List<Orden> ordenes = ordenRepository.findByFechaBetween(inicio, fin);
 
         List<Orden> validas = ordenes.stream()
             .filter(o -> Orden.EstadoOrden.Cancelado != o.getEstado())

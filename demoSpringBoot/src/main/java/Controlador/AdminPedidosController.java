@@ -33,16 +33,19 @@ public class AdminPedidosController {
 
     @GetMapping("/estado/{estado}")
     public ResponseEntity<List<Orden>> listarPorEstado(@PathVariable String estado) {
-        List<Orden> ordenes = ordenRepository.findByOrdEstado(estado);
-        return ResponseEntity.ok(ordenes);
+        // ✅ Convertir String a enum y usar findByEstado
+        try {
+            Orden.EstadoOrden estadoEnum = Orden.EstadoOrden.valueOf(estado);
+            return ResponseEntity.ok(ordenRepository.findByEstado(estadoEnum));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> detalle(@PathVariable Integer id) {
         Optional<Orden> opt = ordenRepository.findById(id);
-        if (opt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (opt.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(opt.get());
     }
 
@@ -57,20 +60,21 @@ public class AdminPedidosController {
                 .body(Map.of("mensaje", "El campo 'estado' es requerido"));
         }
 
-        List<String> estadosValidos = List.of("Pendiente", "Preparando", "Enviado", "Entregado", "Cancelado");
-        if (!estadosValidos.contains(nuevoEstado)) {
+        // ✅ Validar convirtiendo a enum directamente
+        Orden.EstadoOrden estadoEnum;
+        try {
+            estadoEnum = Orden.EstadoOrden.valueOf(nuevoEstado);
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of(
-                "mensaje", "Estado inválido. Valores permitidos: " + estadosValidos
+                "mensaje", "Estado inválido. Valores permitidos: Pendiente, Preparando, Enviado, Entregado, Cancelado"
             ));
         }
 
         Optional<Orden> opt = ordenRepository.findById(id);
-        if (opt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (opt.isEmpty()) return ResponseEntity.notFound().build();
 
         Orden orden = opt.get();
-        orden.setEstado(Orden.EstadoOrden.valueOf(nuevoEstado));
+        orden.setEstado(estadoEnum);
         ordenRepository.save(orden);
 
         return ResponseEntity.ok(Map.of(

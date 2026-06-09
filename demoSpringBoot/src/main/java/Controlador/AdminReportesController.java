@@ -29,7 +29,7 @@ public class AdminReportesController {
     @GetMapping("/mensual")
     public ResponseEntity<AdminDTOs.ReporteCompleto> reporteMensual(
             @RequestParam(defaultValue = "0") int mesOffset) {
-        YearMonth mes    = YearMonth.now().minusMonths(mesOffset);
+        YearMonth mes        = YearMonth.now().minusMonths(mesOffset);
         LocalDateTime inicio = mes.atDay(1).atStartOfDay();
         LocalDateTime fin    = mes.atEndOfMonth().atTime(23, 59, 59);
         return ResponseEntity.ok(construirReporte(inicio, fin, "dia"));
@@ -47,7 +47,7 @@ public class AdminReportesController {
     @GetMapping("/anual")
     public ResponseEntity<AdminDTOs.ReporteCompleto> reporteAnual(
             @RequestParam(defaultValue = "0") int anioOffset) {
-        int anio = LocalDateTime.now().getYear() - anioOffset;
+        int anio             = LocalDateTime.now().getYear() - anioOffset;
         LocalDateTime inicio = LocalDateTime.of(anio, 1, 1, 0, 0, 0);
         LocalDateTime fin    = LocalDateTime.of(anio, 12, 31, 23, 59, 59);
         return ResponseEntity.ok(construirReporte(inicio, fin, "mes"));
@@ -60,10 +60,13 @@ public class AdminReportesController {
 
         Map<String, long[]> acumulado = new HashMap<>();
         for (DetalleOrden d : detalles) {
-            String nombre = (d.getProducto() != null) ? d.getProducto().getProNombre() : "Desconocido";
+            // ✅ getNombre() en lugar de getProNombre()
+            String nombre = (d.getProducto() != null) ? d.getProducto().getNombre() : "Desconocido";
             acumulado.computeIfAbsent(nombre, k -> new long[]{0, 0});
-            acumulado.get(nombre)[0] += d.getDetoCantidad() != null ? d.getDetoCantidad() : 0;
-            acumulado.get(nombre)[1] += d.getDetoSubTotal() != null ? d.getDetoSubTotal().longValue() : 0;
+            // ✅ getCantidad() en lugar de getDetoCantidad()
+            acumulado.get(nombre)[0] += d.getCantidad() != null ? d.getCantidad() : 0;
+            // ✅ getSubTotal() en lugar de getDetoSubTotal() — es Double, no BigDecimal
+            acumulado.get(nombre)[1] += d.getSubTotal() != null ? d.getSubTotal().longValue() : 0;
         }
 
         List<AdminDTOs.ProductoTop> top = acumulado.entrySet().stream()
@@ -81,7 +84,7 @@ public class AdminReportesController {
 
     @GetMapping("/completo")
     public ResponseEntity<AdminDTOs.ReporteCompleto> reporteCompleto() {
-        YearMonth mes    = YearMonth.now();
+        YearMonth mes        = YearMonth.now();
         LocalDateTime inicio = mes.atDay(1).atStartOfDay();
         LocalDateTime fin    = mes.atEndOfMonth().atTime(23, 59, 59);
         AdminDTOs.ReporteCompleto reporte = construirReporte(inicio, fin, "dia");
@@ -89,10 +92,12 @@ public class AdminReportesController {
         List<DetalleOrden> detalles = detalleOrdenRepository.findAll();
         Map<String, long[]> acumulado = new HashMap<>();
         for (DetalleOrden d : detalles) {
-            String nombre = (d.getProducto() != null) ? d.getProducto().getProNombre() : "Otro";
+            // ✅ getNombre() en lugar de getProNombre()
+            String nombre = (d.getProducto() != null) ? d.getProducto().getNombre() : "Otro";
             acumulado.computeIfAbsent(nombre, k -> new long[]{0, 0});
-            acumulado.get(nombre)[0] += d.getDetoCantidad() != null ? d.getDetoCantidad() : 0;
-            acumulado.get(nombre)[1] += d.getDetoSubTotal() != null ? d.getDetoSubTotal().longValue() : 0;
+            // ✅ getCantidad() y getSubTotal()
+            acumulado.get(nombre)[0] += d.getCantidad() != null ? d.getCantidad() : 0;
+            acumulado.get(nombre)[1] += d.getSubTotal() != null ? d.getSubTotal().longValue() : 0;
         }
 
         List<AdminDTOs.ProductoTop> top5 = acumulado.entrySet().stream()
@@ -112,7 +117,8 @@ public class AdminReportesController {
     private AdminDTOs.ReporteCompleto construirReporte(LocalDateTime inicio,
                                                         LocalDateTime fin,
                                                         String agruparPor) {
-        List<Orden> ordenes = ordenRepository.findByOrdFechaBetween(inicio, fin);
+        // ✅ findByFechaBetween en lugar de findByOrdFechaBetween
+        List<Orden> ordenes = ordenRepository.findByFechaBetween(inicio, fin);
         List<Orden> validas = ordenes.stream()
             .filter(o -> Orden.EstadoOrden.Cancelado != o.getEstado())
             .collect(Collectors.toList());
@@ -149,4 +155,4 @@ public class AdminReportesController {
         reporte.setTotalOrdenes(ordenes.size());
         return reporte;
     }
-}   
+}
