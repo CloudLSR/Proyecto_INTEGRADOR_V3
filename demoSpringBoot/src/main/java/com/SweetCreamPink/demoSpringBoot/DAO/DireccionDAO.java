@@ -5,15 +5,6 @@ import java.util.Optional;
 
 import com.SweetCreamPink.demoSpringBoot.Modelo.Direccion;
 
-/**
- * Interfaz DAO para Direccion.
- *
- * FIX COMPLETO: La versión original extendía JpaRepository directamente,
- * pero DireccionServiceImpl llama a métodos como guardar(), buscarPorId(),
- * listarPorUsuario(), buscarPrincipal() y eliminar() que no existen en
- * JpaRepository. Se reescribe como interfaz DAO pura (patrón consistente
- * con UsuarioDAO), y se crea DireccionDAOImpl que sí usa el repositorio.
- */
 public interface DireccionDAO {
     Direccion guardar(Direccion direccion);
     Optional<Direccion> buscarPorId(Long id);

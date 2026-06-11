@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.SweetCreamPink.demoSpringBoot.DTO.AdminDTOs;
 import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.UsuarioRepository;
-import com.SweetCreamPink.demoSpringBoot.Security.JwtUtil;
+import com.SweetCreamPink.demoSpringBoot.Seguridad.JwtUtil;
 
 import java.util.Map;
 import java.util.Optional;

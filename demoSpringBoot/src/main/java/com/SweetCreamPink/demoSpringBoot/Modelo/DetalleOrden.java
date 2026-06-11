@@ -5,10 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Entidad DetalleOrden — una línea del pedido:
- * qué producto/variante, cuántos y a qué precio.
- */
 @Entity
 @Table(name = "detalles_orden")
 @Getter
@@ -23,11 +19,11 @@ public class DetalleOrden {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ordId_fk")
-    private Orden orden;
+    private Orden orden;  //* a que orden pertenece este detalle
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "proId_fk")
-    private Producto producto;
+    private Producto producto; //* Que producto se pidio
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "varId_fk")
@@ -42,7 +38,7 @@ public class DetalleOrden {
     @Column(name = "detoSubTotal")
     private Double subTotal;
 
-    /** Calcula el subtotal antes de persistir */
+    //* @PrePersist/@PreUpdate → calcula el subtotal antes de guardar desde Spring.
     @PrePersist
     @PreUpdate
     public void calcularSubtotal() {

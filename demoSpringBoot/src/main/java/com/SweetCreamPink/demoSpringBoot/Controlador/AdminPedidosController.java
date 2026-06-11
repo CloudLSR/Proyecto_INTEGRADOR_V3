@@ -34,7 +34,7 @@ public class AdminPedidosController {
 
     @GetMapping("/estado/{estado}")
     public ResponseEntity<List<Orden>> listarPorEstado(@PathVariable String estado) {
-        // ✅ Convertir String a enum y usar findByEstado
+        // Convertir String a enum y usar findByEstado
         try {
             Orden.EstadoOrden estadoEnum = Orden.EstadoOrden.valueOf(estado);
             return ResponseEntity.ok(ordenRepository.findByEstado(estadoEnum));
@@ -61,7 +61,7 @@ public class AdminPedidosController {
                 .body(Map.of("mensaje", "El campo 'estado' es requerido"));
         }
 
-        // ✅ Validar convirtiendo a enum directamente
+        // Validar convirtiendo a enum directamente
         Orden.EstadoOrden estadoEnum;
         try {
             estadoEnum = Orden.EstadoOrden.valueOf(nuevoEstado);

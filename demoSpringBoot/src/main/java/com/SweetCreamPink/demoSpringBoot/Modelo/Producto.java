@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entidad Producto — un postre de la pastelería (ej: Cupcakes Especiales).
- * Pertenece a una Categoria y tiene N variantes (sabores/tamaños).
+ * Entidad Producto — un postre de la pastelería
+ * Pertenece a una Categoria y tiene N variantes
  */
 @Entity
 @Table(name = "producto")
@@ -21,20 +21,21 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "proId")
-    private Integer id;
+    @Column(name = "proId") //? el campo se llama "id" aunque la columna sea "proId".
+    private Integer id; 
 
     @Column(name = "proNombre", nullable = false, length = 50)
     private String nombre;
 
+    //* FetchType.EAGER: la categoría siempre se carga junto al producto (necesario para el front)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "catId_fk")
     private Categoria categoria;
 
+    // cascade ALL: si se borra un producto, se borran sus variantes también
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<ProductoVariante> variantes = new ArrayList<>();
 
-    // ── Campos de la tabla 'productos' (catálogo con imagen) ────
     @Column(length = 255)
     private String descripcion;
 

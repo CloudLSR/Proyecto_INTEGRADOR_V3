@@ -15,13 +15,14 @@ public interface OfertaRepository extends JpaRepository<Oferta, Integer> {
 
     List<Oferta> findByOferActivaTrue();
 
-    /** Ofertas vigentes hoy */
+    //* Query manual: ofertas activas cuyas fechas incluyen la fecha de hoy
+    //* Usado en AdminOfertasController.ofertasVigentesPublico() → endpoint PÚBLICO /api/ofertas/vigentes
     @Query("SELECT o FROM Oferta o WHERE o.oferActiva = true " +
            "AND o.oferFechaInicio <= :hoy AND o.oferFechaFin >= :hoy")
     List<Oferta> findVigentes(@Param("hoy") LocalDate hoy);
 
-    // FIX: el campo @Id en Producto.java se llama "id" (no "proId")
-    // aunque la columna en BD se llame proId
+    //* el campo @Id en Producto.java se llama "id" (aunque la columna BD sea "proId")
+    //* Por eso la query usa "o.producto.id", no "o.producto.proId"
     @Query("SELECT o FROM Oferta o WHERE o.producto.id = :proId")
     List<Oferta> findByProductoId(@Param("proId") Integer proId);
 }

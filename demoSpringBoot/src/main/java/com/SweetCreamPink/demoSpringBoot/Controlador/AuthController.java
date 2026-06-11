@@ -11,15 +11,6 @@ import com.SweetCreamPink.demoSpringBoot.service.AuthService;
 
 import java.util.Map;
 
-/**
- * Controlador de autenticación.
- *
- * ENDPOINTS:
- *   POST /api/auth/registro              → crear cuenta
- *   POST /api/auth/login                 → obtener JWT
- *   POST /api/auth/olvide-contrasena     → enviar correo con token
- *   POST /api/auth/restablecer-contrasena → nueva contraseña con token
- */
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "${cors.allowed-origins}")

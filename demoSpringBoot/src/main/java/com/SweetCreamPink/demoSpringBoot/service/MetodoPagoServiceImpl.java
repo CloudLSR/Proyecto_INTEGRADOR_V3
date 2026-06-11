@@ -14,11 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Servicio de métodos de pago.
- * NOTA DE SEGURIDAD: Solo se guardan los últimos 4 dígitos de la tarjeta.
- * NUNCA almacenar número completo, CVV ni fecha de expiración.
- */
 @Service
 @Transactional
 public class MetodoPagoServiceImpl implements MetodoPagoService {

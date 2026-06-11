@@ -29,12 +29,10 @@ public class UsuarioApiController {
             if (usuarioRepo.findByCorreo(usuario.getCorreo()).isPresent()) {
                 return ResponseEntity.badRequest().body("El correo ya está registrado");
             }
-            // FIX: setRolId(2) no existe en la entidad Usuario → usar setRol() con objeto Rol
             Rol rolCliente = new Rol();
             rolCliente.setId(2);
             usuario.setRol(rolCliente);
 
-            // FIX: hashear contraseña antes de guardar
             usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
 
             Usuario guardado = usuarioRepo.save(usuario);
@@ -49,8 +47,6 @@ public class UsuarioApiController {
     public ResponseEntity<?> loginUsuario(@RequestBody Usuario loginData) {
         Optional<Usuario> userOpt = usuarioRepo.findByCorreo(loginData.getCorreo());
 
-        // FIX 1: getPassword() no existe → usar getContrasena()
-        // FIX 2: nunca comparar con .equals() en texto plano, usar BCrypt matches()
         if (userOpt.isPresent() &&
                 passwordEncoder.matches(loginData.getContrasena(), userOpt.get().getContrasena())) {
             Usuario u = userOpt.get();

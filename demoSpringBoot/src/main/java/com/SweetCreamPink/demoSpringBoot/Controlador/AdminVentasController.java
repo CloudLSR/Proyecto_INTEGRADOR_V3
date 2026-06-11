@@ -76,7 +76,7 @@ public class AdminVentasController {
     }
 
     private Map<String, Object> construirResumen(LocalDateTime inicio, LocalDateTime fin, String tipo) {
-        // ✅ findByFechaBetween
+        // findByFechaBetween
         List<Orden> ordenes = ordenRepository.findByFechaBetween(inicio, fin);
 
         List<Orden> validas = ordenes.stream()

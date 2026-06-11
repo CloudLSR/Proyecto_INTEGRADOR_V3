@@ -9,15 +9,6 @@ import com.SweetCreamPink.demoSpringBoot.service.DireccionService;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controlador de direcciones de envío.
- *
- * ENDPOINTS:
- *   GET    /api/direcciones/usuario/{usuarioId}       → listar mis direcciones
- *   POST   /api/direcciones/usuario/{usuarioId}       → agregar dirección
- *   PUT    /api/direcciones/{id}/usuario/{usuarioId}  → editar dirección
- *   DELETE /api/direcciones/{id}/usuario/{usuarioId}  → eliminar dirección
- */
 @RestController
 @RequestMapping("/api/direcciones")
 @CrossOrigin(origins = "${cors.allowed-origins}")

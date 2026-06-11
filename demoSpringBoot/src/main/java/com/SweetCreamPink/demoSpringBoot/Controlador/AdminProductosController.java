@@ -35,7 +35,7 @@ public class AdminProductosController {
 
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody Producto producto) {
-        // ✅ getNombre() en lugar de getProNombre()
+        // getNombre() en lugar de getProNombre()
         if (producto.getNombre() == null || producto.getNombre().isBlank()) {
             return ResponseEntity.badRequest()
                 .body(Map.of("mensaje", "El nombre del producto es requerido"));
@@ -55,7 +55,7 @@ public class AdminProductosController {
 
         Producto producto = opt.get();
 
-        // ✅ getNombre() / setNombre() en lugar de getProNombre() / setProNombre()
+        // getNombre() / setNombre() en lugar de getProNombre() / setProNombre()
         if (datosNuevos.getNombre() != null) {
             producto.setNombre(datosNuevos.getNombre());
         }

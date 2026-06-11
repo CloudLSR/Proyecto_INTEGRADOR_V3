@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalTime;
 
+//*@JsonIgnore en "personal" evita recursión infinita al serializar a JSON
+//* (Personal tiene List<HorarioPersonal>, y HorarioPersonal tiene Personal → bucle).
+
 @Entity
 @Table(name = "horario_personal")
 public class HorarioPersonal {
@@ -12,6 +15,7 @@ public class HorarioPersonal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer horId;
 
+     //* evitacursión infinita al serializar HorarioPersonal como JSON
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "perId_fk", nullable = false)
     @JsonIgnore

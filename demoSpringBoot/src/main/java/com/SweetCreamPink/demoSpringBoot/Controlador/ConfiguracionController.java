@@ -1,13 +1,10 @@
 package com.SweetCreamPink.demoSpringBoot.Controlador;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.UsuarioRepository;
 
 import java.util.Map;
@@ -25,7 +22,6 @@ public class ConfiguracionController {
     private PasswordEncoder passwordEncoder;
 
     // 1. Actualizar Información de la cuenta
-    // FIX: El ID en Usuario es Integer, no Long → cambiado @PathVariable Long a Integer
     @PutMapping("/actualizar-datos/{id}")
     public ResponseEntity<?> actualizarDatos(@PathVariable Integer id, @RequestBody Map<String, String> datos) {
         return usuarioRepo.findById(id).map(user -> {

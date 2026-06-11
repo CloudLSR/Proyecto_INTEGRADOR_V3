@@ -53,10 +53,6 @@ public class mycontroller {
                                 @RequestParam String password,
                                 Model model) {
         Optional<Usuario> userOpt = usuarioRepo.findByCorreo(correo);
-
-        // FIX 1: usar getContrasena() en lugar de getPassword() (que no existe)
-        // FIX 2: verificar con BCrypt en vez de comparar texto plano
-        // FIX 3: getRolId() no existe → usar getRol().getId() para comparar el rol
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getContrasena())) {
             Usuario u = userOpt.get();
             Integer rolId = (u.getRol() != null) ? u.getRol().getId() : 2;
@@ -77,18 +73,15 @@ public class mycontroller {
     public String guardarUsuario(@ModelAttribute Usuario usuario,
                                  @RequestParam String confirmPassword,
                                  Model model) {
-        // FIX 1: usar getContrasena() en lugar de getPassword()
         if (!usuario.getContrasena().equals(confirmPassword)) {
             model.addAttribute("error", "Las contraseñas no coinciden");
             return "registro";
         }
 
-        // FIX 2: setRolId() no existe → asignar un objeto Rol con id=2
         Rol rolCliente = new Rol();
         rolCliente.setId(2);
         usuario.setRol(rolCliente);
 
-        // FIX 3: hashear la contraseña antes de guardar (nunca en texto plano)
         usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
 
         usuarioRepo.save(usuario);

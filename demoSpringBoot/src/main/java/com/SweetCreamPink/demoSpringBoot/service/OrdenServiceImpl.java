@@ -21,10 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Implementación del servicio de órdenes.
- * Usa Apache POI para exportar historial a Excel.
- */
 @Service
 @Transactional
 public class OrdenServiceImpl implements OrdenService {

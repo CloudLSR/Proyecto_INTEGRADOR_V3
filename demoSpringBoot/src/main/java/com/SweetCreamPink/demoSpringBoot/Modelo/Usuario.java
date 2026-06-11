@@ -22,11 +22,15 @@ import java.util.List;
  *   SRP — solo contiene estado del usuario.
  *   OCP — extensible mediante Rol sin modificar esta clase.
  */
+
+//* solo contiene estado del usuario.
+//* para agregar permisos se extiende via Rol, sin modificar esta clase.
+//* Lombok @Getter/@Setter genera todos los getters/setters automáticamente.
+//* Lombok @NoArgsConstructor genera el constructor vacío que JPA necesita.
+
 @Entity
 @Table(name = "usuario")
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Usuario {
 
     @Id
@@ -41,43 +45,44 @@ public class Usuario {
     @Column(name = "usuApellido", length = 100)
     private String apellido;
 
-    @NotBlank(message = "El correo es obligatorio")
-    @Email(message = "Formato de correo inválido")
+    @NotBlank @Email
     @Column(name = "usuCorreo", nullable = false, unique = true, length = 150)
     private String correo;
 
-    /** Siempre almacenada con BCrypt — NUNCA en texto plano */
-    @NotBlank(message = "La contraseña es obligatoria")
+    //* siempre almacenada con BCrypt. nunca en texto plano.
+    //* los servicios que guardan o comparan contraseñas usan PasswordEncoder.
+    @NotBlank
     @Column(name = "usuContrasena", nullable = false)
     private String contrasena;
 
-    @Size(max = 20, message = "Teléfono máximo 20 caracteres")
+    @Size(max = 20)
     @Column(name = "usuTelefono", length = 20)
     private String telefono;
 
-    /** FK al rol (1=Admin, 2=Cliente) */
+    //* */ FK al rol → tabla `rol`
+    //* los IDs 1 y 2 están hardcodeados en AuthServiceImpl y UsuarioApiController.
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "rolId_fk")
     private Rol rol;
 
-    // ── Campos de recuperación de contraseña ────────────────────
+    //* campos para el flujo "Olvidé mi contraseña"
+    //* resetToken se genera en AuthServiceImpl.solicitarRecuperacion()
+    //* resetTokenExpiry expira a los 15 minutos
     @Column(name = "resetToken", length = 200)
     private String resetToken;
 
     @Column(name = "resetTokenExpiry")
     private LocalDateTime resetTokenExpiry;
 
-    // ── Relaciones ───────────────────────────────────────────────
-
-    /** Una cuenta puede tener múltiples direcciones de envío */
+    //* una cuenta puede tener múltiples direcciones de envío → tabla usuario_direccion
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Direccion> direcciones = new ArrayList<>();
 
-    /** Una cuenta puede tener múltiples métodos de pago guardados */
+    //* una cuenta puede tener múltiples métodos de pago → tabla usuario_metodo_pago
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MetodoPago> metodosPago = new ArrayList<>();
 
-    /** Historial de órdenes del cliente */
+    //* historial de compras del cliente → tabla orden
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Orden> ordenes = new ArrayList<>();
 }

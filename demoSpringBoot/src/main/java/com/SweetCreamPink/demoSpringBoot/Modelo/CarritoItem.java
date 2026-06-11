@@ -2,6 +2,10 @@ package com.SweetCreamPink.demoSpringBoot.Modelo;
 
 import jakarta.persistence.*;
 
+//* el subtotal se recalcula automáticamente en setCantidad() y setProducto().
+//* CarritoController usa una List estática en memoria.
+//* esta entidad existe para cuando se implemente persistencia real del carrito.
+
 @Entity
 @Table(name = "carrito_item")
 public class CarritoItem {
@@ -27,12 +31,14 @@ public class CarritoItem {
 
     public CarritoItem() {}
 
+    //* Constructor usado por CarritoController al agregar ítems en memoria
     public CarritoItem(Producto producto, Integer cantidad) {
         this.producto = producto;
         this.cantidad = cantidad;
         calcularSubtotal();
     }
 
+    //* se llama automáticamente en setCantidad() y setProducto()
     public void calcularSubtotal() {
         if (this.producto != null && this.cantidad != null) {
             this.subtotal = this.producto.getPrecio() * this.cantidad;
@@ -46,6 +52,7 @@ public class CarritoItem {
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 
     public Producto getProducto() { return producto; }
+    //* cuando se cambia el producto, el subtotal se actualiza solo
     public void setProducto(Producto producto) {
         this.producto = producto;
         calcularSubtotal();
@@ -55,6 +62,7 @@ public class CarritoItem {
     public void setVariante(ProductoVariante variante) { this.variante = variante; }
 
     public Integer getCantidad() { return cantidad; }
+    //* cuando se cambia la cantidad, el subtotal se actualiza solo
     public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
         calcularSubtotal();

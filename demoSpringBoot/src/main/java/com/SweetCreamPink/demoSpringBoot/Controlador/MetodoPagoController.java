@@ -10,16 +10,6 @@ import com.SweetCreamPink.demoSpringBoot.service.MetodoPagoService;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controlador de métodos de pago guardados.
- *
- * ENDPOINTS:
- *   GET    /api/metodos-pago/usuario/{usuarioId}       → listar métodos
- *   POST   /api/metodos-pago/usuario/{usuarioId}       → agregar método
- *   DELETE /api/metodos-pago/{id}/usuario/{usuarioId}  → eliminar método
- *
- * Tipos aceptados en el campo "tipo": VISA, BANCO, YAPE
- */
 @RestController
 @RequestMapping("/api/metodos-pago")
 @CrossOrigin(origins = "${cors.allowed-origins}")

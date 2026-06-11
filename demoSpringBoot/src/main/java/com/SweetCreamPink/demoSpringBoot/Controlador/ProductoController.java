@@ -18,19 +18,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controlador de productos del catálogo.
- *
- * ENDPOINTS PÚBLICOS:
- *   GET /api/productos           → listar todos
- *   GET /api/productos/{id}      → detalle
- *   GET /api/productos/buscar?q= → búsqueda por nombre
- *
- * ENDPOINTS ADMIN:
- *   POST   /api/productos/guardar → crear con imagen
- *   PUT    /api/productos/{id}    → actualizar
- *   DELETE /api/productos/{id}    → eliminar
- */
 @RestController
 @RequestMapping("/api/productos")
 @CrossOrigin(origins = "${cors.allowed-origins}")

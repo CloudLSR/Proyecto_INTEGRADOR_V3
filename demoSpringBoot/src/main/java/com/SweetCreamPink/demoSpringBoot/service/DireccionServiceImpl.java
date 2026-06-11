@@ -13,10 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Servicio de direcciones.
- * Si se marca una dirección como principal, desactiva la anterior.
- */
 @Service
 @Transactional
 public class DireccionServiceImpl implements DireccionService {

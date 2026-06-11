@@ -15,15 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controlador de órdenes (pedidos).
- *
- * ENDPOINTS:
- *   POST /api/ordenes/usuario/{usuarioId}            → crear nuevo pedido
- *   GET  /api/ordenes/usuario/{usuarioId}/historial  → historial completo
- *   GET  /api/ordenes/usuario/{usuarioId}/exportar   → descargar Excel con historial
- *   GET  /api/ordenes/{id}                           → detalle de una orden
- */
 @RestController
 @RequestMapping("/api/ordenes")
 @CrossOrigin(origins = "${cors.allowed-origins}")

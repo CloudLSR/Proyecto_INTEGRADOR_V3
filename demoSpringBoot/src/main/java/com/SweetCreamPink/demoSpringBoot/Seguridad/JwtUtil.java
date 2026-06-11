@@ -1,4 +1,4 @@
-package com.SweetCreamPink.demoSpringBoot.Security;
+package com.SweetCreamPink.demoSpringBoot.Seguridad;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -16,52 +16,55 @@ import java.util.Date;
  * Principio SRP: esta clase SOLO gestiona lógica JWT.
  * Usa Logback para registrar intentos inválidos.
  */
+
+// La clave secreta y tiempos de expiración vienen de application.properties.
+
 @Component
 public class JwtUtil {
 
     private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
 
     @Value("${jwt.secret}")
-    private String secret;
+    private String secret;          //? clave para firmar los tokens
 
     @Value("${jwt.expiration}")
-    private long expirationMs;
+    private long expirationMs;      //? duración del token de login
 
     @Value("${jwt.reset-expiration}")
-    private long resetExpirationMs;
+    private long resetExpirationMs; //? duración del token de reset contraseña 
 
     private Key getKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    /** Genera token de autenticación (login) */
+    //* genera token de autenticación (se devuelve al frontend en el login)
     public String generarToken(String correo, String rol) {
         return Jwts.builder()
-                .setSubject(correo)
-                .claim("rol", rol)
+                .setSubject(correo)       //* el "usuario" del token es el correo
+                .claim("rol", rol)        //* se guarda el rol para saber si es ADMIN o CLIENTE
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    /** Genera token de recuperación de contraseña (expira en 15 min) */
+    //*gGenera token de recuperación de contraseña
     public String generarTokenReset(String correo) {
         return Jwts.builder()
                 .setSubject(correo)
-                .claim("tipo", "RESET")
+                .claim("tipo", "RESET")   //* marca especial para distinguirlo del token de login
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + resetExpirationMs))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    /** Extrae el correo (subject) del token */
+    //* extrae el correo del subject del toke
     public String extraerCorreo(String token) {
         return parsear(token).getBody().getSubject();
     }
 
-    /** Verifica si el token es válido y no expiró */
+    //* devuelve true si el token es válido y no expiró
     public boolean esValido(String token) {
         try {
             parsear(token);
