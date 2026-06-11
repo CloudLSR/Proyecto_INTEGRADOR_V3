@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.SweetCreamPink.demoSpringBoot.DAO.UsuarioDAO;
 import com.SweetCreamPink.demoSpringBoot.Modelo.Rol;
 import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
+import com.SweetCreamPink.demoSpringBoot.Repositorio.RolRepository;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.UsuarioRepository;
 import com.SweetCreamPink.demoSpringBoot.Seguridad.JwtUtil;
 
@@ -25,15 +26,18 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil         jwtUtil;
     private final UsuarioRepository usuarioRepository;
+    private final RolRepository rolRepository;
 
     public AuthServiceImpl(UsuarioDAO usuarioDAO,
                            PasswordEncoder passwordEncoder,
                            JwtUtil jwtUtil,
-                           UsuarioRepository usuarioRepository) {
+                           UsuarioRepository usuarioRepository,
+                           RolRepository rolRepository) {
         this.usuarioDAO        = usuarioDAO;
         this.passwordEncoder   = passwordEncoder;
         this.jwtUtil           = jwtUtil;
         this.usuarioRepository = usuarioRepository;
+        this.rolRepository     = rolRepository;
     }
 
     // ── REGISTRO ─────────────────────────────────────────────────────────────
@@ -57,13 +61,20 @@ public class AuthServiceImpl implements AuthService {
         u.setTelefono(telefono);
         u.setContrasena(passwordEncoder.encode(contrasena));
 
-        Rol rolCliente = new Rol();
-        rolCliente.setId(2);
-        u.setRol(rolCliente);
+        u.setRol(obtenerRolCliente());
 
         Usuario guardado = usuarioDAO.guardar(u);
         log.info("Nuevo usuario registrado: {}", correo);
         return guardado;
+    }
+
+    private Rol obtenerRolCliente() {
+        return rolRepository.findByDescripcionIgnoreCase("Cliente")
+                .orElseGet(() -> {
+                    Rol rolCliente = new Rol();
+                    rolCliente.setDescripcion("Cliente");
+                    return rolRepository.save(rolCliente);
+                });
     }
 
     // ── LOGIN ─────────────────────────────────────────────────────────────────

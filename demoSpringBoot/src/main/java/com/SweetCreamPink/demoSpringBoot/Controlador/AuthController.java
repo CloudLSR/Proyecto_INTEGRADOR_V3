@@ -1,6 +1,5 @@
 package com.SweetCreamPink.demoSpringBoot.Controlador;
 
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,7 @@ public class AuthController {
     }
 
     // ── REGISTRO ─────────────────────────────────────────────────────────────
-    @PostMapping("/registro")
+    @PostMapping({"/registro", "/registrar"})
     public ResponseEntity<?> registrar(@RequestBody Map<String, String> body) {
         try {
             Usuario nuevo = authService.registrar(
