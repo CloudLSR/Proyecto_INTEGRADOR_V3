@@ -67,11 +67,13 @@ const Inicio = ({ setPage }) => {
   return (
     <div style={{ backgroundColor: '#FFEFEF', fontFamily: 'sans-serif', minHeight: '100vh', paddingBottom: '80px' }}>
       
+      {/* 1. LOGO SUPERIOR CENTRADO UNIVERSAL */}
+      <div style={{ textAlign: 'center', paddingTop: '40px', paddingBottom: '30px' }}>
+        <img src={logoPrincipal} alt="Logo Sweet Cream Rose" style={{ width: '230px', objectFit: 'contain' }} />
+      </div>
+
       {/* SECCIÓN HERO (BANNER PRINCIPAL) */}
-      <section style={{ textAlign: 'center', padding: '30px 20px' }}>
-        
-        <img src={logoPrincipal} alt="Logo Sweet Cream Rose" style={{ width: '150px', objectFit: 'contain', marginBottom: '35px' }} />
-        
+      <section style={{ textAlign: 'center', padding: '0 20px' }}>
         <div style={{ position: 'relative', maxWidth: '850px', margin: '0 auto', overflow: 'hidden' }}>
           {slides.map((slide, i) => (
             <div key={i} style={{ display: currentSlide === i ? 'flex' : 'none', height: '300px' }}>

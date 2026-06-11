@@ -6,6 +6,7 @@ import Footer from './Footer';
 import Inicio from './Inicio';
 import Productos from './Productos';
 import Ofertas from './Ofertas';
+import Nosotros from './Nosotros';
 
 // ─── GLOBAL CSS ──────────────────────────────────────────
 const globalCSS = `
@@ -69,12 +70,7 @@ export default function App() {
       {page === "inicio"    && <Inicio    setPage={navigateTo} />}
       {page === "productos" && <Productos setPage={navigateTo} />}
       {page === "ofertas"   && <Ofertas   setPage={navigateTo} />}
-      {page === "nosotros"  && (
-        <div style={{ minHeight:400, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:16 }}>
-          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:22, color:"#c8506a" }}>Página en construcción 🍰</p>
-          <button className="scr-btn-outline" onClick={() => navigateTo("inicio")}>Volver al inicio</button>
-        </div>
-      )}
+      {page === "nosotros"  && <Nosotros  setPage={navigateTo} />}
 
       {/* FOOTER */}
       <Footer setPage={navigateTo} />
