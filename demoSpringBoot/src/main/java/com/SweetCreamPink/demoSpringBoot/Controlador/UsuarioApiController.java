@@ -1,14 +1,18 @@
 package com.SweetCreamPink.demoSpringBoot.Controlador;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.SweetCreamPink.demoSpringBoot.Modelo.Rol;
 import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.UsuarioRepository;
+import com.SweetCreamPink.demoSpringBoot.service.AuthService;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -16,30 +20,32 @@ import java.util.Optional;
 @CrossOrigin(origins = "${cors.allowed-origins}")
 public class UsuarioApiController {
 
-    @Autowired
-    private UsuarioRepository usuarioRepo;
+    private final UsuarioRepository usuarioRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
-    // FIX: inyectar PasswordEncoder en vez de comparar contraseñas en texto plano
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UsuarioApiController(UsuarioRepository usuarioRepo,
+                                PasswordEncoder passwordEncoder,
+                                AuthService authService) {
+        this.usuarioRepo = usuarioRepo;
+        this.passwordEncoder = passwordEncoder;
+        this.authService = authService;
+    }
 
     @PostMapping("/registrar")
-    public ResponseEntity<?> registrarUsuario(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> registrarUsuario(@RequestBody Map<String, String> body) {
         try {
-            if (usuarioRepo.findByCorreo(usuario.getCorreo()).isPresent()) {
-                return ResponseEntity.badRequest().body("El correo ya está registrado");
-            }
-            Rol rolCliente = new Rol();
-            rolCliente.setId(2);
-            usuario.setRol(rolCliente);
-
-            usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
-
-            Usuario guardado = usuarioRepo.save(usuario);
-            guardado.setContrasena(null); // nunca devolver la contraseña
+            Usuario guardado = authService.registrar(
+                    body.get("nombre"),
+                    body.get("apellido"),
+                    body.get("correo"),
+                    body.get("contrasena"),
+                    body.get("telefono")
+            );
+            guardado.setContrasena(null);
             return ResponseEntity.ok(guardado);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -50,7 +56,7 @@ public class UsuarioApiController {
         if (userOpt.isPresent() &&
                 passwordEncoder.matches(loginData.getContrasena(), userOpt.get().getContrasena())) {
             Usuario u = userOpt.get();
-            u.setContrasena(null); // no devolver la contraseña al cliente
+            u.setContrasena(null);
             return ResponseEntity.ok(u);
         } else {
             return ResponseEntity.status(401).body("Credenciales incorrectas");

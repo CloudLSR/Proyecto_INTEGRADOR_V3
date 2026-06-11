@@ -7,11 +7,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.SweetCreamPink.demoSpringBoot.Modelo.Comentario;
-import com.SweetCreamPink.demoSpringBoot.Modelo.Rol;
 import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.ComentarioRepository;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.ProductoRepository;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.UsuarioRepository;
+import com.SweetCreamPink.demoSpringBoot.service.AuthService;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +32,9 @@ public class mycontroller {
     // FIX: se inyecta PasswordEncoder para hashear y verificar contraseñas correctamente
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/")
     public String inicio(Model model) {
@@ -78,14 +81,19 @@ public class mycontroller {
             return "registro";
         }
 
-        Rol rolCliente = new Rol();
-        rolCliente.setId(2);
-        usuario.setRol(rolCliente);
-
-        usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
-
-        usuarioRepo.save(usuario);
-        return "redirect:/login";
+        try {
+            authService.registrar(
+                    usuario.getNombre(),
+                    usuario.getApellido(),
+                    usuario.getCorreo(),
+                    usuario.getContrasena(),
+                    usuario.getTelefono()
+            );
+            return "redirect:/login";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "registro";
+        }
     }
 
     @PostMapping("/enviar-comentario")
