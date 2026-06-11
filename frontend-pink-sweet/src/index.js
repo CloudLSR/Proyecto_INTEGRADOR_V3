@@ -9,6 +9,10 @@ import CambiarPassword2 from './CambiarPassword2';
 import CambiarPassword3 from './CambiarPassword3';
 import CambiarPassword4 from './CambiarPassword4';
 import Perfil from './Perfil';
+import PreguntasFrecuentes from './PreguntasFrecuentes';
+import TerminosCondiciones from './TerminosCondiciones';
+import PoliticasPrivacidad from './PoliticasPrivacidad';
+import PoliticasEnvio from './PoliticasEnvio';
 // Productos
 import Productos from './Productos';
 
@@ -28,6 +32,10 @@ root.render(
       <Route path="/cambiar-password-3" element={<CambiarPassword3 />} />
       <Route path="/cambiar-password-4" element={<CambiarPassword4 />} />
       <Route path="/productos" element={<Productos />} />
+      <Route path="/faq" element={<PreguntasFrecuentes />} />
+      <Route path="/terminos-y-condiciones" element={<TerminosCondiciones />} />
+      <Route path="/politicas-de-privacidad" element={<PoliticasPrivacidad />} />
+      <Route path="/politicas-de-envio" element={<PoliticasEnvio />} />
     </Routes>
   </BrowserRouter>
 );

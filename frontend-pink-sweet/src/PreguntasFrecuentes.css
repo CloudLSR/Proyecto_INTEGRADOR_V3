@@ -1,0 +1,77 @@
+/* Paleta de colores basada en tu imagen */
+:root {
+    --primary-rose: #d67d8d;
+    --light-rose: #fdf2f3;
+    --text-dark: #5a2e34;
+}
+
+.faq-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+.faq-container h2 {
+    text-align: center;
+    color: var(--text-dark);
+    margin-bottom: 30px;
+}
+
+.faq-item {
+    border: 1px solid var(--primary-rose);
+    border-radius: 12px;
+    margin-bottom: 15px;
+    background-color: white;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* Estado activo cuando la pregunta está desplegada */
+.faq-item.active {
+    background-color: var(--light-rose);
+}
+
+.faq-question {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.faq-question i {
+    color: var(--primary-rose);
+}
+
+.faq-answer {
+    padding: 0 20px 20px 20px;
+    color: #777;
+    line-height: 1.6;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+/* Caja de contacto inferior */
+.contact-box {
+    background-color: var(--light-rose);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-dark);
+}
+
+.contact-box button {
+    background-color: var(--primary-rose);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    cursor: pointer;
+}

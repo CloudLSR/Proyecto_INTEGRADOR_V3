@@ -1,0 +1,135 @@
+/* Reutilizando la paleta de colores de tu configuración */
+.terms-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px 60px 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Fila del botón de regreso */
+.terms-back-row {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.terms-back-btn {
+    background: none;
+    border: none;
+    color: var(--primary-rose, #d67d8d);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.terms-back-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Encabezado */
+.terms-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.terms-header h2 {
+    color: var(--text-dark, #5a2e34);
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.terms-deco {
+    margin-bottom: 20px;
+}
+
+.terms-hearts {
+    color: var(--primary-rose, #d67d8d);
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+}
+
+.terms-subtitle {
+    color: var(--text-dark, #5a2e34);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    font-weight: 600;
+}
+
+/* Gran caja contenedora unificada de los 10 puntos */
+.terms-box {
+    background-color: white;
+    border: 1.5px solid #f3d2d7; /* Borde rosado pastel suave */
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(184, 107, 116, 0.04);
+}
+
+/* Cada fila de término */
+.terms-item {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding: 25px 30px;
+    border-bottom: 1px solid #fdf2f3; /* Separador tenue */
+    transition: background-color 0.2s ease;
+}
+
+.terms-item:last-child {
+    border-bottom: none;
+}
+
+.terms-item:hover {
+    background-color: var(--light-rose, #fdf2f3);
+}
+
+/* Círculos contenedores de iconos */
+.terms-icon-wrapper {
+    flex-shrink: 0;
+}
+
+.terms-icon-circle {
+    background-color: #fdf2f3; /* Rosa muy claro de fondo */
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #f9d5da;
+}
+
+.terms-icon-circle i {
+    color: var(--primary-rose, #d67d8d);
+    font-size: 1.5rem;
+}
+
+/* Textos informativos de cada sección */
+.terms-text-content {
+    flex: 1;
+}
+
+.terms-text-content h3 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-dark, #5a2e34);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.terms-text-content p {
+    font-size: 0.85rem;
+    color: #777777;
+    line-height: 1.5;
+}
+
+/* Adaptación para pantallas pequeñas */
+@media (max-width: 600px) {
+    .terms-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px 20px;
+        gap: 15px;
+    }
+}
