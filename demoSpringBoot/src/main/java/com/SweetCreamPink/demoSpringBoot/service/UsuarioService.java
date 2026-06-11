@@ -1,7 +1,6 @@
 package com.SweetCreamPink.demoSpringBoot.service;
 
 import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
-
 /**
  * Gestión del perfil del usuario autenticado.
  */

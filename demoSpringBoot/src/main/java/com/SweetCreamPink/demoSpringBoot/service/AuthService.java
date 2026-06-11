@@ -4,29 +4,36 @@ import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
 
 /**
  * Contrato del servicio de autenticación.
- * Cubre registro, login, olvido de contraseña y restablecimiento.
+ *
+ * CORRECCIÓN: login() devuelve String (el JWT), no Usuario,
+ * para que el AuthController pueda retornar { "token": "..." }
+ * al frontend React.
  */
 public interface AuthService {
 
-    /** Registra un nuevo usuario (cliente). Lanza excepción si el correo ya existe. */
-    Usuario registrar(String nombre, String apellido, String correo,
-                      String contrasena, String telefono);
+    /**
+     * Crea una nueva cuenta de cliente.
+     * @return el Usuario guardado (sin contraseña en texto plano)
+     * @throws IllegalArgumentException si el correo ya existe o los datos son inválidos
+     */
+    Usuario registrar(String nombre, String apellido,
+                      String correo, String contrasena, String telefono);
 
     /**
-     * Valida credenciales y devuelve el token JWT.
-     * @throws RuntimeException si las credenciales son incorrectas.
+     * Verifica credenciales y genera un JWT.
+     * @return el token JWT listo para enviar al frontend
+     * @throws RuntimeException si las credenciales son incorrectas
      */
     String login(String correo, String contrasena);
 
     /**
-     * Genera un token de recuperación y lo envía al correo.
-     * No revela si el correo existe o no (seguridad contra enumeración).
+     * Genera un token de recuperación y (cuando esté configurado) lo envía por correo.
      */
     void solicitarRecuperacion(String correo);
 
     /**
-     * Cambia la contraseña usando el token de recuperación recibido por email.
-     * @throws RuntimeException si el token es inválido o expiró.
+     * Valida el token de reset y actualiza la contraseña.
+     * @throws RuntimeException si el token es inválido o expiró
      */
     void restablecerContrasena(String token, String nuevaContrasena);
 }

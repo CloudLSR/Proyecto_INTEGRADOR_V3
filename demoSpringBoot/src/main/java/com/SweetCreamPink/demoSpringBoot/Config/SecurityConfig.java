@@ -21,18 +21,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.SweetCreamPink.demoSpringBoot.Security.CustomUserDetailsService;
 import com.SweetCreamPink.demoSpringBoot.Security.JwtAuthFilter;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * SecurityConfig ACTUALIZADA — incluye rutas del panel de administrador.
- *
- * NUEVAS RUTAS PÚBLICAS:
- *   POST /api/admin/auth/verificar-admin  → paso 1 del login admin (solo verifica credenciales)
- *   POST /api/admin/auth/pin              → paso 2 del login admin (valida PIN y emite JWT)
- *   GET  /api/ofertas/vigentes            → ofertas públicas para el frontend de clientes
- *
- * NUEVAS RUTAS ADMIN:
- *   /api/admin/**                         → protegidas con hasRole('ADMIN')
+ * SecurityConfig — configuración de Spring Security.
+ * * CORRECCIONES APLICADAS EN ESTA VERSIÓN:
+ * 1. Reorganización estricta del orden de filtros (Públicos arriba, Restrictivos abajo)
+ * para evitar el error 403 Forbidden en registros y logins.
+ * 2. Permitir explícitamente peticiones HttpMethod.OPTIONS en todo el servidor para evitar fallos de CORS Preflight.
  */
 @Configuration
 @EnableWebSecurity
@@ -43,11 +40,11 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
 
     @Value("${cors.allowed-origins}")
-    private String allowedOrigins;
+    private String allowedOriginsRaw;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter,
                           CustomUserDetailsService userDetailsService) {
-        this.jwtAuthFilter = jwtAuthFilter;
+        this.jwtAuthFilter   = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
     }
 
@@ -70,48 +67,50 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
 
-                // ── Rutas completamente públicas ─────────────────────────────
+                // 1. PERMITIR PREFLIGHT OPTIONS GLOBALMENTE (Esencial para navegadores y React)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                // 2. RUTAS PÚBLICAS GENERALES (Sin importar el método HTTP)
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/uploads/**", "/assets/**").permitAll()
+
+                // 3. RUTAS PÚBLICAS ESPECÍFICAS DE TIPO POST (Registro, Login, Endpoints de Admin Públicos)
                 .requestMatchers(HttpMethod.POST,
                         "/api/auth/registro",
                         "/api/auth/login",
                         "/api/auth/olvide-contrasena",
                         "/api/auth/restablecer-contrasena",
-                        // NUEVO: autenticación de 2 pasos del admin (no requiere JWT previo)
                         "/api/admin/auth/verificar-admin",
                         "/api/admin/auth/pin"
                 ).permitAll()
 
-                // Catálogo de productos y comentarios aprobados (público)
+                // 4. RUTAS PÚBLICAS ESPECÍFICAS DE TIPO GET
                 .requestMatchers(HttpMethod.GET,
                         "/api/productos/**",
                         "/api/comentarios/aprobados/**",
-                        // NUEVO: ofertas vigentes para el frontend de clientes
                         "/api/ofertas/vigentes"
                 ).permitAll()
 
-                // Archivos estáticos (imágenes subidas)
-                .requestMatchers("/uploads/**").permitAll()
-
-                // ── Solo ADMIN ────────────────────────────────────────────────
-                // Todas las rutas /api/admin/** (excepto las de auth ya definidas arriba)
+                // 5. RUTAS PRIVADAS - SOLO PARA ROL ADMIN
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                // Operaciones de escritura sobre productos también requieren ADMIN
                 .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST,   "/api/productos/guardar").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,    "/api/productos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,    "/api/comentarios/*/aprobar").hasRole("ADMIN")
 
-                // ── CLIENTE autenticado ───────────────────────────────────────
+                // 6. RUTAS PRIVADAS - PARA ROLES CLIENTE o ADMIN AUTENTICADOS
                 .requestMatchers("/api/perfil/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/direcciones/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/metodos-pago/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/ordenes/**").hasAnyRole("CLIENTE", "ADMIN")
+                .requestMatchers("/api/carrito/**").hasAnyRole("CLIENTE", "ADMIN")
+                .requestMatchers("/api/configuracion/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/comentarios/**").hasAnyRole("CLIENTE", "ADMIN")
 
-                // El resto requiere autenticación
+                // CUALQUIER OTRA RUTA NO ESPECIFICADA ARRIBA REQUIERE AUTENTICACIÓN
                 .anyRequest().authenticated()
             )
+            // Filtro JWT antes del filtro de usuario/contraseña estándar
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -120,10 +119,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(allowedOrigins));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Mapear los orígenes permitidos desde application.properties
+        List<String> origenes = Arrays.asList(allowedOriginsRaw.split(","));
+        config.setAllowedOrigins(origenes);
+
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
+        
+        // Exponer la cabecera de Autorización para que React pueda guardar el JWT Token
+        config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
