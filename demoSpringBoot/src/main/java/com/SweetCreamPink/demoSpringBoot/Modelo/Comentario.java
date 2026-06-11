@@ -23,10 +23,12 @@ public class Comentario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //* el usuario que escribió la reseña (puede ser null si no se requiere login para comentar)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuId_fk")
     private Usuario usuario;
 
+    //* El producto sobre el que es la reseña
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proId_fk")
     private Producto producto;
@@ -36,14 +38,13 @@ public class Comentario {
     private String contenido;
 
     @Column(length = 100)
-    private String nombre;
+    private String nombre; //* nombre visible del autor
 
-    /** 1-5 estrellas */
     @Column
     private Integer calificacion;
 
     @Column(nullable = false)
-    private boolean aprobado = false;
+    private boolean aprobado = false; 
 
     @Column
     private LocalDateTime fechaCreacion = LocalDateTime.now();

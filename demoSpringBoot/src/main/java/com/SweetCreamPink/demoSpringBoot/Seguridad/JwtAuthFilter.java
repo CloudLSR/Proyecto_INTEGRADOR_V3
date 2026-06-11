@@ -1,4 +1,4 @@
-package com.SweetCreamPink.demoSpringBoot.Security;
+package com.SweetCreamPink.demoSpringBoot.Seguridad;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,6 +14,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+//* se encadena con otros filtros de Spring Security.
+//* oncePerRequestFilter garantiza que este filtro se ejecuta UNA SOLA VEZ por request.
+
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -27,10 +30,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
-    // Este método hace que el filtro se salte las rutas públicas completamente
+    //* rutas que se SALTAN este filtro completamente.
+    //* deben estar sincronizadas con las rutas públicas de SecurityConfig.
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
+        String path   = request.getServletPath();
         String method = request.getMethod();
         return method.equals("OPTIONS")
             || path.startsWith("/api/auth/")
@@ -46,15 +50,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
+        //* lee el header "Authorization: Bearer <token>"
         String authHeader = request.getHeader("Authorization");
 
+        //* si no viene token, deja pasar el request
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
         }
 
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(7); //* quita el "Bearer " del inicio
 
+        //* si el token es inválido o expirado, deja pasar
         if (!jwtUtil.esValido(token)) {
             log.warn("Token inválido en request a: {}", request.getRequestURI());
             chain.doFilter(request, response);
@@ -63,11 +70,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String correo = jwtUtil.extraerCorreo(token);
 
+        //* si hay correo válido y todavía no hay autenticación en el contexto, la inyecta
         if (correo != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            //* carga el usuario desde la BD usando CustomUserDetailsService → UsuarioRepository
             var userDetails = userDetailsService.loadUserByUsername(correo);
-            var authToken = new UsernamePasswordAuthenticationToken(
+            var authToken   = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            //* guarda la autenticación en el contexto — a partir de aquí Spring sabe quién eres
             SecurityContextHolder.getContext().setAuthentication(authToken);
             log.debug("Usuario autenticado vía JWT: {}", correo);
         }

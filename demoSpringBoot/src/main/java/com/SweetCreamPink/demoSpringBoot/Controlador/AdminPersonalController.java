@@ -16,23 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Gestión de Personal (empleados) para el administrador.
- *
- * PERSONAL:
- *  GET    /api/admin/personal              → listar todos
- *  GET    /api/admin/personal/{id}         → ver uno
- *  POST   /api/admin/personal              → agregar empleado
- *  PUT    /api/admin/personal/{id}         → editar empleado (nombre, rol, estado, etc.)
- *  DELETE /api/admin/personal/{id}         → eliminar empleado
- *  PUT    /api/admin/personal/{id}/estado  → activar/desactivar
- *
- * HORARIOS:
- *  GET    /api/admin/personal/{id}/horarios          → ver horarios del empleado
- *  POST   /api/admin/personal/{id}/horarios          → agregar turno
- *  DELETE /api/admin/personal/horarios/{horId}       → eliminar turno específico
- *  PUT    /api/admin/personal/horarios/{horId}        → editar turno específico
- */
 @RestController
 @RequestMapping("/api/admin/personal")
 @CrossOrigin(origins = "${cors.allowed-origins}")

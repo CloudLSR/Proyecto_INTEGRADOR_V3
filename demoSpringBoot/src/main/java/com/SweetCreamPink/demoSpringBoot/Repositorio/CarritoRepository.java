@@ -10,6 +10,8 @@ import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
 import java.util.List;
 import java.util.Optional;
 
+//* Actualmente NO se usa. CarritoController usa una List estática en memoria.
+//* Este repositorio existe para una futura implementación de carrito persistente.
 public interface CarritoRepository extends JpaRepository<CarritoItem, Long> {
     List<CarritoItem> findByUsuario(Usuario usuario);
     Optional<CarritoItem> findByUsuarioAndProductoAndVariante(Usuario usuario, Producto producto, ProductoVariante variante);

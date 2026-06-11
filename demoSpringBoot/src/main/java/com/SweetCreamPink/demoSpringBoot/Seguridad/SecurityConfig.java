@@ -1,4 +1,4 @@
-package com.SweetCreamPink.demoSpringBoot.Config;
+package com.SweetCreamPink.demoSpringBoot.Seguridad;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,27 +18,21 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.SweetCreamPink.demoSpringBoot.Security.CustomUserDetailsService;
-import com.SweetCreamPink.demoSpringBoot.Security.JwtAuthFilter;
-
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * SecurityConfig — configuración de Spring Security.
- * * CORRECCIONES APLICADAS EN ESTA VERSIÓN:
- * 1. Reorganización estricta del orden de filtros (Públicos arriba, Restrictivos abajo)
- * para evitar el error 403 Forbidden en registros y logins.
- * 2. Permitir explícitamente peticiones HttpMethod.OPTIONS en todo el servidor para evitar fallos de CORS Preflight.
- */
+//* SOLID — SRP: solo configura la seguridad
+//*SOLID — DIP: depende de JwtAuthFilter y CustomUserDetailsService por inyección.
+
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity  //? activa @PreAuthorize en los controladores
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
 
+    //? los orígenes CORS vienen de application.properties (cors.allowed-origins).
     @Value("${cors.allowed-origins}")
     private String allowedOriginsRaw;
 
@@ -48,6 +42,9 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    //*Bean BCrypt — se inyecta en todos los servicios que manejan contraseñas.
+    //! solo debe estar declarado AQUÍ. Si lo declaras en otro @Configuration o
+    //! en un controlador, Spring lanzará "ConflictingBeanDefinitionException".
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -62,19 +59,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.disable())           //* JWT (JSON Web Token) ya protege contra CSRF
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //* sin sesión → JWT
             .authorizeHttpRequests(auth -> auth
 
-                // 1. PERMITIR PREFLIGHT OPTIONS GLOBALMENTE (Esencial para navegadores y React)
+                //! preflight OPTIONS — los navegadores (React) envían esto antes de cada POST.
+                //! si no está al principio, Spring lo bloquea antes de llegar aquí.
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // 2. RUTAS PÚBLICAS GENERALES (Sin importar el método HTTP)
+                //! rutas de autenticación — siempre públicas
                 .requestMatchers("/api/auth/**").permitAll()
+
+                //! si cambias uploads.directory en application.properties, también cambia esto.
                 .requestMatchers("/uploads/**", "/assets/**").permitAll()
 
-                // 3. RUTAS PÚBLICAS ESPECÍFICAS DE TIPO POST (Registro, Login, Endpoints de Admin Públicos)
+                //! endpoints POST públicos específicos (registro, login, admin auth)
                 .requestMatchers(HttpMethod.POST,
                         "/api/auth/registro",
                         "/api/auth/login",
@@ -84,21 +84,21 @@ public class SecurityConfig {
                         "/api/admin/auth/pin"
                 ).permitAll()
 
-                // 4. RUTAS PÚBLICAS ESPECÍFICAS DE TIPO GET
+                //! endpoints GET públicos (catálogo de productos, comentarios aprobados, ofertas vigentes)
                 .requestMatchers(HttpMethod.GET,
                         "/api/productos/**",
                         "/api/comentarios/aprobados/**",
                         "/api/ofertas/vigentes"
                 ).permitAll()
 
-                // 5. RUTAS PRIVADAS - SOLO PARA ROL ADMIN
+                //! todo /api/admin/** y operaciones de escritura sobre productos → solo ADMIN
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST,   "/api/productos/guardar").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,    "/api/productos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,    "/api/comentarios/*/aprobar").hasRole("ADMIN")
 
-                // 6. RUTAS PRIVADAS - PARA ROLES CLIENTE o ADMIN AUTENTICADOS
+                //! rutas privadas del cliente (requieren JWT con rol CLIENTE o ADMIN)
                 .requestMatchers("/api/perfil/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/direcciones/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/metodos-pago/**").hasAnyRole("CLIENTE", "ADMIN")
@@ -107,10 +107,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/configuracion/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/comentarios/**").hasAnyRole("CLIENTE", "ADMIN")
 
-                // CUALQUIER OTRA RUTA NO ESPECIFICADA ARRIBA REQUIERE AUTENTICACIÓN
+                //! cualquier otra ruta no listada arriba: requiere autenticación
                 .anyRequest().authenticated()
             )
-            // Filtro JWT antes del filtro de usuario/contraseña estándar
+            //* el filtro JWT se ejecuta ANTES del filtro estándar de usuario/contraseña.
+            //* si el token es válido, Spring ya sabe quién es el usuario sin tocar la BD de sesiones.
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -120,15 +121,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Mapear los orígenes permitidos desde application.properties
         List<String> origenes = Arrays.asList(allowedOriginsRaw.split(","));
         config.setAllowedOrigins(origenes);
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-        
-        // Exponer la cabecera de Autorización para que React pueda guardar el JWT Token
+
+        //* exponer el header Authorization para que React pueda leer y guardar el JWT
         config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

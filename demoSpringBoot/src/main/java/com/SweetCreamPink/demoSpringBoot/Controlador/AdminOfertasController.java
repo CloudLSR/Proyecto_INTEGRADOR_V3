@@ -49,7 +49,7 @@ public class AdminOfertasController {
             return ResponseEntity.badRequest()
                 .body(Map.of("mensaje", "La fecha de fin no puede ser anterior a la de inicio"));
 
-        // ✅ Producto.id se llama getId() porque Lombok usa el campo 'id'
+        // Producto.id se llama getId() porque Lombok usa el campo 'id'
         if (oferta.getProducto() != null && oferta.getProducto().getId() != null) {
             Optional<Producto> prodOpt = productoRepository.findById(oferta.getProducto().getId());
             prodOpt.ifPresent(oferta::setProducto);
@@ -73,7 +73,7 @@ public class AdminOfertasController {
         if (datos.getOferFechaFin()    != null) o.setOferFechaFin(datos.getOferFechaFin());
         if (datos.getOferActiva()      != null) o.setOferActiva(datos.getOferActiva());
 
-        // ✅ getId() en lugar de getProId()
+        // getId() en lugar de getProId()
         if (datos.getProducto() != null && datos.getProducto().getId() != null) {
             productoRepository.findById(datos.getProducto().getId()).ifPresent(o::setProducto);
         }

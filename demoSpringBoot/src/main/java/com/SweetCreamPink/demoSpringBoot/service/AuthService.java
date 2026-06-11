@@ -2,13 +2,6 @@ package com.SweetCreamPink.demoSpringBoot.service;
 
 import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
 
-/**
- * Contrato del servicio de autenticación.
- *
- * CORRECCIÓN: login() devuelve String (el JWT), no Usuario,
- * para que el AuthController pueda retornar { "token": "..." }
- * al frontend React.
- */
 public interface AuthService {
 
     /**

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Categoría de productos: Cupcakes, Galletas, Tortas, etc. */
 @Entity
 @Table(name = "categoria")
 @Getter

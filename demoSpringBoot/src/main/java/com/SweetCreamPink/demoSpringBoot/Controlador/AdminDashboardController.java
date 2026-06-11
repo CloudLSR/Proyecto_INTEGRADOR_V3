@@ -37,7 +37,7 @@ public class AdminDashboardController {
         LocalDateTime inicio = mesActual.atDay(1).atStartOfDay();
         LocalDateTime fin    = mesActual.atEndOfMonth().atTime(23, 59, 59);
 
-        // ✅ findByFechaBetween
+        // findByFechaBetween
         List<Orden> ordenesMes = ordenRepository.findByFechaBetween(inicio, fin);
 
         resumen.setTotalOrdenesMes(ordenesMes.size());

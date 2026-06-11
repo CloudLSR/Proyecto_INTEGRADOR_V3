@@ -12,15 +12,7 @@ import com.SweetCreamPink.demoSpringBoot.service.UsuarioService;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * PerfilController — gestión del perfil del usuario autenticado.
- *
- * CORRECCIONES APLICADAS:
- *   1. Se agrega GET /api/perfil/correo/{correo} para que el frontend
- *      pueda obtener el ID del usuario después del login (sin exponer datos sensibles).
- *   2. GET /api/perfil/me resuelve el perfil usando el JWT (AuthenticationPrincipal).
- *   3. Nunca se devuelve la contraseña en la respuesta.
- */
+
 @RestController
 @RequestMapping("/api/perfil")
 @CrossOrigin(origins = "${cors.allowed-origins}")
@@ -55,7 +47,7 @@ public class PerfilController {
 
     // ── GET /api/perfil/correo/{correo} ───────────────────────────────────────
     /**
-     * FIX NUEVO: permite al frontend obtener el ID del usuario a partir del correo
+     * permite al frontend obtener el ID del usuario a partir del correo
      * que viene en el payload del JWT, justo después del login.
      * Solo devuelve id, nombre, apellido, correo y rol (sin contraseña).
      */
@@ -82,7 +74,6 @@ public class PerfilController {
         ));
     }
 
-    // ── GET /api/perfil/{usuarioId} ────────────────────────────────────────────
     @GetMapping("/{usuarioId}")
     public ResponseEntity<?> obtener(@PathVariable Integer usuarioId,
                                      @AuthenticationPrincipal UserDetails userDetails) {
@@ -95,7 +86,6 @@ public class PerfilController {
         }
     }
 
-    // ── PUT /api/perfil/{usuarioId} ────────────────────────────────────────────
     @PutMapping("/{usuarioId}")
     public ResponseEntity<?> actualizar(@PathVariable Integer usuarioId,
                                         @RequestBody Map<String, String> body,

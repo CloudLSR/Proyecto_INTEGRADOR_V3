@@ -61,12 +61,12 @@ public class AdminReportesController {
 
         Map<String, long[]> acumulado = new HashMap<>();
         for (DetalleOrden d : detalles) {
-            // ✅ getNombre() en lugar de getProNombre()
+            // getNombre() en lugar de getProNombre()
             String nombre = (d.getProducto() != null) ? d.getProducto().getNombre() : "Desconocido";
             acumulado.computeIfAbsent(nombre, k -> new long[]{0, 0});
-            // ✅ getCantidad() en lugar de getDetoCantidad()
+            // getCantidad() en lugar de getDetoCantidad()
             acumulado.get(nombre)[0] += d.getCantidad() != null ? d.getCantidad() : 0;
-            // ✅ getSubTotal() en lugar de getDetoSubTotal() — es Double, no BigDecimal
+            // getSubTotal() en lugar de getDetoSubTotal() — es Double, no BigDecimal
             acumulado.get(nombre)[1] += d.getSubTotal() != null ? d.getSubTotal().longValue() : 0;
         }
 
@@ -93,10 +93,10 @@ public class AdminReportesController {
         List<DetalleOrden> detalles = detalleOrdenRepository.findAll();
         Map<String, long[]> acumulado = new HashMap<>();
         for (DetalleOrden d : detalles) {
-            // ✅ getNombre() en lugar de getProNombre()
+            // getNombre() en lugar de getProNombre()
             String nombre = (d.getProducto() != null) ? d.getProducto().getNombre() : "Otro";
             acumulado.computeIfAbsent(nombre, k -> new long[]{0, 0});
-            // ✅ getCantidad() y getSubTotal()
+            // getCantidad() y getSubTotal()
             acumulado.get(nombre)[0] += d.getCantidad() != null ? d.getCantidad() : 0;
             acumulado.get(nombre)[1] += d.getSubTotal() != null ? d.getSubTotal().longValue() : 0;
         }
@@ -118,7 +118,7 @@ public class AdminReportesController {
     private AdminDTOs.ReporteCompleto construirReporte(LocalDateTime inicio,
                                                         LocalDateTime fin,
                                                         String agruparPor) {
-        // ✅ findByFechaBetween en lugar de findByOrdFechaBetween
+        // findByFechaBetween en lugar de findByOrdFechaBetween
         List<Orden> ordenes = ordenRepository.findByFechaBetween(inicio, fin);
         List<Orden> validas = ordenes.stream()
             .filter(o -> Orden.EstadoOrden.Cancelado != o.getEstado())

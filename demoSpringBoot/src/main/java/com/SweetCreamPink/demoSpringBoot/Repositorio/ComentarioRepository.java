@@ -7,7 +7,7 @@ import com.SweetCreamPink.demoSpringBoot.Modelo.Comentario;
 
 @Repository
 public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
-    List<Comentario> findByAprobadoTrue();
-    List<Comentario> findByAprobadoFalse();
-    List<Comentario> findByProductoIdAndAprobadoTrue(Integer productoId);
+    List<Comentario> findByAprobadoTrue(); //* Comentarios visibles al público
+    List<Comentario> findByAprobadoFalse(); //* Pendientes de moderación (para el admin)
+    List<Comentario> findByProductoIdAndAprobadoTrue(Integer productoId); //* Reseñas de un producto
 }

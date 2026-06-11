@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entidad Orden — representa un pedido completo del cliente.
- * Cada orden tiene N detalles (productos + cantidades).
- * Sirve como historial de compras en el perfil del usuario.
+ * representa un pedido completo del cliente.
+ * cada orden tiene N detalles (productos + cantidades).
+ * sirve como historial de compras en el perfil del usuario.
  */
 @Entity
 @Table(name = "orden")
@@ -34,7 +34,7 @@ public class Orden {
     private LocalDateTime fecha = LocalDateTime.now();
 
     @Column(name = "ordTotal")
-    private Double total = 0.0;
+    private Double total = 0.0;  //? se recalcula en OrdenServiceImpl al crear la orden
 
     @Column(name = "ordDireccionEntrega", columnDefinition = "TEXT")
     private String direccionEntrega;
@@ -43,6 +43,7 @@ public class Orden {
     @Column(name = "ordMetodoPago", length = 30)
     private MetodoPagoOrden metodoPago;
 
+    //* el admin cambia el estado desde AdminPedidosController
     @Enumerated(EnumType.STRING)
     @Column(name = "ordEstado", length = 20)
     private EstadoOrden estado = EstadoOrden.Pendiente;

@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
+// Son solo datos de gestión interna para el admin.
+// Un empleado puede tener N horarios (HorarioPersonal) con día y hora entrada/salida.
+
 @Entity
 @Table(name = "personal")
 public class Personal {

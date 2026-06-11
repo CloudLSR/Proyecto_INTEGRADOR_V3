@@ -10,21 +10,6 @@ import com.SweetCreamPink.demoSpringBoot.service.ComentarioService;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controlador de comentarios / reseñas.
- *
- * ENDPOINTS PÚBLICOS:
- *   GET  /api/comentarios/aprobados               → todos los aprobados
- *   GET  /api/comentarios/aprobados/producto/{id} → aprobados por producto
- *
- * ENDPOINTS CLIENTE (requiere JWT):
- *   POST /api/comentarios                         → crear comentario (queda pendiente)
- *
- * ENDPOINTS ADMIN:
- *   GET  /api/comentarios/pendientes              → revisar pendientes
- *   PUT  /api/comentarios/{id}/aprobar            → aprobar comentario
- *   DELETE /api/comentarios/{id}                  → eliminar comentario
- */
 @RestController
 @RequestMapping("/api/comentarios")
 @CrossOrigin(origins = "${cors.allowed-origins}")

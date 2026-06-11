@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+//? una oferta tiene título, descripción, porcentaje de descuento y fechas de vigencia.
+//? si producto=null → la oferta aplica a TODA la tienda.
+//? si producto tiene valor → aplica solo a ese producto específico.
+//? oferActiva=false para desactivar sin borrar
+
 @Entity
 @Table(name = "oferta")
 public class Oferta {

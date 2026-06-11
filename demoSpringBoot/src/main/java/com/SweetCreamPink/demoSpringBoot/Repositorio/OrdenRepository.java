@@ -9,9 +9,12 @@ import java.util.List;
 
 public interface OrdenRepository extends JpaRepository<Orden, Integer> {
 
+    //* usado por AdminVentasController, AdminReportesController y AdminDashboardController
     List<Orden> findByFechaBetween(LocalDateTime inicio, LocalDateTime fin);
 
+    //* usado por AdminPedidosController para filtrar por estado
     List<Orden> findByEstado(Orden.EstadoOrden estado);
 
+    //* usado por OrdenServiceImpl para el historial del cliente
     List<Orden> findByUsuario_IdOrderByFechaDesc(Integer usuarioId);
 }

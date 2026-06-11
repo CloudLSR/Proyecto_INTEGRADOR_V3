@@ -6,12 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Entidad Direccion — un usuario puede registrar N direcciones de envío.
- * Cada dirección pertenece exclusivamente a ese usuario (clave foránea).
- *
- * Tabla nueva: usuario_direccion
- */
+//? dirección de envío de un usuario.
+//? un usuario puede tener N direcciones, solo una puede ser principal.
+//? direccionServiceImpl se encarga de desmarcar la anterior cuando se marca una nueva como principal.
+
 @Entity
 @Table(name = "usuario_direccion")
 @Getter

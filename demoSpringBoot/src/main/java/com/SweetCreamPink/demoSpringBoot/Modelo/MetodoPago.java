@@ -7,16 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Entidad MetodoPago — guarda los métodos de pago del usuario.
- * Tipos soportados: VISA, BANCO, YAPE.
- *
- * NOTA DE SEGURIDAD: Nunca guardar número de tarjeta completo.
- * Solo se almacena los últimos 4 dígitos (para Visa) o el
- * número de celular (para Yape).
- *
- * Tabla nueva: usuario_metodo_pago
- */
+//? metodo de pago guardado del usuario.
+//? nunca guardar el número completo de tarjeta, CVV ni fecha de expiración.
+//? solo se guardan los ÚLTIMOS 4 DÍGITOS para identificar la tarjeta.
+//? tipos soportados: VISA, BANCO, YAPE.
+
 @Entity
 @Table(name = "usuario_metodo_pago")
 @Getter
@@ -37,7 +32,6 @@ public class MetodoPago {
     @Column(nullable = false, length = 20)
     private TipoPago tipo;
 
-    /** Alias o apodo: "Mi Visa Personal", "Yape Principal" */
     @NotBlank(message = "El alias es obligatorio")
     @Column(length = 80)
     private String alias;
@@ -49,11 +43,10 @@ public class MetodoPago {
     @Column(length = 10)
     private String ultimosDigitos;
 
-    /** Nombre del titular impreso en la tarjeta (solo para VISA) */
+    //* nombre del titular impreso en la tarjeta (solo para VISA)
     @Column(length = 100)
     private String titular;
 
-    /** Nombre del banco (BCP, Interbank, BBVA...) — para BANCO y VISA */
     @Column(length = 80)
     private String banco;
 

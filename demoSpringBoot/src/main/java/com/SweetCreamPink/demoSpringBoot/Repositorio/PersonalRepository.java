@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface PersonalRepository extends JpaRepository<Personal, Integer> {
     List<Personal> findByPerEstado(Personal.EstadoPersonal estado);
-    boolean existsByPerCorreo(String correo);
+    boolean existsByPerCorreo(String correo); //* evitar duplicados al registrar empleados
 }
