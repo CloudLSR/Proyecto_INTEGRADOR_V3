@@ -1,141 +1,191 @@
 import React, { useState } from 'react';
 
-// Imágenes de Ofertas
-import tortaFresa       from "./assets/products/torta de fresa.png";
-import tortaChoco       from "./assets/products/torta triple chocolate.jpg";
-import trufas           from "./assets/products/trufas.png";
-import empanadas        from "./assets/products/empanadas.png";
-import alfajores        from "./assets/products/alfajores.png";
-import cupcakeArandano  from "./assets/products/cupcake_arandano.png";
-import logo             from "./assets/products/logo.png";
+import logoPrincipal from './assets/logo.png';
+import dividerTitle from "./assets/divider-title.png"; 
+import iconOferta from "./assets/icon-oferta.png"; 
+import tortaFresa from "./assets/products/torta de fresa.png";
 
-// Datos de Ofertas
-const offerProducts = [
-  { img: tortaChoco,      name: "Torta Triple Chocolate",  desc: "Bizcocho de chocolate con relleno y cobertura de ganache, decorada con crema de chocolate.", oldPrice: "S/. 80.00", newPrice: "S/. 64.00", discount: "-20%" },
-  { img: trufas,          name: "Trufas de Fresa",         desc: "Delicadas trufas de chocolate rellenas con crema sabor fresa.",                              oldPrice: "S/. 45.00", newPrice: "S/. 33.75", discount: "-25%" },
-  { img: empanadas,       name: "Mini Empanadas de Carne", desc: "Empanadas doradas con relleno de carne casera.",                                             oldPrice: "S/. 36.00", newPrice: "S/. 30.60", discount: "-15%" },
-  { img: alfajores,       name: "Alfajor Clásico",         desc: "Alfajores artesanales rellenos de manjar y espolvoreados con azúcar.",                       oldPrice: "S/. 28.00", newPrice: "S/. 22.40", discount: "-20%" },
-  { img: cupcakeArandano, name: "Cupcakes de Arándano",    desc: "Cupcakes esponjosos decorados con crema y arándanos frescos.",                               oldPrice: "S/. 42.00", newPrice: "S/. 37.80", discount: "-10%" },
-];
-
-const valueProps = [
-  { icon: "fa-seedling",   label: "Ingredientes de primera calidad" },
-  { icon: "fa-heart",      label: "Hecho con amor en cada detalle" },
-  { icon: "fa-truck",      label: "Envíos seguros y rápidos" },
-  { icon: "fa-user",       label: "Atención personalizada para ti" },
-];
-
-// Componente Encabezado de Página
-function PageHeader({ title, subtitle1, subtitle2 }) {
-  return (
-    <section style={{ background:"#fdf2f4", padding:"48px 24px 32px", textAlign:"center", borderBottom:"1px solid #f0d0d8" }}>
-      <img src={logo} alt="Sweet Cream Rose" style={{ height:80, objectFit:"contain", marginBottom:16 }} />
-      <p style={{ fontFamily:"'Playfair Display',serif", fontStyle:"italic", fontSize:18, color:"#7a4055", marginBottom:6 }}>{subtitle1}</p>
-      <p style={{ fontFamily:"'Playfair Display',serif", fontStyle:"italic", fontSize:16, color:"#a07080", marginBottom:28 }}>{subtitle2}</p>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:16 }}>
-        <div style={{ height:1, width:60, background:"#f0d0d8" }}></div>
-        <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:26, fontWeight:700, color:"#2d1a10", letterSpacing:3 }}>{title}</h2>
-        <div style={{ height:1, width:60, background:"#f0d0d8" }}></div>
-      </div>
-      <div style={{ marginTop:8, color:"#c8506a", fontSize:18, letterSpacing:4 }}>— 🤍 —</div>
-    </section>
-  );
-}
+// IMAGENES OFERTAS
+import imgAClasico from './assets/products/a-clasico.png';
+import imgTvClasicos from './assets/products/tv-clasicos.png';
+import imgMeQueso from './assets/products/me-queso.png';
+import imgTcChocolate from './assets/products/tc-chocolate.png';
+import imgCArandano from './assets/products/c-arandano.png';
+import imgTFresa from './assets/products/t-fresa.png';
 
 const Ofertas = ({ setPage }) => {
+  // WISHLIST
   const [wishlist, setWishlist] = useState([]);
   const toggleWish = i => setWishlist(w => w.includes(i) ? w.filter(x => x !== i) : [...w, i]);
 
-  const scrollToGrid = () => document.getElementById("ofertas-grid")?.scrollIntoView({ behavior:"smooth" });
+  const offerProducts = [
+    { id: 0, img: imgTcChocolate, name: "Torta Triple Chocolate", desc: "Delicioso bizcocho de chocolate con relleno y cobertura de ganache, decorado con crema de chocolate.", oldPrice: "80.00", newPrice: "64.00", discount: "-20%" },
+    { id: 1, img: imgTvClasicos, name: "Tequeños Clásicos", desc: "La receta tradicional que nunca falla. Rellenos de queso blanco llanero, crujientes por fuera y derretidos por dentro.", oldPrice: "38.00", newPrice: "32.30", discount: "-15%" },
+    { id: 2, img: imgTFresa, name: "Trufas de Fresa", desc: "Chocolate negro relleno de una suave crema de fresa natural. Dulces, frutales y absolutamente irresistibles.", oldPrice: "45.00", newPrice: "33.75", discount: "-25%" },
+    { id: 3, img: imgMeQueso, name: "Mini Empanadas de Queso", desc: "Deliciosas empanadas rellenas de queso fundido, cremosas por dentro y doradas por fuera.", oldPrice: "36.00", newPrice: "30.60", discount: "-15%" },
+    { id: 4, img: imgAClasico, name: "Alfajor Clásico", desc: "Delicadas tapitas artesanales con un suave relleno de dulce de leche y un toque de azúcar en polvo.", oldPrice: "28.00", newPrice: "22.40", discount: "-20%" },
+    { id: 5, img: imgCArandano, name: "Cupcakes de Arándano", desc: "Delicioso y suave pastelito de miga fina con un toque de dulzor a chocolate, es ideal para decorar con crema batida y/o fondant.", oldPrice: "42.00", newPrice: "37.80", discount: "-10%" },
+  ];
 
   return (
-    <>
-      <PageHeader title="OFERTAS"
-        subtitle1="Aprovecha nuestras ofertas en postres artesanales hechos con amor."
-        subtitle2="Sabores irresistibles ahora a precios especiales." />
+    <div style={{ backgroundColor: '#FFEFEF', fontFamily: 'sans-serif', minHeight: '100vh', paddingBottom: '80px' }}>
+      
+      <section style={{ textAlign: 'center', paddingTop: '40px', paddingBottom: '20px' }}>
+        <img src={logoPrincipal} alt="Logo Sweet Cream Rose" style={{ width: '230px', objectFit: 'contain', marginBottom: '15px' }} />
+        <h1 style={{ color: '#5A3E41', margin: '10 0 5px 30', fontFamily: 'Poppins-Bold', fontSize: '30px', letterSpacing: '2px' }}>OFERTAS</h1>
+        <img src={dividerTitle} alt="divisor" style={{ width: '180px', height: 'auto', display: 'block', margin: '0 auto 10px auto' }} />
+      </section>
 
-      <section style={{ background:"linear-gradient(135deg,#fdf2f4 0%,#f5c8d8 100%)", padding:"52px 40px" }}>
-        <div className="hero-offer-inner" style={{ maxWidth:1000, margin:"0 auto", display:"flex", alignItems:"center", gap:48, flexWrap:"wrap" }}>
-          <div style={{ flex:1, minWidth:260 }}>
-            <span style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#c8506a", color:"#fff", fontFamily:"'Lato',sans-serif", fontSize:12, fontWeight:700, letterSpacing:1.5, padding:"6px 16px", borderRadius:20, marginBottom:20 }}>
-              <i className="fa-solid fa-heart"></i> DESCUENTOS ESPECIALES
-            </span>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:36, fontWeight:700, color:"#2d1a10", marginBottom:14, lineHeight:1.25 }}>Disfruta lo mejor por menos</h2>
-            <p style={{ fontFamily:"'Lato',sans-serif", fontSize:16, color:"#7a4055", marginBottom:32, lineHeight:1.7 }}>Aprovecha nuestras ofertas por tiempo limitado en tus productos favoritos.</p>
-            <button className="scr-btn-primary" onClick={scrollToGrid}>
-              APROVECHAR OFERTA <i className="fa-solid fa-arrow-right" style={{ marginLeft:8 }}></i>
-            </button>
+      {/* HERO BANNER DE DESCUENTOS */}
+      <section style={{ maxWidth: '1100px', margin: '0 auto 60px auto', backgroundColor: '#FACFD8', borderRadius: '25px', display: 'flex', overflow: 'hidden', position: 'relative', padding: '0 20px' }}>
+        <div style={{ flex: '1', padding: '60px 50px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <span style={{ color: '#C6676D', fontFamily: 'Poppins-Bold', fontSize: '13px', letterSpacing: '1px', marginBottom: '15px' }}>
+            ♥ DESCUENTOS ESPECIALES
+          </span>
+          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '46px', color: '#5A3E41', margin: '0 0 15px 0', lineHeight: '1.1' }}>
+            Disfruta lo mejor<br/>por menos
+          </h2>
+          <p style={{ fontFamily: 'Poppins-Medium', fontSize: '15px', color: '#5A3E41', margin: '0 0 30px 0', maxWidth: '350px', lineHeight: '1.5' }}>
+            Aprovecha nuestras ofertas por tiempo limitado en tus productos favoritos.
+          </p>
+          <button style={{ alignSelf: 'flex-start', backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '12px 35px', fontFamily: 'Poppins-Bold', fontSize: '14px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            APROVECHAR OFERTA <span style={{ fontSize: '18px' }}>→</span>
+          </button>
+        </div>
+        
+        <div style={{ flex: '1', position: 'relative' }}>
+          <img src={tortaFresa} alt="Pastel en oferta" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          
+          {/* ICON-OFERTA GRANDE */}
+          <div style={{ 
+            position: 'absolute', 
+            top: '30px', 
+            right: '40px', 
+            width: '140px', 
+            height: '140px', 
+            backgroundImage: `url(${iconOferta})`, 
+            backgroundSize: 'contain', 
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            color: 'white',
+            transform: 'rotate(-5deg)'
+          }}>
+            <span style={{ fontFamily: 'Poppins-Medium', fontSize: '15px', marginTop: '-5px' }}>Hasta</span>
+            <span style={{ fontFamily: 'Poppins-Bold', fontSize: '38px', lineHeight: '1' }}>25%</span>
+            <span style={{ fontFamily: 'Poppins-Medium', fontSize: '13px' }}>DSCTO.</span>
           </div>
-          <div style={{ flex:"0 0 300px", position:"relative", display:"flex", justifyContent:"center" }}>
-            <img src={tortaFresa} alt="Torta Especial de Oferta"
-              style={{ width:260, height:260, objectFit:"cover", borderRadius:"50%", border:"6px solid #fff", boxShadow:"0 8px 32px rgba(200,80,106,.25)", display:"block" }} />
-            <div style={{ position:"absolute", top:0, right:20, width:72, height:72, borderRadius:"50%", background:"#c8506a", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 12px rgba(200,80,106,.4)" }}>
-              <span style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.8)", letterSpacing:1 }}>Hasta</span>
-              <span style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:700, color:"#fff", lineHeight:1 }}>25%</span>
-              <span style={{ fontFamily:"'Lato',sans-serif", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.8)", letterSpacing:1 }}>DSCTO.</span>
-            </div>
-          </div>
+
         </div>
       </section>
 
-      <section id="ofertas-grid" style={{ maxWidth:1100, margin:"0 auto", padding:"60px 24px" }}>
-        <div style={{ textAlign:"center", marginBottom:40 }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:12 }}>
-            <i className="fa-solid fa-tag" style={{ color:"#c8506a", fontSize:18 }}></i>
-            <span style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:700, color:"#2d1a10", letterSpacing:2 }}>OFERTAS DESTACADAS</span>
-          </div>
-          <div style={{ marginTop:8, color:"#c8506a", letterSpacing:6, fontSize:14 }}>— — — — — —</div>
+      {/* TÍTULO OFERTAS DESTACADAS */}
+      <div style={{ maxWidth: '1100px', margin: '0 auto 30px auto', padding: '0 20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <i className="fa-solid fa-tag" style={{ color: '#C6676D', fontSize: '26px', transform: 'scaleX(-1)' }}></i>
+          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '28px', color: '#5A3E41', margin: '0' }}>OFERTAS DESTACADAS</h2>
         </div>
-        <div className="offers-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:24 }}>
-          {offerProducts.map((p, i) => (
-            <div key={i} className="offer-card">
-              <span className="badge-discount">{p.discount}</span>
-              <button className={`wishlist-btn${wishlist.includes(i) ? " active" : ""}`} onClick={() => toggleWish(i)}>
-                <i className={wishlist.includes(i) ? "fa-solid fa-heart" : "fa-regular fa-heart"}></i>
-              </button>
-              <img src={p.img} alt={p.name} />
-              <div style={{ padding:"16px 18px" }}>
-                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:16, fontWeight:700, color:"#2d1a10", marginBottom:6 }}>{p.name}</h3>
-                <p style={{ fontFamily:"'Lato',sans-serif", fontSize:13, color:"#7a4055", lineHeight:1.6, marginBottom:14 }}>{p.desc}</p>
-                <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:4 }}>
-                  <span style={{ fontFamily:"'Lato',sans-serif", fontSize:13, color:"#b0a0a5", textDecoration:"line-through" }}>{p.oldPrice}</span>
-                  <span style={{ fontFamily:"'Lato',sans-serif", fontSize:18, fontWeight:700, color:"#c8506a" }}>{p.newPrice}</span>
-                </div>
-                <button className="btn-add-cart">
-                  <i className="fa-solid fa-cart-shopping" style={{ marginRight:8 }}></i>AÑADIR AL CARRITO
-                </button>
+        <img src={dividerTitle} alt="Divisor" style={{ width: '140px', objectFit: 'contain', marginLeft: '45px', marginTop: '5px' }} onError={e => e.target.style.display='none'} />
+      </div>
+
+      {/* GRID DE PRODUCTOS */}
+      <section style={{ maxWidth: '1100px', margin: '0 auto 60px auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', padding: '0 20px' }}>
+        {offerProducts.map((p) => (
+          <div key={p.id} style={{ border: '2px solid #EAAFB8', borderRadius: '25px', overflow: 'hidden', backgroundColor: '#FFEFEF', display: 'flex', flexDirection: 'column' }}>
+            
+            <div style={{ position: 'relative', height: '240px' }}>
+              <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              
+              {/* ICON-OFERTA PEQUEÑOS */}
+              <div style={{ 
+                position: 'absolute', 
+                top: '5px', 
+                left: '5px', 
+                width: '80px', 
+                height: '80px',
+                backgroundImage: `url(${iconOferta})`, 
+                backgroundSize: 'contain', 
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                color: 'white',
+                fontFamily: 'Poppins-Bold', 
+                fontSize: '20px' 
+              }}>
+                {p.discount}
+              </div>
+              
+              {/* FAVORITOS */}
+              <div onClick={() => toggleWish(p.id)} style={{ position: 'absolute', top: '15px', right: '15px', backgroundColor: 'rgba(255,255,255,0.9)', width: '38px', height: '38px', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+                <i className={wishlist.includes(p.id) ? "fa-solid fa-heart" : "fa-regular fa-heart"} style={{ color: '#C6676D', fontSize: '18px', marginTop: '1px' }}></i>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
 
-      <section style={{ padding:"0 24px 48px" }}>
-        <div style={{ maxWidth:900, margin:"0 auto", background:"linear-gradient(135deg,#c8506a 0%,#a83858 100%)", borderRadius:14, padding:"28px 40px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:20 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:20 }}>
-            <div style={{ width:54, height:54, borderRadius:"50%", background:"rgba(255,255,255,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, color:"#fff", flexShrink:0 }}>
-              <i className="fa-regular fa-clock"></i>
-            </div>
-            <div>
-              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:20, color:"#fff", marginBottom:4 }}>¡OFERTAS POR TIEMPO LIMITADO!</h3>
-              <p style={{ fontFamily:"'Lato',sans-serif", fontSize:14, color:"rgba(255,255,255,.85)" }}>No te quedes sin tus favoritos. Promociones válidas hasta agotar stock</p>
+            {/* CONTENIDO */}
+            <div style={{ padding: '25px', display: 'flex', flexDirection: 'column', flexGrow: '1' }}>
+              <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#644444', margin: '0 0 10px 0' }}>{p.name}</h3>
+              <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#644444', margin: '0 0 20px 0', lineHeight: '1.5' }}>{p.desc}</p>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: 'auto', marginBottom: '20px' }}>
+                <span style={{ fontFamily: 'Poltawski-Nowy', fontSize: '20px', color: '#7C7978', textDecoration: 'line-through' }}>S/. {p.oldPrice}</span>
+                <span style={{ fontFamily: 'Poltawski-Nowy', fontSize: '20px', color: '#C6676D' }}>S/. {p.newPrice}</span>
+              </div>
+
+              <button style={{ backgroundColor: '#C6676D', color: '#FFFFFF', border: 'none', padding: '12px', borderRadius: '10px', fontFamily: 'Poppins-Medium', fontSize: '18px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', width: '100%' }}>
+                <i className="fa-solid fa-cart-shopping"></i> AÑADIR AL CARRITO
+              </button>
             </div>
           </div>
-          <button className="scr-btn-white" onClick={scrollToGrid}>¡APROVÉCHALOS YA!</button>
-        </div>
+        ))}
       </section>
 
-      <section style={{ background:"#fdf2f4", padding:"48px 24px", borderTop:"1px solid #f0d0d8" }}>
-        <div className="value-props-grid" style={{ maxWidth:900, margin:"0 auto", display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:24 }}>
-          {valueProps.map((v, i) => (
-            <div key={i} className="prop-item">
-              <div className="prop-icon"><i className={`fa-solid ${v.icon}`}></i></div>
-              <span style={{ fontFamily:"'Lato',sans-serif", fontSize:13, color:"#5a3040", fontWeight:600, lineHeight:1.5 }}>{v.label}</span>
-            </div>
-          ))}
+      {/* BANNER INFERIOR TIEMPO LIMITADO */}
+      <section style={{ maxWidth: '1100px', margin: '0 auto 60px auto', backgroundColor: '#FACFD8', borderRadius: '20px', padding: '30px 60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+          <div style={{ width: '80px', height: '80px', backgroundColor: 'white', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '3px solid #C6676D' }}>
+            <i className="fa-regular fa-clock" style={{ fontSize: '35px', color: '#B14B47' }}></i>
+          </div>
+          <div>
+            <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '24px', color: '#7D2530', margin: '0 0 5px 0' }}>¡OFERTAS POR TIEMPO LIMITADO!</h3>
+            <p style={{ fontFamily: 'Poppins-Medium', fontSize: '15px', color: '#B14B47', margin: '0' }}>No te quedes sin tus favoritos.<br/>Promociones válidas hasta agotar stock</p>
+          </div>
         </div>
+        <button style={{ backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '12px 30px', fontFamily: 'Poppins-Bold', fontSize: '15px', borderRadius: '8px', cursor: 'pointer' }}>
+          ¡APROVECHALOS YA!
+        </button>
       </section>
-    </>
+
+      {/* 7. PROPUESTAS DE VALOR */}
+      <section style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', padding: '30px 40px 0 40px', borderTop: '2px solid #FADADD' }}>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <i className="fa-solid fa-cube" style={{ fontSize: '35px', color: '#EAAFB8' }}></i>
+          <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', maxWidth: '120px', lineHeight: '1.3' }}>Ingredientes de primera calidad</span>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <i className="fa-regular fa-heart" style={{ fontSize: '35px', color: '#EAAFB8' }}></i>
+          <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', maxWidth: '120px', lineHeight: '1.3' }}>Hecho con amor en cada detalle</span>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <i className="fa-solid fa-truck-fast" style={{ fontSize: '35px', color: '#EAAFB8' }}></i>
+          <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', maxWidth: '120px', lineHeight: '1.3' }}>Envíos seguros y rápidos</span>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <i className="fa-regular fa-user" style={{ fontSize: '35px', color: '#EAAFB8' }}></i>
+          <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', maxWidth: '120px', lineHeight: '1.3' }}>Atención personalizada para ti</span>
+        </div>
+
+      </section>
+
+    </div>
   );
 };
 
