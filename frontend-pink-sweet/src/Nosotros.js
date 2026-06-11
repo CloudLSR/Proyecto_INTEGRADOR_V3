@@ -1,100 +1,188 @@
-// Nosotros.js — Página de NOSOTROS / CONTÁCTANOS
-// Replica exactamente nosotros.html
+import React, { useState } from 'react';
 
-import React from 'react';
-import { Header, Footer } from './Layout';
-import './Stylee.css';
+import logoPrincipal from './assets/logo.png';
+import cupcakeAsset from './assets/cupcake-cont.png';
+import cupcake2Asset from './assets/cupcake2-cont.png';
+import mapaImg from './assets/mapa-cont.png';
 
-function Nosotros() {
+const Nosotros = () => {
+
+  const [formData, setFormData] = useState({ nombre: '', mensaje: '' });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Mensaje enviado:", formData);
+  };
+
   return (
-    <div style={{ backgroundColor: '#FFF0F2', fontFamily: "'Segoe UI', sans-serif", color: '#4A3E3F' }}>
-      <Header />
+    <div style={{ backgroundColor: '#FFEFEF', fontFamily: 'Poppins-Regular, sans-serif', minHeight: '100vh', paddingBottom: '100px' }}>
+      
+      <div style={{ textAlign: 'center', paddingTop: '40px', paddingBottom: '15px' }}>
+        <img 
+          src={logoPrincipal} 
+          alt="Logo Sweet Cream Rose" 
+          style={{ width: '230px', objectFit: 'contain' }} 
+        />
+      </div>
 
-      {/* ══ Hero Nosotros ══ */}
-      <section className="contact-hero-section">
-        <div className="contact-hero-container">
-          <div className="contact-hero-text">
-            <h1 className="cursive-brand-title">Contáctanos</h1>
-            <h2>¡Ven a conocernos y endulza tu día!</h2>
-            <p>Siempre estamos felices de recibirte y atenderte. A continuación te dejamos toda la información para que nos encuentres fácil y rápido:</p>
-          </div>
-          <div className="contact-hero-image">
-            <img src="/assets/products/cupcakecorazon.jpg" alt="Cupcakes Sweet Cream Rose"
-                 onError={e => e.target.style.display='none'} />
-          </div>
+      {/* SECCIÓN HERO CONTÁCTANOS */}
+      <section style={{ maxWidth: '850px', margin: '0 auto 60px auto', display: 'flex', alignItems: 'center', gap: '30px', padding: '0 0px' }}>
+        <div style={{ flex: '' }}>
+
+          <h1 style={{ fontFamily: 'RougeScript-Regular', fontSize: '100px', color: '#5A3E41', margin: '0 0 10px 0', lineHeight: '1.1', maxWidth: '430px' }}>
+            Contáctanos
+          </h1>
+          <h2 style={{ fontFamily: 'Rosario-Regular', fontSize: '27px', color: '#5A3E41', margin: '0 0 15px 0', lineHeight: '1.3', maxWidth: '430px' }}>
+            ¡Ven a conocernos y endulza tu día!
+          </h2>
+          <p style={{ fontFamily: 'Rosario-Regular', fontSize: '21px', color: '#5A3E41', lineHeight: '1.5', margin: '0', maxWidth: '430px' }}>
+            Siempre estamos felices de recibirte y atenderte. A continuación te dejamos toda la información para que nos encuentres fácil y rápido:
+          </p>
+        </div>
+        <div style={{ flex: '1', height: '350px' }}>
+
+          <img 
+            src={cupcakeAsset} 
+            alt="Cupcakes Contáctanos" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '15px' }} 
+          />
         </div>
       </section>
 
-      {/* ══ Tarjetas de info ══ */}
-      <section className="info-cards-section">
-        <div className="cards-grid-container">
+      {/* SECCIÓN TARJETAS */}
+      <section style={{ maxWidth: '850px', margin: '0 auto 80px auto', display: 'flex', gap: '40px', padding: '0 0px' }}>
+        
+        {/* TARJETA IZQUIERDA */}
+        <div style={{ flex: '1', backgroundColor: '#EAAFB8', padding: '20px', borderRadius: '0px' }}>
+          <div style={{ backgroundColor: '#ffeded', borderRadius: '0px', padding: '30px 30px', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', boxSizing: 'border-box' }}>
+            <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 15px 0' }}>
+              <span style={{ color: '#EAAFB8' }}>•</span> Nuestra Sucursal <span style={{ color: '#EAAFB8' }}>•</span>
+            </h3>
+            <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41', margin: '0 0 20px 0', lineHeight: '1.4' }}>
+              Los Olivos<br/>Av. Los Próceres de Huandoy - Mz.33A Lt.13
+            </p>
+            {/* FOTO MAPA */}
+            <div style={{ width: '100%', height: '140px', marginBottom: '20px', borderRadius: '10px', overflow: 'hidden' }}>
+              <img 
+                src={mapaImg} 
+                alt="Mapa Sucursal" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                onError={e => e.target.style.display='none'} 
+              />
+            </div>
+            <a
+              href="https://maps.app.goo.gl/A3riJ6B1X5LeHMQM8"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ backgroundColor: '#C6676D', color: 'white', textDecoration: 'none', display: 'inline-block', padding: '10px 30px', fontFamily: 'Poppins-SemiBold', fontSize: '14px', borderRadius: '20px', cursor: 'pointer', marginTop: 'auto' }}
+            >
+              Cómo llegar
+            </a>
+          </div>
+        </div>
 
-          <div className="outer-info-card">
-            <div className="inner-info-card">
-              <h3>Nuestra Sucursal</h3>
-              <p className="card-address">Larcomar<br />Mal. de la Reserva 610, Miraflores 15074</p>
-              <div className="map-container-box">
-                <img src="/assets/products/mapa.jpg" alt="Ubicación en el mapa" className="map-static-img"
-                     onError={e => e.target.style.display='none'} />
+        {/* TARJETA DERECHA */}
+        <div style={{ flex: '1', backgroundColor: '#EAAFB8', padding: '20px', borderRadius: '0px' }}>
+          <div style={{ backgroundColor: '#ffeded', borderRadius: '0px', padding: '30px 20px', height: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+            <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 25px 0', textAlign: 'center' }}>
+              <span style={{ color: '#EAAFB8' }}>•</span> Horarios y Contacto <span style={{ color: '#EAAFB8' }}>•</span>
+            </h3>
+            
+            <ul style={{ listStyle: 'none', padding: '0', margin: '0 0 30px 10px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41', lineHeight: '1.2' }}>
+              <li><span style={{ color: '#C6676D', marginRight: '5px', fontSize: '26px' }}>•</span>Lunes a Sábado de 9:00 am - 8:00 pm</li>
+              <li><span style={{ color: '#C6676D', marginRight: '5px', fontSize: '26px' }}>•</span>Domingo de 9:00 am - 4:00 pm</li>
+            </ul>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginLeft: '10px', marginBottom: '30px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontFamily: 'Poppins-SemiBold', fontSize: '16px', color: '#5A3E41' }}>
+                <div style={{ width: '30px', height: '30px', backgroundColor: '#C6676D', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '13px' }}>
+                  <i className="fa-solid fa-phone"></i>
+                </div>
+                +51 992 376 537
               </div>
-              <a href="https://maps.app.goo.gl/f1KiFD5F15MLFb358" target="_blank" rel="noreferrer" className="btn-card-action">
-                Cómo llegar
-              </a>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontFamily: 'Poppins-Medium', fontSize: '15px', color: '#5A3E41' }}>
+                <div style={{ width: '30px', height: '30px', backgroundColor: '#C6676D', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '13px' }}>
+                  <i className="fa-solid fa-envelope"></i>
+                </div>
+                sweetcreamrose@gmail.com
+              </div>
+            </div>
+
+            {/* REDES ICONOS */}
+            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: 'auto' }}>
+              {[ {icon: 'fa-facebook-f'}, {icon: 'fa-instagram'}, {icon: 'fa-whatsapp'} ].map((r,idx) => (
+                <div key={idx} style={{ width: '35px', height: '35px', backgroundColor: '#C6676D', borderRadius: '50%', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '16px' }}>
+                  <i className={`fa-brands ${r.icon}`}></i>
+                </div>
+              ))}
             </div>
           </div>
+        </div>
 
-          <div className="outer-info-card">
-            <div className="inner-info-card">
-              <h3>Horarios y Contacto</h3>
-              <ul className="card-schedule-list">
-                <li>Lunes a Sábado de 9:00 am - 8:00 pm</li>
-                <li>Domingo de 9:00 am - 4:00 pm</li>
-              </ul>
-              <div className="card-direct-contact">
-                <p><i className="fa-solid fa-phone"></i> 81 1234 5678</p>
-                <p><i className="fa-solid fa-envelope"></i> info@SweetCreamRose.com</p>
-              </div>
-              <div className="card-social-icons">
-                <a href="#" className="social-circle-btn"><i className="fa-brands fa-facebook-f"></i></a>
-                <a href="#" className="social-circle-btn"><i className="fa-brands fa-instagram"></i></a>
-                <a href="#" className="social-circle-btn"><i className="fa-brands fa-whatsapp"></i></a>
-              </div>
+      </section>
+
+      {/* FORMULARIO */}
+      <section style={{ maxWidth: '850px', margin: '0 auto', display: 'flex', gap: '40px', padding: '0 0px', alignItems: 'center' }}>
+        <div style={{ flex: '1', height: '320px' }}>
+          {/* FOTO CUPCAKE-CONT.PNG OTRA VEZ (Como en Figma) */}
+          <img 
+            src={cupcake2Asset} 
+            alt="Déjanos un mensaje" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '15px' }} 
+          />
+        </div>
+        
+        <div style={{ flex: '1' }}>
+          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '28px', color: '#5A3E41', margin: '0 0 10px 0' }}>
+            Déjanos un mensaje
+          </h2>
+          <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#5A3E41', margin: '0 0 25px 0', lineHeight: '1.4' }}>
+            ¿Tienes alguna pregunta o sugerencia? Completa el formulario y te responderemos lo más pronto posible.
+          </p>
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div>
+              <label style={{ display: 'block', fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#5A3E41', marginBottom: '5px' }}>Nombre</label>
+
+              <input 
+                type="text" 
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                placeholder="Escribe tu nombre completo" 
+                style={{ width: '100%', backgroundColor: '#FADADD', border: 'none', padding: '12px 15px', fontFamily: 'Poppins-Medium', fontSize: '13px', outline: 'none', color: '#5A3E41', borderRadius: '5px', boxSizing: 'border-box' }} 
+              />
             </div>
-          </div>
+            
+            <div>
+              <label style={{ display: 'block', fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#5A3E41', marginBottom: '5px' }}>Mensaje</label>
 
+              <textarea 
+                name="mensaje"
+                value={formData.mensaje}
+                onChange={handleChange}
+                placeholder="Mensaje" 
+                rows={4}
+                style={{ width: '100%', backgroundColor: '#FADADD', border: 'none', padding: '12px 15px', fontFamily: 'Poppins-Medium', fontSize: '13px', outline: 'none', resize: 'vertical', color: '#5A3E41', borderRadius: '5px', boxSizing: 'border-box' }} 
+              />
+            </div>
+
+            <div style={{ textAlign: 'right', marginTop: '5px' }}>
+
+              <button type="submit" style={{ backgroundColor: '#EAAFB8', color: 'white', border: 'none', padding: '10px 40px', fontFamily: 'Poppins-Bold', fontSize: '14px', borderRadius: '8px', cursor: 'pointer' }}>
+                ENVIAR
+              </button>
+            </div>
+          </form>
         </div>
       </section>
 
-      {/* ══ Formulario de mensaje ══ */}
-      <section className="message-form-section">
-        <div className="form-main-banner">
-          <div className="form-left-illustration">
-            <img src="/assets/products/mapa.jpg" alt="Ilustración"
-                 onError={e => e.target.style.display='none'} />
-          </div>
-          <div className="form-right-content">
-            <h2>Déjanos un mensaje</h2>
-            <p>¿Tienes alguna pregunta o sugerencia? Completa el formulario y te responderemos lo más pronto posible.</p>
-            <form className="contact-inner-form" onSubmit={e => e.preventDefault()}>
-              <div className="form-field-group">
-                <label htmlFor="user-name">Nombre</label>
-                <input type="text" id="user-name" placeholder="Escribe tu nombre completo" required />
-              </div>
-              <div className="form-field-group">
-                <label htmlFor="user-message">Mensaje</label>
-                <textarea id="user-message" placeholder="Mensaje" rows="4" required></textarea>
-              </div>
-              <div className="form-submit-container">
-                <button type="submit" className="btn-submit-message">ENVIAR</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
     </div>
   );
-}
+};
 
 export default Nosotros;
