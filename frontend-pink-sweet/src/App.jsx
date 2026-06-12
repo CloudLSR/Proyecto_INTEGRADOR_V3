@@ -7,6 +7,10 @@ import Inicio from './Inicio';
 import Productos from './Productos';
 import Ofertas from './Ofertas';
 import Nosotros from './Nosotros';
+import PreguntasFrecuentes from './PreguntasFrecuentes';
+import PoliticasEnvio from './PoliticasEnvio';
+import TerminosCondiciones from './TerminosCondiciones';
+import PoliticasPrivacidad from './PoliticasPrivacidad';
 
 // ─── GLOBAL CSS ──────────────────────────────────────────
 const globalCSS = `
@@ -71,6 +75,10 @@ export default function App() {
       {page === "productos" && <Productos setPage={navigateTo} />}
       {page === "ofertas"   && <Ofertas   setPage={navigateTo} />}
       {page === "nosotros"  && <Nosotros  setPage={navigateTo} />}
+      {page === "fqa"       && <PreguntasFrecuentes setPage={navigateTo} />}
+      {page === "terminos-y-condiciones" && <TerminosCondiciones setPage={navigateTo} />}
+      {page === "politicas-de-privacidad" && <PoliticasPrivacidad setPage={navigateTo} />}
+      {page === "politicas-de-envio" && <PoliticasEnvio setPage={navigateTo} />}
 
       {/* FOOTER */}
       <Footer setPage={navigateTo} />

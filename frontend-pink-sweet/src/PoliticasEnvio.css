@@ -151,15 +151,6 @@
     background-repeat: no-repeat;
 }
 
-/* Vincula aquí las imágenes de tus assets */
-.img-moto {
-    background-image: url('../assets/moto_delivery.png');
-}
-
-.img-box {
-    background-image: url('../assets/empaque_rosado.png');
-}
-
 /* Banner Inferior "Viajan con Amor" */
 .shipping-love-banner {
     background-color: #f9d7dd;

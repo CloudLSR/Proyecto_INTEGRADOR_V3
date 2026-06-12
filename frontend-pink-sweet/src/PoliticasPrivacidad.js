@@ -55,12 +55,6 @@ const PoliticasPrivacidad = ({ setPage }) => {
 
     return (
         <div className="privacy-container">
-            {/* Botón Volver */}
-            <div className="privacy-back-row">
-                <button className="privacy-back-btn" onClick={() => setPage('inicio')}>
-                    <i className="fas fa-arrow-left"></i>
-                </button>
-            </div>
 
             {/* Encabezado */}
             <div className="privacy-header">

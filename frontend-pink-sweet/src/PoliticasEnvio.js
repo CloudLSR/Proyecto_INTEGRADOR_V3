@@ -1,15 +1,13 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './PoliticasEnvio.css';
 
-const PoliticasEnvio = ({ setPage }) => {
+const PoliticasEnvio = () => {
+    const navigate = useNavigate(); // Hook para la navegación nativa de React Router
+
     return (
         <div className="shipping-container">
-            {/* Botón Volver */}
-            <div className="shipping-back-row">
-                <button className="shipping-back-btn" onClick={() => setPage('inicio')}>
-                    <i className="fas fa-arrow-left"></i>
-                </button>
-            </div>
+            
 
             {/* Encabezado */}
             <div className="shipping-header">
@@ -25,7 +23,7 @@ const PoliticasEnvio = ({ setPage }) => {
 
             {/* Contenedor Unificado con Bordes Redondeados */}
             <div className="shipping-box">
-
+                
                 {/* SECCIÓN INTERNA 1: Entregas + Imagen de la Moto */}
                 <div className="shipping-row-with-img">
                     <div className="shipping-text-block">
@@ -45,11 +43,9 @@ const PoliticasEnvio = ({ setPage }) => {
                             </div>
                         </div>
                     </div>
-                    {/* Reemplazar con la ruta real de tu imagen de la moto/mochila */}
-                    <div className="shipping-side-img img-moto"></div>
                 </div>
 
-                {/* 3. SEGUIMIENTO DEL PEDIDO (Fila Completa) */}
+                {/* 3. SEGUIMIENTO DEL PEDIDO */}
                 <div className="shipping-item item-full-width border-top-solid">
                     <div className="shipping-icon-circle"><i className="fas fa-map-marker-alt"></i></div>
                     <div className="shipping-text-content">
@@ -74,8 +70,6 @@ const PoliticasEnvio = ({ setPage }) => {
                             </div>
                         </div>
                     </div>
-                    {/* Reemplazar con la ruta real de tu imagen del empaque */}
-                    <div className="shipping-side-img img-box"></div>
                 </div>
 
                 {/* 5. RESPONSABILIDAD */}
@@ -116,7 +110,7 @@ const PoliticasEnvio = ({ setPage }) => {
 
             </div>
 
-            {/* Banner Mensaje de Cierre Pasional */}
+            {/* Banner Inferior */}
             <div className="shipping-love-banner">
                 <div className="shipping-love-icon">
                     <i className="fas fa-shipping-fast"></i>
