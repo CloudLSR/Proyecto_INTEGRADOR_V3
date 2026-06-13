@@ -24,10 +24,10 @@ const Footer = ({ setPage }) => {
           <div>
             <h4 style={{ margin: '0 0 15px 0', fontFamily: 'Poppins-Bold', fontSize: '16px', fontWeight: 'bold', color: 'white' }}>AYUDA</h4>
             <ul style={{ listStyle: 'none', padding: '0', margin: '0', lineHeight: '2', fontSize: '14px' }}>
-                <li style={{ fontFamily: 'Sedan-Regular', cursor: 'pointer', color: 'white' }}>Preguntas frecuentes</li>
-                <li style={{ fontFamily: 'Sedan-Regular', cursor: 'pointer', color: 'white' }}>Políticas de envío</li>
-                <li style={{ fontFamily: 'Sedan-Regular', cursor: 'pointer', color: 'white' }}>Términos y condiciones</li>
-                <li style={{ fontFamily: 'Sedan-Regular', cursor: 'pointer', color: 'white' }}>Políticas de privacidad</li>
+                <li onClick={() => setPage('preguntasFrecuentes')} style={{ fontFamily: 'Sedan-Regular', cursor: 'pointer', color: 'white' }}>Preguntas frecuentes</li>
+                <li onClick={() => setPage('politicasEnvio')} style={{ fontFamily: 'Sedan-Regular', cursor: 'pointer', color: 'white' }}>Políticas de envío</li>
+                <li onClick={() => setPage('terminosCondiciones')} style={{ fontFamily: 'Sedan-Regular', cursor: 'pointer', color: 'white' }}>Términos y condiciones</li>
+                <li onClick={() => setPage('politicasPrivacidad')} style={{ fontFamily: 'Sedan-Regular', cursor: 'pointer', color: 'white' }}>Políticas de privacidad</li>
             </ul>
           </div>
           <div>
