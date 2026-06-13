@@ -9,11 +9,6 @@ import CambiarPassword2 from './CambiarPassword2';
 import CambiarPassword3 from './CambiarPassword3';
 import CambiarPassword4 from './CambiarPassword4';
 import Perfil from './Perfil';
-import PreguntasFrecuentes from './PreguntasFrecuentes';
-import TerminosCondiciones from './TerminosCondiciones';
-import PoliticasPrivacidad from './PoliticasPrivacidad';
-import PoliticasEnvio from './PoliticasEnvio';
-import AppLayout from './AppLayout';
 // Productos
 import Productos from './Productos';
 
@@ -23,12 +18,6 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <Routes>
-    <Route element={<AppLayout />}>
-      <Route path="/fqa" element={<PreguntasFrecuentes />} />
-      <Route path="/terminos-y-condiciones" element={<TerminosCondiciones />} />
-      <Route path="/politicas-de-privacidad" element={<PoliticasPrivacidad />} />
-      <Route path="/politicas-de-envio" element={<PoliticasEnvio />} />
-    </Route>
       <Route path="/"          element={<App />} />
       <Route path="/login"     element={<Login />} />
       <Route path="/registro"  element={<Registro />} />
@@ -39,8 +28,6 @@ root.render(
       <Route path="/cambiar-password-3" element={<CambiarPassword3 />} />
       <Route path="/cambiar-password-4" element={<CambiarPassword4 />} />
       <Route path="/productos" element={<Productos />} />
-    
-      
     </Routes>
   </BrowserRouter>
 );
