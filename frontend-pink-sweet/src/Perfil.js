@@ -92,8 +92,18 @@ const Perfil = ({ setPage }) => {
             
             <hr style={{ border: 'none', borderTop: '1px solid #EAAFB8', margin: '15px 10px' }} />
             
+            {/* CERRAR SESIÓN */}
             <button 
-              onClick={() => setPage("inicio")}
+              onClick={() => {
+                // Borramos todos los datos de sesión
+                localStorage.removeItem('token');
+                localStorage.removeItem('correo');
+                localStorage.removeItem('rol');
+                localStorage.removeItem('nombre');
+                
+                // Refrescamos la página de golpe para que el Header lea que ya no hay usuario y se reinicie todo el estado
+                window.location.href = "/";
+              }}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '15px', backgroundColor: 'transparent', border: 'none', padding: '14px 20px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', textAlign: 'left', cursor: 'pointer', borderRadius: '10px' }}
             >
               <i className="fa-solid fa-arrow-right-from-bracket" style={{ fontSize: '18px', width: '20px', textAlign: 'center' }}></i> Cerrar sesión

@@ -686,9 +686,10 @@ const Header = ({ page, setPage }) => {
 
   // Actualizar nombre de usuario tras login/logout
   const handleAuthClose = (loggedIn) => {
-    setShowAuth(false);
+    setShowAuth(false); // cierra la ventana flotante
     if (loggedIn) {
-      setUsuario(localStorage.getItem('correo') || 'Usuario');
+      setUsuario(localStorage.getItem('correo') || 'Usuario'); // Lee el usuario logeado
+      setPage('perfil'); // redirecciona a la vista de perfil
     }
   };
 
@@ -750,27 +751,19 @@ const Header = ({ page, setPage }) => {
               <img src={iconLupa} alt="Lupa" style={{ height: '16px', cursor: 'pointer', marginLeft: '5px' }} />
             </div>
 
-            {/* ICONO USUARIO — abre modal o muestra nombre + logout */}
+            {/* ICONO USUARIO — Lógica cíclica */}
             {usuario ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span
-                  title={usuario}
-                  style={{ color: '#fff', fontSize: '12px', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
-                >
-                  {usuario.split('@')[0]}
-                </span>
-                <img
-                  src={iconUser}
-                  alt="Usuario"
-                  title="Cerrar sesión"
-                  style={{ height: '32px', cursor: 'pointer', opacity: 0.85 }}
-                  onClick={handleLogout}
-                />
-              </div>
+              <img
+                src={iconUser}
+                alt="Ir a mi perfil"
+                title="Ir a mi perfil"
+                style={{ height: '32px', cursor: 'pointer' }}
+                onClick={() => setPage('perfil')}
+              />
             ) : (
               <img
                 src={iconUser}
-                alt="Usuario"
+                alt="Iniciar sesión"
                 title="Iniciar sesión / Registrarse"
                 style={{ height: '32px', cursor: 'pointer' }}
                 onClick={() => setShowAuth(true)}

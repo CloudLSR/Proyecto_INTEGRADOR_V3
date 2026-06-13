@@ -8,6 +8,12 @@ import Inicio from './Inicio';
 import Productos from './Productos';
 import Ofertas from './Ofertas';
 import Nosotros from './Nosotros';
+import Perfil from './Perfil';
+
+import TerminosCondiciones from './TerminosCondiciones';
+import PreguntasFrecuentes from './PreguntasFrecuentes';
+import PoliticasPrivacidad from './PoliticasPrivacidad';
+import PoliticasEnvio from './PoliticasEnvio';
 
 import TerminosCondiciones from './TerminosCondiciones';
 import PreguntasFrecuentes from './PreguntasFrecuentes';
@@ -77,6 +83,12 @@ export default function App() {
       {page === "productos" && <Productos setPage={navigateTo} />}
       {page === "ofertas"   && <Ofertas   setPage={navigateTo} />}
       {page === "nosotros"  && <Nosotros  setPage={navigateTo} />}
+      {page === "perfil"    && <Perfil    setPage={navigateTo} />}
+
+      {page === "preguntasFrecuentes"   && <PreguntasFrecuentes   setPage={navigateTo} />}
+      {page === "politicasEnvio"        && <PoliticasEnvio        setPage={navigateTo} />}
+      {page === "terminosCondiciones"   && <TerminosCondiciones   setPage={navigateTo} />}
+      {page === "politicasPrivacidad"   && <PoliticasPrivacidad   setPage={navigateTo} />}
 
       {page === "preguntasFrecuentes"   && <PreguntasFrecuentes   setPage={navigateTo} />}
       {page === "politicasEnvio"        && <PoliticasEnvio        setPage={navigateTo} />}
