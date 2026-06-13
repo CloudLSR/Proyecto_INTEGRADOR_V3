@@ -15,6 +15,11 @@ import PreguntasFrecuentes from './PreguntasFrecuentes';
 import PoliticasPrivacidad from './PoliticasPrivacidad';
 import PoliticasEnvio from './PoliticasEnvio';
 
+import TerminosCondiciones from './TerminosCondiciones';
+import PreguntasFrecuentes from './PreguntasFrecuentes';
+import PoliticasPrivacidad from './PoliticasPrivacidad';
+import PoliticasEnvio from './PoliticasEnvio';
+
 // ─── GLOBAL CSS ──────────────────────────────────────────
 const globalCSS = `
   * { box-sizing:border-box; margin:0; padding:0; }
@@ -79,6 +84,11 @@ export default function App() {
       {page === "ofertas"   && <Ofertas   setPage={navigateTo} />}
       {page === "nosotros"  && <Nosotros  setPage={navigateTo} />}
       {page === "perfil"    && <Perfil    setPage={navigateTo} />}
+
+      {page === "preguntasFrecuentes"   && <PreguntasFrecuentes   setPage={navigateTo} />}
+      {page === "politicasEnvio"        && <PoliticasEnvio        setPage={navigateTo} />}
+      {page === "terminosCondiciones"   && <TerminosCondiciones   setPage={navigateTo} />}
+      {page === "politicasPrivacidad"   && <PoliticasPrivacidad   setPage={navigateTo} />}
 
       {page === "preguntasFrecuentes"   && <PreguntasFrecuentes   setPage={navigateTo} />}
       {page === "politicasEnvio"        && <PoliticasEnvio        setPage={navigateTo} />}
