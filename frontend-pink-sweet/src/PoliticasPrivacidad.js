@@ -1,7 +1,11 @@
-import React from 'react';
-import './PoliticasPrivacidad.css';
+import React, { useState } from 'react';
+
+import dividerTitle from "./assets/divider-title.png"; 
 
 const PoliticasPrivacidad = ({ setPage }) => {
+    // Estado para manejar el efecto "hover" en línea
+    const [hoveredId, setHoveredId] = useState(null);
+
     const politicasData = [
         {
             id: 1,
@@ -54,47 +58,113 @@ const PoliticasPrivacidad = ({ setPage }) => {
     ];
 
     return (
-        <div className="privacy-container">
+        <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', padding: '40px 20px 80px 20px', fontFamily: 'Poppins-Regular' }}>
+            
+            {/* Contenedor Principal Central (800px) */}
+            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
 
-            {/* Encabezado */}
-            <div className="privacy-header">
-                <h2>POLÍTICAS DE PRIVACIDAD</h2>
-                <div className="privacy-deco">
-                    <span className="privacy-hearts">═══🧡═══</span>
+                {/* Botón de retroceso */}
+                <button 
+                    onClick={() => setPage('inicio')} 
+                    style={{ background: 'none', border: 'none', color: '#C6676D', fontSize: '24px', cursor: 'pointer', marginBottom: '20px' }}
+                    title="Volver"
+                >
+                    <i className="fas fa-arrow-left"></i>
+                </button>
+
+                {/* Encabezado Principal */}
+                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                    <h2 style={{ color: '#5A3E41', fontSize: '26px', fontFamily: 'Poppins-Bold', margin: '0 0 0px 0', letterSpacing: '1px' }}>
+                        POLÍTICAS DE PRIVACIDAD
+                    </h2>
+                    
+                    <img 
+                        src={dividerTitle} 
+                        alt="divisor" 
+                        style={{ width: '180px', height: 'auto', display: 'block', margin: '0 auto 20px auto' }} 
+                    />
+                    
+                    <p style={{ color: '#5A3E41', fontSize: '15px', fontFamily: 'Poppins-Medium', lineHeight: '1.5', margin: '0' }}>
+                        En Sweet Cream Rose, tu privacidad es muy importante para nosotros. Esta<br />
+                        política explica cómo recopilamos, usamos y protegemos tu información.
+                    </p>
                 </div>
-                <p className="privacy-subtitle">
-                    En Sweet Cream Rose, tu privacidad es muy importante para nosotros. Esta<br />
-                    política explica cómo recopilamos, usamos y protegemos tu información.
-                </p>
-            </div>
 
-            {/* Bloque Principal de Políticas */}
-            <div className="privacy-box">
-                {politicasData.map((item) => (
-                    <div className="privacy-item" key={item.id}>
-                        <div className="privacy-icon-wrapper">
-                            <div className="privacy-icon-circle">
-                                <i className={item.icon}></i>
+                {/* Caja Unificada de Políticas (Molde Maestro) */}
+                <div style={{ backgroundColor: 'white', border: '2px solid #EAAFB8', borderRadius: '20px', overflow: 'hidden', marginBottom: '35px' }}>
+                    {politicasData.map((item, index) => (
+                        <div 
+                            key={item.id} 
+                            onMouseEnter={() => setHoveredId(item.id)}
+                            onMouseLeave={() => setHoveredId(null)}
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '35px', 
+                                padding: '30px 60px', 
+                                borderBottom: index === politicasData.length - 1 ? 'none' : '1px solid #EAAFB8',
+                                backgroundColor: hoveredId === item.id ? '#FDF2F3' : 'transparent',
+                                transition: 'background-color 0.2s ease'
+                            }}
+                        >
+                            {/* Círculo contenedor del icono */}
+                            <div style={{ flexShrink: 0 }}>
+                                <div style={{ backgroundColor: '#FDF2F3', width: '85px', height: '85px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #F9D5DA' }}>
+                                    <i className={item.icon} style={{ color: '#C6676D', fontSize: '32px' }}></i>
+                                </div>
+                            </div>
+                            
+                            {/* Textos informativos */}
+                            <div style={{ flex: 1 }}>
+                                <h3 style={{ fontSize: '16px', fontFamily: 'Poppins-Bold', color: '#5A3E41', margin: '0 0 8px 0', letterSpacing: '0.5px' }}>
+                                    {item.titulo}
+                                </h3>
+                                <p style={{ fontSize: '14px', fontFamily: 'Poppins-Regular', color: '#777777', lineHeight: '1.6', margin: '0' }}>
+                                    {item.descripcion}
+                                </p>
                             </div>
                         </div>
-                        <div className="privacy-text-content">
-                            <h3>{item.titulo}</h3>
-                            <p>{item.descripcion}</p>
-                        </div>
+                    ))}
+                </div>
+
+                {/* Banner Destacado Inferior de Confianza */}
+                <div style={{ backgroundColor: '#F9D7DD', borderRadius: '20px', padding: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '30px' }}>
+                    <div style={{ flexShrink: 0 }}>
+                        {/* Puedes cambiar esta etiqueta <i> por tu PNG cuando lo tengas */}
+                        <i className="fas fa-user-shield" style={{ color: '#EAAFB8', fontSize: '60px' }}></i>
                     </div>
-                ))}
+                    <div>
+                        <h4 style={{ color: '#5A3E41', fontSize: '18px', fontFamily: 'Poppins-Bold', margin: '0 0 5px 0' }}>
+                            Tu confianza es nuestro ingrediente principal
+                        </h4>
+                        <p style={{ color: '#C6676D', fontSize: '15px', fontFamily: 'Poppins-Medium', margin: '0' }}>
+                            Gracias por permitirnos ser parte de tus momentos más dulces.
+                        </p>
+                    </div>
+                </div>
+
             </div>
 
-            {/* Banner Destacado Inferior de Confianza */}
-            <div className="privacy-trust-banner">
-                <div className="privacy-trust-icon">
-                    <i className="fas fa-user-lock"></i>
+            {/* PROPUESTAS DE VALOR (Ancho de 1100px para alinear con footer) */}
+            <div style={{ maxWidth: '1100px', margin: '60px auto 0 auto', display: 'flex', justifyContent: 'space-between', padding: '30px 40px 0 40px', borderTop: '2px solid #FADADD' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <i className="fa-solid fa-cube" style={{ fontSize: '35px', color: '#EAAFB8' }}></i>
+                    <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', maxWidth: '120px', lineHeight: '1.3' }}>Ingredientes de primera calidad</span>
                 </div>
-                <div className="privacy-trust-text">
-                    <h4>Tu confianza es nuestro ingrediente principal</h4>
-                    <p>Gracias por permitirnos ser parte de tus momentos más dulces.</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <i className="fa-regular fa-heart" style={{ fontSize: '35px', color: '#EAAFB8' }}></i>
+                    <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', maxWidth: '120px', lineHeight: '1.3' }}>Hecho con amor en cada detalle</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <i className="fa-solid fa-truck-fast" style={{ fontSize: '35px', color: '#EAAFB8' }}></i>
+                    <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', maxWidth: '120px', lineHeight: '1.3' }}>Envíos seguros y rápidos</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <i className="fa-regular fa-user" style={{ fontSize: '35px', color: '#EAAFB8' }}></i>
+                    <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', maxWidth: '120px', lineHeight: '1.3' }}>Atención personalizada para ti</span>
                 </div>
             </div>
+
         </div>
     );
 };
