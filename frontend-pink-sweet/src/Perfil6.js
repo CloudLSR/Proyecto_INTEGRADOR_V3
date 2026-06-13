@@ -1,175 +1,202 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-// Subcomponente de Contenido de Configuración
-function ConfiguracionView() {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      
-      {/* NUEVA SECCIÓN SUPERIOR AÑADIDA */}
-      <div style={{ textAlign: "center", marginBottom: 10 }}>
-        <p style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: "#5d4037", fontStyle: "italic", marginBottom: 15 }}>
-          Tu espacio personal para organizar tus pedidos, favoritos<br />
-          y disfrutar de una experiencia más dulce.
-        </p>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, color: "#2d1a10", margin: "0 0 20px 0" }}>MI PERFIL</h2>
-      </div>
+const Perfil6 = () => {
+  // Estado para los toggles de notificaciones
+  const [toggles, setToggles] = useState({
+    pedidos: true,
+    cambios: true,
+    ofertas: true,
+    recordatorios: true,
+    correo: true
+  });
 
-      <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, color: "#2d1a10", margin: 0 }}>CONFIGURACIÓN</h2>
-      <p style={{ color: "#9c7382", fontSize: 14 }}>Administra tu cuenta y las preferencias del sistema.</p>
+  const handleToggle = (key) => {
+    setToggles({ ...toggles, [key]: !toggles[key] });
+  };
 
-      {/* 1. INFORMACIÓN DE LA CUENTA */}
-      <div style={{ background: "#fff", border: "1px solid #f2d5dd", borderRadius: 12, padding: "24px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h3 style={{ fontSize: 18, margin: 0 }}><i className="fa-regular fa-user" style={{ color: "#c8506a", marginRight: 10 }}></i> Información de la cuenta</h3>
-          <button style={{ border: "1px solid #f2d5dd", background: "none", color: "#c8506a", padding: "4px 20px", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>Editar</button>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          {[
-            {l:"Nombre completo", v:"María Rodríguez"}, 
-            {l:"Correo electrónico", v:"maria.rodriguez@gmail.com"}, 
-            {l:"Teléfono", v:"+51 987654987"}, 
-            {l:"Fecha de nacimiento", v:"15 de mayo de 1998"},
-            {l:"Genero", v:"Femenino"},
-            {l:"Fecha de registro", v:"20 de enero de 2024"}
-          ].map((item, i) => (
-            <div key={item.l} style={{ display: "flex", borderBottom: i < 5 ? "1px solid #fdf2f4" : "none", paddingBottom: "10px" }}>
-              <div style={{ width: "40%", fontSize: 14, fontWeight: 600, color: "#2d1a10" }}>{item.l}</div>
-              <div style={{ width: "60%", fontSize: 14, color: "#2d1a10" }}>{item.v}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 2. CAMBIAR CONTRASEÑA */}
-      <div style={{ background: "#fff", border: "1px solid #f2d5dd", borderRadius: 12, padding: "24px" }}>
-        <h3 style={{ fontSize: 18, marginBottom: 20 }}><i className="fa-solid fa-lock" style={{ color: "#c8506a", marginRight: 10 }}></i> Cambiar contraseña</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
-          {[ {p: "Ingrese su contraseña actual"}, {p: "Ingrese su nueva contraseña"}, {p: "Confirme su nueva contraseña"} ].map((input, idx) => (
-            <div key={idx} style={{ position: "relative" }}>
-              <input type="password" placeholder={input.p} style={{ width: "100%", padding: "12px 40px 12px 12px", borderRadius: 8, border: "1px solid #f2d5dd" }} />
-            </div>
-          ))}
-          <button style={{ background: "#c8506a", color: "#fff", border: "none", padding: "12px", borderRadius: 8, alignSelf: "flex-end", cursor: "pointer" }}>Actualizar contraseña</button>
-        </div>
-      </div>
-
-      {/* 3. NOTIFICACIONES */}
-      <div style={{ background: "#fff", border: "1px solid #f2d5dd", borderRadius: 12, padding: "24px" }}>
-        <h3 style={{ fontSize: 18, marginBottom: 20 }}><i className="fa-regular fa-bell" style={{ color: "#c8506a", marginRight: 10 }}></i> Notificaciones</h3>
-        {[
-          { t: "Nuevos pedidos", d: "Elige el modo de visualización" },
-          { t: "Cambios en pedidos", d: "Selecciona el idioma del sistema" },
-          { t: "Ofertas y promociones", d: "Selecciona tu zona horaria" },
-          { t: "Recordatorios importantes", d: "Recibe recordatorios del sistema" },
-          { t: "Notificaciones por correo", d: "Recibe notificaciones también por gmail" }
-        ].map((n, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 0", borderBottom: i < 4 ? "1px solid #fdf2f4" : "none" }}>
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>{n.t}</div>
-              <div style={{ fontSize: 12, color: "#9c7382" }}>{n.d}</div>
-            </div>
-            <input type="checkbox" defaultChecked style={{ accentColor: "#c8506a", transform: "scale(1.2)" }} />
-          </div>
-        ))}
-      </div>
-
-      {/* 4. SEGURIDAD DE LA CUENTA */}
-      <div style={{ background: "#fff", border: "1px solid #f2d5dd", borderRadius: 12, padding: "24px" }}>
-        <h3 style={{ fontSize: 18, marginBottom: 20 }}><i className="fa-solid fa-shield-halved" style={{ color: "#c8506a", marginRight: 10 }}></i> Seguridad de la cuenta</h3>
-        {[
-          { t: "Verificación de dos pasos", d: "Aumenta la seguridad de tu cuenta", b: "ACTIVAR" },
-          { t: "Dispositivos conectados", d: "Administra los dispositivos con acceso a tu cuenta", b: "VER DISPOSITIVOS" },
-          { t: "Sesiones activas", d: "Revisa y cierra sesiones activas", b: "VER SESIONES" }
-        ].map((s, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 0", borderBottom: i < 2 ? "1px solid #fdf2f4" : "none" }}>
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>{s.t}</div>
-              <div style={{ fontSize: 12, color: "#9c7382" }}>{s.d}</div>
-            </div>
-            <button style={{ border: "1px solid #f2d5dd", background: "none", color: "#c8506a", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>{s.b}</button>
-          </div>
-        ))}
-      </div>
+  // Componente interno para toggle switch
+  const ToggleSwitch = ({ isOn, onClick }) => (
+    <div 
+      onClick={onClick}
+      style={{ 
+        width: '46px', 
+        height: '24px', 
+        backgroundColor: isOn ? '#C6676D' : '#EAAFB8', 
+        borderRadius: '15px', 
+        position: 'relative', 
+        cursor: 'pointer', 
+        transition: 'background-color 0.3s',
+        flexShrink: 0
+      }}
+    >
+      <div style={{ 
+        width: '18px', 
+        height: '18px', 
+        backgroundColor: 'white', 
+        borderRadius: '50%', 
+        position: 'absolute', 
+        top: '3px', 
+        left: isOn ? '25px' : '3px', 
+        transition: 'left 0.3s',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+      }} />
     </div>
   );
-}
-
-// Componente Principal
-export default function Perfil6() {
-  const [activeTab, setActiveTab] = useState("configuración");
-  const menu = [
-    { name: "Información personal", icon: "fa-user" },
-    { name: "Mis pedidos", icon: "fa-bag-shopping" },
-    { name: "Direcciones", icon: "fa-location-dot" },
-    { name: "Métodos de pago", icon: "fa-credit-card" },
-    { name: "Favoritos", icon: "fa-heart" },
-    { name: "Configuración", icon: "fa-gear" }
-  ];
 
   return (
     <>
-      <div style={{ maxWidth: 1200, margin: "40px auto", display: "flex", gap: 32, padding: "0 20px" }}>
-        <aside style={{ width: 280 }}>
-          <div style={{ textAlign: "center", padding: 20, border: "1px solid #f2d5dd", borderRadius: 12, marginBottom: 20 }}>
-            <div style={{ width: 70, height: 70, borderRadius: "50%", background: "#fdf2f4", margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", color: "#c8506a" }}>
-              <i className="fa-solid fa-user" style={{ fontSize: 24 }}></i>
+      {/* CONTENEDOR MAESTRO DE CONFIGURACIÓN */}
+      <div style={{ backgroundColor: 'white', border: '2px solid #EAAFB8', borderRadius: '20px', padding: '40px', display: 'flex', flexDirection: 'column', gap: '25px' }}>
+        
+        <div style={{ paddingBottom: '10px' }}>
+          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '24px', color: '#5A3E41', margin: '0 0 5px 0', letterSpacing: '0.5px' }}>CONFIGURACIÓN</h2>
+          <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777', margin: 0 }}>Administra tu cuenta y las preferencias del sistema</p>
+        </div>
+
+        {/* INFORMACIÓN DE LA CUENTA */}
+        <div style={{ border: '2px solid #EAAFB8', borderRadius: '15px', padding: '30px' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '30px', borderBottom: "1px solid #FDF2F3", paddingBottom: "20px", flexWrap: 'wrap', gap: '15px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <div style={{ width: '45px', height: '45px', borderRadius: "50%", backgroundColor: "#FDF2F3", display: "flex", alignItems: "center", justifyContent: "center", color: "#C6676D", fontSize: '20px' }}>
+                <i className="fa-regular fa-user"></i>
+              </div>
+              <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0' }}>Información de la cuenta</h3>
             </div>
-            <h3 style={{ margin: 0 }}>María Rodríguez</h3>
+            <button style={{ backgroundColor: 'transparent', color: '#C6676D', border: '2px solid #EAAFB8', padding: '6px 20px', borderRadius: '20px', fontFamily: 'Poppins-Medium', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s' }}
+                    onMouseOver={(e) => e.target.style.borderColor = '#C6676D'}
+                    onMouseOut={(e) => e.target.style.borderColor = '#EAAFB8'}>
+              <i className="fa-solid fa-pen-to-square"></i> Editar
+            </button>
           </div>
-          <nav style={{ border: "1px solid #f2d5dd", borderRadius: 12, padding: "10px" }}>
-            {menu.map(item => (
-              <div key={item.name} onClick={() => setActiveTab(item.name.toLowerCase())} 
-                style={{ padding: "12px", cursor: "pointer", borderRadius: 6, display: "flex", alignItems: "center", gap: 10,
-                background: activeTab === item.name.toLowerCase() ? "#fdf2f4" : "transparent",
-                color: activeTab === item.name.toLowerCase() ? "#c8506a" : "#2d1a10" }}>
-                <i className={`fa-solid ${item.icon}`}></i> {item.name}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {[
+              { label: "Nombre completo", value: "María Rodríguez", icon: "fa-regular fa-user" },
+              { label: "Correo electrónico", value: "maria.rodriguez@gmail.com", icon: "fa-regular fa-envelope" },
+              { label: "Teléfono", value: "+51 987654987", icon: "fa-solid fa-phone" },
+              { label: "Fecha de nacimiento", value: "15 de mayo de 1998", icon: "fa-regular fa-calendar" },
+              { label: "Genero", value: "Femenino", icon: "fa-solid fa-venus-mars" },
+              { label: "Fecha de registro", value: "20 de enero de 2024", icon: "fa-regular fa-id-card" }
+            ].map((row, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', borderBottom: i < 5 ? '1px solid #FDF2F3' : 'none', paddingBottom: i < 5 ? '15px' : '0' }}>
+                <div style={{ width: '250px', color: '#5A3E41', display: 'flex', alignItems: 'center', gap: '12px', fontFamily: 'Poppins-Bold', fontSize: '13px' }}>
+                  <i className={row.icon} style={{ color: '#C6676D', width: '20px', textAlign: 'center', fontSize: '16px' }}></i> {row.label}
+                </div>
+                <div style={{ color: '#5A3E41', fontFamily: 'Poppins-Regular', fontSize: '14px' }}>{row.value}</div>
               </div>
             ))}
-          </nav>
-        </aside>
-        <main style={{ flex: 1 }}>
-          <ConfiguracionView />
-        </main>
+          </div>
+        </div>
+
+        {/* CAMBIAR CONTRASEÑA */}
+        <div style={{ border: '2px solid #EAAFB8', borderRadius: '15px', padding: '30px' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+            <div style={{ width: '45px', height: '45px', borderRadius: "50%", backgroundColor: "#FDF2F3", display: "flex", alignItems: "center", justifyContent: "center", color: "#C6676D", fontSize: '20px' }}>
+              <i className="fa-solid fa-lock"></i>
+            </div>
+            <div>
+              <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 2px 0' }}>Cambiar contraseña</h3>
+              <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: '0' }}>Asegurate de llevar una contraseña segura</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {[
+              { id: 'actual', label: 'Contraseña actual:', placeholder: 'Ingresa tu contraseña actual' },
+              { id: 'nueva', label: 'Nueva contraseña:', placeholder: 'Ingresa tu nueva contraseña' },
+              { id: 'confirmar', label: 'Confirmar nueva contraseña:', placeholder: 'Confirmar tu nueva contraseña' }
+            ].map((input) => (
+              <div key={input.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontFamily: 'Poppins-Bold', fontSize: '13px', color: '#5A3E41' }}>{input.label}</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="password" 
+                    placeholder={input.placeholder} 
+                    style={{ width: '100%', padding: '12px 45px 12px 15px', border: '2px solid #EAAFB8', borderRadius: '10px', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#5A3E41', outline: 'none', boxSizing: 'border-box' }} 
+                  />
+                  <i className="fa-regular fa-eye-slash" style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', color: '#777', cursor: 'pointer' }}></i>
+                </div>
+              </div>
+            ))}
+            
+            <button style={{ backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '12px 30px', borderRadius: '8px', fontFamily: 'Poppins-Medium', fontSize: '13px', cursor: 'pointer', alignSelf: 'flex-end', marginTop: '10px' }}>
+              Actualizar contraseña
+            </button>
+          </div>
+        </div>
+
+        {/* NOTIFICACIONES */}
+        <div style={{ border: '2px solid #EAAFB8', borderRadius: '15px', padding: '30px' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+            <div style={{ width: '45px', height: '45px', borderRadius: "50%", backgroundColor: "#FDF2F3", display: "flex", alignItems: "center", justifyContent: "center", color: "#C6676D", fontSize: '20px' }}>
+              <i className="fa-regular fa-bell"></i>
+            </div>
+            <div>
+              <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 2px 0' }}>Notificaciones</h3>
+              <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: '0' }}>Elige que notificaciones deseas recibir.</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {[
+              { key: 'pedidos', title: 'Nuevos pedidos', sub: 'Elige el modo de visualización' },
+              { key: 'cambios', title: 'Cambios en pedidos', sub: 'Selecciona el idioma del sistema' },
+              { key: 'ofertas', title: 'Ofertas y promociones', sub: 'Selecciona tu zona horaria' },
+              { key: 'recordatorios', title: 'Recordatorios importantes', sub: 'Recibe recordatorios del sistema' },
+              { key: 'correo', title: 'Notificaciones por correo', sub: 'Recibe notificaciones tambien por gmail' }
+            ].map((item, i) => (
+              <div key={item.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: i < 4 ? '15px' : '0', borderBottom: i < 4 ? '1px solid #FDF2F3' : 'none' }}>
+                <div>
+                  <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '14px', color: '#5A3E41', margin: '0 0 3px 0' }}>{item.title}</h4>
+                  <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: 0 }}>{item.sub}</p>
+                </div>
+                <ToggleSwitch isOn={toggles[item.key]} onClick={() => handleToggle(item.key)} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SEGURIDAD DE LA CUENTA */}
+        <div style={{ border: '2px solid #EAAFB8', borderRadius: '15px', padding: '30px' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+            <div style={{ width: '45px', height: '45px', borderRadius: "50%", backgroundColor: "#FDF2F3", display: "flex", alignItems: "center", justifyContent: "center", color: "#C6676D", fontSize: '20px' }}>
+              <i className="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+              <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 2px 0' }}>Seguridad de la cuenta</h3>
+              <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: '0' }}>Refuerza la seguridad de tu cuenta</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {[
+              { title: 'Verificación de dos pasos', sub: 'Aumenta la seguridad de tu cuenta', btnText: 'ACTIVAR' },
+              { title: 'Dispositivos conectados', sub: 'Administra los dispositivos con acceso a tu cuenta', btnText: 'VER DISPOSITIVOS' },
+              { title: 'Sesiones activas', sub: 'Revisa y cierra sesiones activas', btnText: 'VER SESIONES' }
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: i < 2 ? '15px' : '0', borderBottom: i < 2 ? '1px solid #FDF2F3' : 'none', flexWrap: 'wrap', gap: '15px' }}>
+                <div>
+                  <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '14px', color: '#5A3E41', margin: '0 0 3px 0' }}>{item.title}</h4>
+                  <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: 0 }}>{item.sub}</p>
+                </div>
+                <button style={{ backgroundColor: 'transparent', color: '#C6676D', border: '2px solid #EAAFB8', padding: '8px 25px', borderRadius: '25px', fontFamily: 'Poppins-Medium', fontSize: '12px', cursor: 'pointer', transition: 'border-color 0.3s' }}
+                        onMouseOver={(e) => e.target.style.borderColor = '#C6676D'}
+                        onMouseOut={(e) => e.target.style.borderColor = '#EAAFB8'}
+                >
+                  {item.btnText}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
-      <Footer />
     </>
   );
-}
+};
 
-function Footer() {
-  return (
-    <footer style={{ backgroundColor: "#c8506a", color: "#fff", padding: "40px 0", fontFamily: "'Lato', sans-serif" }}>
-      <div style={{ display: "flex", justifyContent: "space-around", paddingBottom: "40px", borderBottom: "1px solid #d9788f" }}>
-        {["Ingredientes de primera calidad", "Hecho con amor en cada detalle", "Envíos seguros y rápidos", "Atención personalizada para ti"].map((text, i) => (
-          <div key={i} style={{ textAlign: "center", width: "20%" }}>
-            <p style={{ fontSize: 13, margin: 0 }}>{text}</p>
-          </div>
-        ))}
-      </div>
-      <div style={{ display: "flex", justifyContent: "space-between", padding: "40px 60px", alignItems: "flex-start" }}>
-        <div style={{ width: "25%" }}>
-          <p style={{ fontSize: 13, lineHeight: 1.6 }}>En un mundo de experiencias duras con un pastel dale dulzura.</p>
-        </div>
-        <div style={{ width: "20%" }}>
-          <h4 style={{ marginBottom: 15, fontSize: 14 }}>ENLACES</h4>
-          {["Inicio", "Productos", "Ofertas", "Nosotros"].map(link => <p key={link} style={{ fontSize: 13, margin: "5px 0" }}>{link}</p>)}
-        </div>
-        <div style={{ width: "20%" }}>
-          <h4 style={{ marginBottom: 15, fontSize: 14 }}>AYUDA</h4>
-          {["Preguntas frecuentes", "Políticas de envío", "Términos y condiciones", "Políticas de privacidad"].map(link => <p key={link} style={{ fontSize: 13, margin: "5px 0" }}>{link}</p>)}
-        </div>
-        <div style={{ width: "25%" }}>
-          <h4 style={{ marginBottom: 15, fontSize: 14 }}>CONTÁCTANOS</h4>
-          <p style={{ fontSize: 13, margin: "5px 0" }}>Lima, Perú</p>
-          <p style={{ fontSize: 13, margin: "5px 0" }}>+51 987654900</p>
-          <p style={{ fontSize: 13, margin: "5px 0" }}>info@SweetCreamRose.com</p>
-          <p style={{ fontSize: 13, margin: "5px 0" }}>Lunes a Sábado: 9am - 6pm</p>
-        </div>
-      </div>
-      <div style={{ padding: "20px 60px", borderTop: "1px solid #d9788f", display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-        <div style={{ fontWeight: 600 }}>SÍGUENOS</div>
-        <div>© 2026 Sweet Cream Rose. Todos los derechos reservados.</div>
-      </div>
-    </footer>
-  );
-}
+export default Perfil6;

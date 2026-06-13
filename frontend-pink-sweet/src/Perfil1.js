@@ -1,10 +1,17 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import iconShop from './assets/icon-shop.png';
 
-// ─── DATA DE MARTA RODRÍGUEZ (INFORMACIÓN PERSONAL) ───────
+// PRODUCTOS
+import imgTcTripleChocolate from './assets/products/tc-triple-chocolate.png';
+import imgCArandano from './assets/products/c-arandano.png';
+import imgAClasico from './assets/products/a-clasico.png';
+import imgTFresa from './assets/products/t-fresa.png';
+
+// DATA DE USUARIO
 const usuarioInfo = {
-  nombre: "Marta Rodríguez",
-  correo: "marta.rodriguez@gmail.com",
-  telefono: "+51 987654321",
+  nombre: "María Rodríguez",
+  correo: "maria.rodriguez@gmail.com",
+  telefono: "+51 987654987",
   fechaNacimiento: "15 de mayo de 1998",
   genero: "Femenino",
   fechaRegistro: "20 de enero de 2024"
@@ -12,373 +19,212 @@ const usuarioInfo = {
 
 const actividadUsuario = {
   totalPedidos: "12 pedidos",
-  ultimoPedido: "#0008425 — 12 de mayo de 2026",
-  totalGastado: "S/ 1874.50"
+  ultimoPedido: "#000125 - 12 de mayo de 2026",
+  totalGastado: "+51 987654987"
 };
 
-// ─── DATA DE PEDIDOS RECIENTES ───────────────────────────
+// DATA DE PEDIDOS RECIENTES
 const PEDIDOS_RECIENTES = [
   {
-    id: "#0008425",
+    id: "#000125",
     nombre: "Torta Triple Chocolate",
     fecha: "12 de mayo, 2026",
     estado: "Entregado",
-    imagen: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=150&auto=format&fit=crop&q=60"
+    imagen: imgTcTripleChocolate
   },
   {
-    id: "#0000124",
-    nombre: "Cupcakes de Arándanos",
+    id: "#000124",
+    nombre: "Cupcakes de Arándano",
     fecha: "05 de mayo, 2026",
     estado: "Entregado",
-    imagen: "https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=150&auto=format&fit=crop&q=60"
+    imagen: imgCArandano
   },
   {
-    id: "#0000103",
+    id: "#000123",
     nombre: "Alfajor Clásico",
     fecha: "28 de abril, 2026",
     estado: "Entregado",
-    imagen: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=150&auto=format&fit=crop&q=60"
+    imagen: imgAClasico
   }
 ];
 
-// ─── DATA DE PRODUCTOS FAVORITOS ─────────────────────────
+// DATA DE PRODUCTOS FAVORITOS
 const PRODUCTOS_FAVORITOS = [
   {
     id: 1,
     nombre: "Torta Triple Chocolate",
-    descripcion: "Bizcocho húmedo relleno de fudge artesanal y crema de chocolate.",
-    precio: "S/ 85.00",
-    imagen: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&auto=format&fit=crop&q=60"
+    descripcion: "Delicioso bizcocho de chocolate con relleno y cobertura de ganache, decorado con crema de chocolate.",
+    precio: "80.00",
+    imagen: imgTcTripleChocolate
   },
   {
     id: 2,
-    nombre: "Cupcake Amor",
-    descripcion: "Suave cupcake de vainilla con frosting de fresas naturales.",
-    precio: "S/ 7.50",
-    imagen: "https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=300&auto=format&fit=crop&q=60"
+    nombre: "Trufas de Fresa",
+    descripcion: "Chocolate negro relleno de una suave crema de fresa natural. Dulces, frutales y absolutamente irresistibles.",
+    precio: "45.00",
+    imagen: imgTFresa
   },
   {
     id: 3,
     nombre: "Alfajor Clásico",
-    descripcion: "Fina masa de maicena rellena de abundante manjar blanco.",
-    precio: "S/ 4.50",
-    imagen: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=300&auto=format&fit=crop&q=60"
+    descripcion: "Delicadas tapitas artesanales con un suave relleno de dulce de leche y un toque de azúcar en polvo.",
+    precio: "28.00",
+    imagen: imgAClasico
   },
   {
     id: 4,
-    nombre: "Cupcake de Arándanos",
-    descripcion: "Muffin esponjoso con arándanos frescos y topping de crema.",
-    precio: "S/ 8.00",
-    imagen: "https://images.unsplash.com/photo-1464349172961-60a361c57eef?w=300&auto=format&fit=crop&q=60"
+    nombre: "Cupcakes de Arándano",
+    descripcion: "Delicioso y suave pastelito de miga fina con un toque de dulzor a chocolate, es ideal para decorar con crema batida.",
+    precio: "42.00",
+    imagen: imgCArandano
   }
 ];
 
-// ─── COMPONENTE HEADER ───────────────────────────────────
-function PageHeader() {
-  return (
-    <section style={{ background: "#fdf2f4", padding: "48px 24px 32px", textAlign: "center", borderBottom: "1px solid #f0d0d8" }}>
-      <div style={{ width: 80, height: 80, borderRadius: "50%", background: "#fff", border: "1px solid #f0d0d8", display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 16, fontFamily: "'Playfair Display', serif", fontStyle: "italic", fontWeight: "bold", color: "#c8506a", fontSize: 20 }}>
-        SCR
-      </div>
-      <p style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 18, color: "#7a4055", marginBottom: 6 }}>
-        "Tu espacio personal para organizar tus pedidos, favoritos y disfrutar de una experiencia más dulce."
-      </p>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, marginTop: 24 }}>
-        <div style={{ height: 1, width: 60, background: "#f0d0d8" }}></div>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, fontWeight: 700, color: "#2d1a10", letterSpacing: 3 }}>MI PERFIL</h2>
-        <div style={{ height: 1, width: 60, background: "#f0d0d8" }}></div>
-      </div>
-      <div style={{ marginTop: 8, color: "#c8506a", fontSize: 18, letterSpacing: 4 }}>— 🤍 —</div>
-    </section>
-  );
-}
-
-// ─── COMPONENTE PRINCIPAL INTEGRADO CON FOOTER ────────────
-export default function PerfilInformacionCompleto({ setPage }) {
-  const [activeTab, setActiveTab] = useState("info");
+const Perfil1 = ({ setActiveTab }) => {
+  const [wishlist, setWishlist] = useState([1, 2, 3, 4]);
+  const toggleWish = i => setWishlist(w => w.includes(i) ? w.filter(x => x !== i) : [...w, i]);
 
   return (
     <>
-      <style>{`
-        .menu-profile-btn { width:100%; display:flex; align-items:center; gap:12px; background:none; border:none; padding:12px 16px; font-family:'Lato',sans-serif; font-size:13px; color:#2d1a10; text-align:left; cursor:pointer; border-radius:6px; transition: background .2s, color .2s; }
-        .menu-profile-btn:hover { background:#fdf2f4; color:#c8506a; }
-        .menu-profile-btn.active { background:#fdf2f4; color:#c8506a; font-weight:700; }
+      {/* INFORMACIÓN PERSONAL Y ACTIVIDAD */}
+      <div style={{ backgroundColor: 'white', border: '2px solid #EAAFB8', borderRadius: '20px', padding: '40px' }}>
         
-        .info-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px dashed #fdf2f4; font-family: 'Lato', sans-serif; font-size: 13px; }
-        .info-label { width: 200px; color: #7a4055; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .info-value { color: #2d1a10; }
-
-        .recent-card { display: flex; align-items: center; justify-content: space-between; border: 1px solid #fdf2f4; border-radius: 10px; padding: 12px; background: #fff; transition: box-shadow .2s; }
-        .recent-card:hover { box-shadow: 0 4px 12px rgba(200,80,106,.03); }
-
-        .fav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        .fav-card { border: 1px solid #fdf2f4; border-radius: 12px; overflow: hidden; background: #fff; display: flex; flexDirection: column; justify-content: space-between; }
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '30px' }}>
+          <i className="fa-regular fa-user" style={{ color: '#C6676D', fontSize: '24px' }}></i>
+          <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '20px', color: '#5A3E41', margin: '0' }}>INFORMACIÓN PERSONAL</h3>
+        </div>
         
-        .footer-feature-item { display: flex; align-items: center; gap: 12px; font-family: 'Lato', sans-serif; font-size: 13px; color: #7a4055; font-weight: 600; }
-        .footer-link { display: block; font-family: 'Lato', sans-serif; font-size: 13px; color: rgba(255,255,255,0.8); text-decoration: none; margin-bottom: 8px; transition: color .2s; }
-        .footer-link:hover { color: #fff; }
-
-        @media(max-width:900px){
-          .profile-layout { flex-direction: column!important; }
-          .profile-sidebar { width: 100%!important; }
-          .fav-grid { grid-template-columns: repeat(2, 1fr); }
-          .info-row { flex-direction: column; align-items: flex-start; gap: 4px; }
-        }
-        @media(max-width:600px) {
-          .fav-grid { grid-template-columns: 1fr; }
-          .footer-features { flex-direction: column; gap: 16px; align-items: flex-start!important; }
-          .footer-cols { flex-direction: column; gap: 32px; }
-        }
-      `}</style>
-
-      <PageHeader />
-
-      <main className="profile-layout" style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px 60px", display: "flex", gap: 32 }}>
-        
-        {/* COLUMNA IZQUIERDA: MENÚ DE CONFIGURACIÓN */}
-        <div className="profile-sidebar" style={{ width: 260, flexShrink: 0 }}>
-          <div style={{ background: "#fff", border: "1px solid #f0d0d8", borderRadius: 12, padding: "24px 16px", textAlign: "center", marginBottom: 20, boxShadow: "0 2px 12px rgba(200,80,106,.05)" }}>
-            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#fdf2f4", border: "2px solid #f0d0d8", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 28, color: "#c8506a", marginBottom: 12 }}>
-              <i className="fa-regular fa-user"></i>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '25px', marginBottom: '50px' }}>
+          {[
+            { label: "Nombre completo", value: usuarioInfo.nombre, icon: "fa-regular fa-user" },
+            { label: "Correo electrónico", value: usuarioInfo.correo, icon: "fa-regular fa-envelope" },
+            { label: "Teléfono", value: usuarioInfo.telefono, icon: "fa-solid fa-phone" },
+            { label: "Fecha de nacimiento", value: usuarioInfo.fechaNacimiento, icon: "fa-regular fa-calendar" },
+            { label: "Genero", value: usuarioInfo.genero, icon: "fa-solid fa-venus-mars" },
+            { label: "Fecha de registro", value: usuarioInfo.fechaRegistro, icon: "fa-regular fa-id-card" }
+          ].map((row, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', fontFamily: 'Poppins-Medium', fontSize: '14px' }}>
+              <div style={{ width: '250px', color: '#5A3E41', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <i className={row.icon} style={{ color: '#C6676D', width: '20px', textAlign: 'center', fontSize: '16px' }}></i> {row.label}
+              </div>
+              <div style={{ color: '#5A3E41', fontFamily: 'Poppins-Regular' }}>{row.value}</div>
             </div>
-            <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 16, fontWeight: 700, color: "#2d1a10", marginBottom: 4 }}>{usuarioInfo.nombre}</h3>
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 12, color: "#a07080", margin: 0 }}>{usuarioInfo.correo}</p>
-          </div>
-
-          <div style={{ background: "#fff", border: "1px solid #f0d0d8", borderRadius: 12, padding: "10px", boxShadow: "0 2px 12px rgba(200,80,106,.05)" }}>
-            <button className={`menu-profile-btn ${activeTab === "info" ? "active" : ""}`} onClick={() => setActiveTab("info")}>
-              <i className="fa-solid fa-id-card" style={{ width: 16 }}></i> Información personal
-            </button>
-            <button className="menu-profile-btn" onClick={() => setPage("pedidos")}>
-              <i className="fa-solid fa-bag-shopping" style={{ width: 16 }}></i> Mis pedidos
-            </button>
-            <button className="menu-profile-btn">
-              <i className="fa-solid fa-location-dot" style={{ width: 16 }}></i> Direcciones
-            </button>
-            <button className="menu-profile-btn">
-              <i className="fa-solid fa-credit-card" style={{ width: 16 }}></i> Métodos de pago
-            </button>
-            <button className="menu-profile-btn">
-              <i className="fa-solid fa-heart" style={{ width: 16 }}></i> Favoritos
-            </button>
-            <button className="menu-profile-btn">
-              <i className="fa-solid fa-gear" style={{ width: 16 }}></i> Configuración
-            </button>
-            <hr style={{ border: "none", borderTop: "1px solid #f0d0d8", margin: "8px 0" }} />
-            <button className="menu-profile-btn" style={{ color: "#c8506a" }} onClick={() => setPage("inicio")}>
-              <i className="fa-solid fa-right-from-bracket" style={{ width: 16 }}></i> Cerrar sesión
-            </button>
-          </div>
+          ))}
         </div>
 
-        {/* COLUMNA DERECHA: SECCIÓN COMPLETA DE PERFIL 1_2 */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 24 }}>
-          
-          {/* Bloque 1: Información Personal y Actividad */}
-          <div style={{ background: "#fff", border: "1px solid #f0d0d8", borderRadius: 14, padding: "28px", boxShadow: "0 2px 14 rgba(200,80,106,.04)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, paddingBottom: 8, borderBottom: "1px solid #fdf2f4" }}>
-              <i className="fa-regular fa-id-card" style={{ color: "#c8506a" }}></i>
-              <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 16, fontWeight: 700, color: "#2d1a10", margin: 0 }}>INFORMACIÓN PERSONAL</h3>
-            </div>
-            
-            <div className="info-row">
-              <span className="info-label"><i className="fa-regular fa-user" style={{ width: 14 }}></i> Nombre completo:</span>
-              <span className="info-value">{usuarioInfo.nombre}</span>
-            </div>
-            <div className="info-row">
-              <span className="info-label"><i className="fa-regular fa-envelope" style={{ width: 14 }}></i> Correo electrónico:</span>
-              <span className="info-value">{usuarioInfo.correo}</span>
-            </div>
-            <div className="info-row">
-              <span className="info-label"><i className="fa-solid fa-phone" style={{ width: 14 }}></i> Teléfono:</span>
-              <span className="info-value">{usuarioInfo.telefono}</span>
-            </div>
-            <div className="info-row">
-              <span className="info-label"><i className="fa-regular fa-calendar" style={{ width: 14 }}></i> Fecha de nacimiento:</span>
-              <span className="info-value">{usuarioInfo.fechaNacimiento}</span>
-            </div>
-            <div className="info-row">
-              <span className="info-label"><i className="fa-solid fa-venus-mars" style={{ width: 14 }}></i> Género:</span>
-              <span className="info-value">{usuarioInfo.genero}</span>
-            </div>
-            <div className="info-row" style={{ borderBottom: "none" }}>
-              <span className="info-label"><i className="fa-regular fa-calendar-check" style={{ width: 14 }}></i> Fecha de registro:</span>
-              <span className="info-value">{usuarioInfo.fechaRegistro}</span>
-            </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '30px' }}>
+          <i className="fa-regular fa-calendar" style={{ color: '#C6676D', fontSize: '24px' }}></i>
+          <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '20px', color: '#5A3E41', margin: '0' }}>MI ACTIVIDAD</h3>
+        </div>
 
-            {/* Sub-bloque: Actividad */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 32, marginBottom: 16, paddingBottom: 8, borderBottom: "1px solid #fdf2f4" }}>
-              <i className="fa-solid fa-chart-line" style={{ color: "#c8506a" }}></i>
-              <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 16, fontWeight: 700, color: "#2d1a10", margin: 0 }}>MI ACTIVIDAD</h3>
-            </div>
-            <div className="info-row">
-              <span className="info-label"><i className="fa-solid fa-basket-shopping" style={{ width: 14 }}></i> Total de pedidos:</span>
-              <span className="info-value" style={{ fontWeight: 600 }}>{actividadUsuario.totalPedidos}</span>
-            </div>
-            <div className="info-row">
-              <span className="info-label"><i className="fa-regular fa-clock" style={{ width: 14 }}></i> Último pedido:</span>
-              <span className="info-value">{actividadUsuario.ultimoPedido}</span>
-            </div>
-            <div className="info-row" style={{ borderBottom: "none" }}>
-              <span className="info-label"><i className="fa-solid fa-wallet" style={{ width: 14 }}></i> Total gastado:</span>
-              <span className="info-value" style={{ color: "#c8506a", fontWeight: 700 }}>{actividadUsuario.totalGastado}</span>
-            </div>
-          </div>
-
-          {/* Bloque 2: Pedidos Recientes */}
-          <div style={{ background: "#fff", border: "1px solid #f0d0d8", borderRadius: 14, padding: "28px", boxShadow: "0 2px 14 rgba(200,80,106,.04)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, borderBottom: "1px solid #fdf2f4", paddingBottom: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <i className="fa-solid fa-bag-shopping" style={{ color: "#c8506a" }}></i>
-                <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 16, fontWeight: 700, color: "#2d1a10", margin: 0 }}>MIS PEDIDOS RECIENTES</h3>
-              </div>
-              <button style={{ background: "none", border: "none", color: "#c8506a", fontFamily: "'Lato',sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer" }} onClick={() => setPage("pedidos")}>Ver todos →</button>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {PEDIDOS_RECIENTES.map((pedido) => (
-                <div key={pedido.id} className="recent-card">
-                  <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                    <img src={pedido.imagen} alt={pedido.nombre} style={{ width: 56, height: 50, objectFit: "cover", borderRadius: 6, border: "1px solid #f0d0d8" }} />
-                    <div>
-                      <h4 style={{ fontFamily: "'Playfair Display',serif", fontSize: 14, fontWeight: 700, color: "#2d1a10", margin: "0 0 2px 0" }}>Pedido {pedido.id}</h4>
-                      <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 12, color: "#7a4055", margin: "0 0 2px 0" }}>{pedido.nombre}</p>
-                      <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 11, color: "#a07080", margin: 0 }}>{pedido.fecha}</p>
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                    <span style={{ background: "#e8f5e9", color: "#2e7d32", border: "1px solid #c8e6c9", fontFamily: "'Lato',sans-serif", fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 20 }}>
-                      {pedido.estado}
-                    </span>
-                    <i className="fa-solid fa-chevron-right" style={{ color: "#a07080", fontSize: 12 }}></i>
-                  </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+          {[
+            { label: "Total de pedidos realizados", value: actividadUsuario.totalPedidos, icon: "fa-solid fa-bag-shopping" },
+            { label: "Último pedido", value: actividadUsuario.ultimoPedido, icon: "fa-regular fa-clock" },
+            { label: "Total gastado", value: actividadUsuario.totalGastado, icon: "fa-solid fa-money-bill" }
+          ].map((row, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', fontFamily: 'Poppins-Medium', fontSize: '14px' }}>
+              <div style={{ width: '250px', color: '#5A3E41', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '24px', height: '24px', border: '2px solid #C6676D', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <i className={row.icon} style={{ color: '#C6676D', fontSize: '12px' }}></i>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Bloque 3: Productos Favoritos */}
-          <div style={{ background: "#fff", border: "1px solid #f0d0d8", borderRadius: 14, padding: "28px", boxShadow: "0 2px 14 rgba(200,80,106,.04)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, borderBottom: "1px solid #fdf2f4", paddingBottom: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <i className="fa-regular fa-heart" style={{ color: "#c8506a" }}></i>
-                <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 16, fontWeight: 700, color: "#2d1a10", margin: 0 }}>MIS PRODUCTOS FAVORITOS</h3>
+                {row.label}
               </div>
-              <button style={{ background: "none", border: "none", color: "#c8506a", fontFamily: "'Lato',sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Ver todos →</button>
+              <div style={{ color: '#5A3E41', fontFamily: 'Poppins-Regular' }}>{row.value}</div>
             </div>
+          ))}
+        </div>
+      </div>
 
-            <div className="fav-grid">
-              {PRODUCTOS_FAVORITOS.map((prod) => (
-                <div key={prod.id} className="fav-card">
-                  <img src={prod.imagen} alt={prod.nombre} style={{ width: "100%", height: 110, objectFit: "cover" }} />
-                  <div style={{ padding: "10px", display: "flex", flexDirection: "column", justifyInbound: "space-between", flex: 1 }}>
-                    <div>
-                      <h4 style={{ fontFamily: "'Playfair Display',serif", fontSize: 13, fontWeight: 700, color: "#2d1a10", margin: "0 0 4px 0" }}>{prod.nombre}</h4>
-                      <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 11, color: "#a07080", margin: "0 0 10px 0", lineHeight: "1.3" }}>{prod.descripcion}</p>
-                    </div>
-                    <div>
-                      <span style={{ display: "block", fontFamily: "'Lato',sans-serif", fontSize: 13, fontWeight: 700, color: "#c8506a", marginBottom: 8 }}>{prod.precio}</span>
-                      <button className="btn-add-cart" style={{ width: "100%", padding: "6px 0", fontSize: 11 }}>Añadir al carrito</button>
-                    </div>
-                  </div>
+      {/* PEDIDOS RECIENTES */}
+      <div style={{ backgroundColor: 'white', border: '2px solid #EAAFB8', borderRadius: '20px', padding: '30px 40px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '25px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <i className="fa-solid fa-bag-shopping" style={{ color: '#C6676D', fontSize: '24px' }}></i>
+            <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '20px', color: '#5A3E41', margin: '0' }}>MIS PEDIDOS RECIENTES</h3>
+          </div>
+          {/* Aquí usamos setActiveTab para cambiar a la pestaña de pedidos */}
+          <span onClick={() => setActiveTab("pedidos")} style={{ color: '#C6676D', fontFamily: 'Poppins-Medium', fontSize: '14px', cursor: 'pointer' }}>
+            Ver todos →
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          {PEDIDOS_RECIENTES.map((pedido, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #EAAFB8', borderRadius: '15px', padding: '15px 25px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                <img src={pedido.imagen} alt={pedido.nombre} style={{ width: '120px', height: '90px', objectFit: 'cover', borderRadius: '20px' }} />
+                <div>
+                  <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '16px', color: '#5A3E41', margin: '0 0 5px 0' }}>Pedido {pedido.id}</h4>
+                  <p style={{ fontFamily: 'Poppins-Regular', fontSize: '15px', color: '#5A3E41', margin: '0 0 2px 0' }}>{pedido.nombre}</p>
+                  <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777', margin: '0' }}>{pedido.fecha}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Banner de Invitación / CTA */}
-          <div style={{ background: "linear-gradient(135deg,#c8506a 0%,#a83858 100%)", borderRadius: 14, padding: "24px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "#fff" }}>
-                <i className="fa-solid fa-cookie-bite"></i>
               </div>
-              <div>
-                <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 16, color: "#fff", fontWeight: 700 }}>¿No encuentras lo que buscas?</h3>
-                <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 12, color: "rgba(255,255,255,.8)" }}>Contáctanos para realizar un diseño de repostería totalmente personalizado.</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <div style={{ backgroundColor: '#FADADD', color: '#C6676D', padding: '6px 16px', borderRadius: '20px', fontFamily: 'Poppins-Medium', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <i className="fa-regular fa-circle-check"></i> {pedido.estado}
+                  </div>
+                  <i className="fa-solid fa-chevron-right" style={{ color: '#5A3E41', fontSize: '16px', cursor: 'pointer' }}></i>
               </div>
             </div>
-            <button className="scr-btn-white" style={{ padding: "8px 20px", fontSize: 12 }}>Contactar 📞</button>
-          </div>
-
+          ))}
         </div>
-      </main>
+      </div>
 
-      {/* ─── NAVEGACIÓN DE CARACTERÍSTICAS (PRE-FOOTER) ────────── */}
-      <section style={{ background: "#fdf2f4", padding: "24px", borderTop: "1px solid #f0d0d8", borderBottom: "1px solid #f0d0d8" }}>
-        <div className="footer-features" style={{ maxWidth: 1100, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
-          <div className="footer-feature-item">
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#c8506a", border: "1px solid #f0d0d8" }}><i className="fa-solid fa-cake-candles"></i></div>
-            <span>Ingredientes de primera calidad</span>
+      {/* PRODUCTOS FAVORITOS */}
+      <div style={{ backgroundColor: 'white', border: '2px solid #EAAFB8', borderRadius: '20px', padding: '30px 40px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '25px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <i className="fa-regular fa-heart" style={{ color: '#C6676D', fontSize: '24px' }}></i>
+            <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '20px', color: '#5A3E41', margin: '0' }}>MIS PRODUCTOS FAVORITOS</h3>
           </div>
-          <div className="footer-feature-item">
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#c8506a", border: "1px solid #f0d0d8" }}><i className="fa-solid fa-heart"></i></div>
-            <span>Hecho con amor en cada detalle</span>
-          </div>
-          <div className="footer-feature-item">
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#c8506a", border: "1px solid #f0d0d8" }}><i className="fa-solid fa-truck"></i></div>
-            <span>Envíos seguros y rápidos</span>
-          </div>
-          <div className="footer-feature-item">
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#c8506a", border: "1px solid #f0d0d8" }}><i className="fa-solid fa-user-tag"></i></div>
-            <span>Atención personalizada para ti</span>
-          </div>
+          {/* Aquí usamos setActiveTab para cambiar a la pestaña de favoritos */}
+          <span onClick={() => setActiveTab("favoritos")} style={{ color: '#C6676D', fontFamily: 'Poppins-Medium', fontSize: '14px', cursor: 'pointer' }}>
+            Ver todos →
+          </span>
         </div>
-      </section>
 
-      {/* ─── FOOTER DE LA MARCA COMPLETO ─────────────────────── */}
-      <footer style={{ background: "#b2586c", padding: "48px 24px 20px", color: "#fff" }}>
-        <div className="footer-cols" style={{ maxWidth: 1100, margin: "0 auto", display: "flex", justifyContent: "space-between", gap: 40, flexWrap: "wrap", borderBottom: "1px solid rgba(255,255,255,0.2)", paddingBottom: 32 }}>
-          
-          <div style={{ maxWidth: 280 }}>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic", fontSize: 22, fontWeight: "bold", color: "#fff", marginBottom: 16 }}>Sweet Cream Rose</div>
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.85)", lineHeight: "1.6" }}>
-              Creamos momentos inolvidables con la mejor pastelería artesanal y detalles hechos con amor.
-            </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
+          {PRODUCTOS_FAVORITOS.map((p) => (
+            <div key={p.id} style={{ border: '2px solid #EAAFB8', borderRadius: '20px', overflow: 'hidden', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ position: 'relative', height: '120px' }}>
+                <img src={p.imagen} alt={p.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div onClick={() => toggleWish(p.id)} style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: 'rgba(255,255,255,0.9)', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+                  <i className={wishlist.includes(p.id) ? "fa-solid fa-heart" : "fa-regular fa-heart"} style={{ color: '#C6676D', fontSize: '14px', marginTop: '1px' }}></i>
+                </div>
+              </div>
+              <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', flexGrow: '1' }}>
+                <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '12px', color: '#5A3E41', margin: '0 0 5px 0' }}>{p.nombre}</h3>
+                <p style={{ fontFamily: 'Poppins-Medium', fontSize: '10px', color: '#644444', margin: '0 0 10px 0', lineHeight: '1.4', flexGrow: 1 }}>{p.descripcion}</p>
+                <div style={{ fontFamily: 'Poltawski-Nowy', fontSize: '16px', color: '#644444', marginBottom: '10px' }}>
+                  S/. {p.precio}
+                </div>
+                <button style={{ backgroundColor: '#C6676D', color: '#FFFFFF', border: 'none', padding: '8px', borderRadius: '8px', fontFamily: 'Poppins-Medium', fontSize: '11px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', width: '100%' }}>
+                  <i className="fa-solid fa-cart-shopping"></i> AÑADIR AL CARRITO
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* BANNER DE CONTACTO */}
+      <div style={{ backgroundColor: '#FACFD8', borderRadius: '20px', padding: '25px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ width: '80px', height: '80px', flexShrink: 0, backgroundColor: 'white', border: '3px solid #EAAFB8', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+            <img src={iconShop} alt="Icono Tienda" style={{ width: '60%', height: 'auto', objectFit: 'contain' }} />
           </div>
-
           <div>
-            <h4 style={{ fontFamily: "'Playfair Display',serif", fontSize: 15, fontWeight: 700, marginBottom: 16, letterSpacing: 1 }}>ENLACES</h4>
-            <a href="#inicio" className="footer-link">Inicio</a>
-            <a href="#productos" className="footer-link">Productos</a>
-            <a href="#ofertas" className="footer-link">Ofertas</a>
-            <a href="#nosotros" className="footer-link">Nosotros</a>
-          </div>
-
-          <div>
-            <h4 style={{ fontFamily: "'Playfair Display',serif", fontSize: 15, fontWeight: 700, marginBottom: 16, letterSpacing: 1 }}>AYUDA</h4>
-            <a href="#preguntas" className="footer-link">Preguntas frecuentes</a>
-            <a href="#politicas" className="footer-link">Políticas de envío</a>
-            <a href="#terminos" className="footer-link">Términos y condiciones</a>
-            <a href="#privacidad" className="footer-link">Políticas de privacidad</a>
-          </div>
-
-          <div style={{ maxWidth: 240 }}>
-            <h4 style={{ fontFamily: "'Playfair Display',serif", fontSize: 15, fontWeight: 700, marginBottom: 16, letterSpacing: 1 }}>CONTÁCTANOS</h4>
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: "0 0 8px 0" }}>
-              <i className="fa-solid fa-location-dot" style={{ marginRight: 8 }}></i> Lima, Perú
-            </p>
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: "0 0 8px 0" }}>
-              <i className="fa-solid fa-phone" style={{ marginRight: 8 }}></i> +51 987654321
-            </p>
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: "0 0 8px 0" }}>
-              <i className="fa-solid fa-envelope" style={{ marginRight: 8 }}></i> hola@sweetcreamrose.com
-            </p>
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: "0 0 8px 0" }}>
-              <i className="fa-regular fa-clock" style={{ marginRight: 8 }}></i> Lunes a Sábado: 9am - 8pm
-            </p>
+            <h3 style={{ color: '#7D2530', margin: '0 0 5px 0', fontSize: '18px', fontFamily: 'Poppins-SemiBold' }}>¿No encuentras lo que buscas?</h3>
+            <p style={{ margin: '0', color: '#B14B47', fontSize: '15px', fontFamily: 'Signika-Regular', maxWidth: '350px', lineHeight: '1.2' }}>Contáctanos y con gusto te ayudamos a crear el postre perfecto</p>
           </div>
         </div>
-
-        <div style={{ maxWidth: 1100, margin: "20px auto 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, fontFamily: "'Lato',sans-serif", fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
-          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-            <span>SÍGUENOS:</span>
-            <a href="#fb" style={{ color: "#fff", fontSize: 14 }}><i className="fa-brands fa-facebook-f"></i></a>
-            <a href="#ig" style={{ color: "#fff", fontSize: 14 }}><i className="fa-brands fa-instagram"></i></a>
-            <a href="#wa" style={{ color: "#fff", fontSize: 14 }}><i className="fa-brands fa-whatsapp"></i></a>
-          </div>
-          <span>© 2026 Sweet Cream Rose. Todos los derechos reservados.</span>
-        </div>
-      </footer>
+        <button style={{ backgroundColor: '#C3666D', color: 'white', fontSize: '14px', fontFamily: 'Poppins-Bold', border: 'none', padding: '10px 25px', borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          CONTACTAR <span style={{ fontSize: '16px' }}>›</span>
+        </button>
+      </div>
     </>
   );
-}
+};
+
+export default Perfil1;
