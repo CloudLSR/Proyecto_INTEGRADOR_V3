@@ -1,53 +1,802 @@
-import React from 'react';
+// Header.js — CON MODAL DE AUTH Y DRAWER DE CARRITO
+// Los modales se abren sin salir de la página actual (inicio, productos, ofertas, nosotros)
+// Cerrar: clic en ✕ o clic fuera del panel
+
+import React, { useState, useEffect, useRef } from 'react';
 import bannerPrincipal from './assets/banner.png';
 import iconUser from './assets/icon-user.png';
 import iconCart from './assets/icon-cart.png';
 import iconLupa from './assets/icon-lupa.png';
 
-// Agregamos "page" a las props que recibe el Header
+// ─── ESTILOS INLINE DEL MODAL + DRAWER ─────────────────────────────────────
+const modalCSS = `
+  /* ── Overlay oscuro ── */
+  .scr-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 9000;
+    display: flex; align-items: center; justify-content: center;
+    animation: scrFadeIn .18s ease;
+  }
+  @keyframes scrFadeIn { from { opacity:0 } to { opacity:1 } }
+
+  /* ── Tarjeta auth ── */
+  .scr-auth-card {
+    display: flex;
+    width: 100%; max-width: 860px;
+    min-height: 560px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.30);
+    position: relative;
+    animation: scrSlideUp .22s ease;
+    margin: 16px;
+  }
+  @keyframes scrSlideUp { from { transform:translateY(30px); opacity:0 } to { transform:translateY(0); opacity:1 } }
+
+  /* ── Panel rosado izquierdo ── */
+  .scr-panel-left {
+    background: linear-gradient(160deg, #c8506a 0%, #a83858 100%);
+    flex: 0 0 42%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between;
+    padding: 36px 28px 28px;
+    position: relative;
+    color: #fff;
+  }
+  .scr-panel-right {
+    background: #fff;
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 36px;
+    position: relative;
+  }
+
+  /* ── Botón cerrar ── */
+  .scr-close-btn {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(255,255,255,0.25); color: #fff;
+    border: none; border-radius: 50%;
+    width: 30px; height: 30px;
+    font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+    z-index: 2;
+  }
+  .scr-close-btn:hover { background: rgba(255,255,255,0.45); }
+  .scr-close-btn.dark {
+    background: #f0e4e8; color: #7a3a3a;
+  }
+  .scr-close-btn.dark:hover { background: #e8d0d8; }
+
+  /* ── Textos panel izquierdo ── */
+  .scr-welcome-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.7rem; font-weight: 400;
+    color: #fff; text-align: center; line-height: 1.3;
+    margin-bottom: 10px;
+  }
+  .scr-welcome-title span { font-size: 2rem; display: block; }
+  .scr-welcome-desc {
+    font-size: 0.82rem; color: rgba(255,255,255,0.88);
+    text-align: center; line-height: 1.5; margin-bottom: 12px;
+  }
+  .scr-food-img {
+    width: 70%; max-height: 180px;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+    margin: 10px 0;
+  }
+  .scr-btn-outline-white {
+    background: transparent; color: #fff;
+    border: 2px solid rgba(255,255,255,0.7);
+    padding: 9px 28px; border-radius: 4px;
+    font-family: 'Lato', sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1px;
+    cursor: pointer; transition: background .2s;
+    margin-top: 8px;
+  }
+  .scr-btn-outline-white:hover { background: rgba(255,255,255,0.2); }
+
+  /* ── Formulario derecho ── */
+  .scr-form-wrap { width: 100%; max-width: 320px; }
+  .scr-form-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.65rem; font-weight: 400;
+    color: #58413B; text-align: center;
+    margin-bottom: 16px;
+  }
+  .scr-hint { font-size: 0.82rem; color: #999; text-align: center; margin-bottom: 14px; }
+  .scr-input {
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid #e0c8cc; border-radius: 7px;
+    font-size: 0.92rem; font-family: 'Lato', sans-serif;
+    color: #4a3030; outline: none; margin-bottom: 10px;
+    transition: border-color .2s;
+    box-sizing: border-box;
+  }
+  .scr-input:focus { border-color: #c8506a; }
+  .scr-input.ok { border-color: #4caf50; }
+  .scr-input.err { border-color: #e53935; }
+  .scr-error {
+    background: #ffeaea; color: #c0392b;
+    border-radius: 6px; padding: 8px 12px;
+    font-size: 0.83rem; margin-bottom: 10px;
+    text-align: center;
+  }
+  .scr-btn-main {
+    width: 100%; padding: 11px;
+    background: #c8506a; color: #fff;
+    border: none; border-radius: 6px;
+    font-family: 'Lato', sans-serif; font-weight: 700;
+    font-size: 14px; letter-spacing: 1px;
+    cursor: pointer; transition: background .2s;
+    margin-top: 4px;
+  }
+  .scr-btn-main:hover:not(:disabled) { background: #a83858; }
+  .scr-btn-main:disabled { opacity: 0.6; cursor: not-allowed; }
+  .scr-forgot {
+    font-size: 0.83rem; color: #b86b6b;
+    cursor: pointer; text-align: right;
+    margin-bottom: 10px;
+    text-decoration: underline;
+  }
+  .scr-forgot:hover { color: #7a3a3a; }
+  .scr-pass-hint { font-size: 0.82rem; margin: -6px 0 8px; }
+  .scr-pass-hint.ok { color: #4caf50; }
+  .scr-pass-hint.bad { color: #e53935; }
+
+  /* ── Pantalla "Revisa tu correo" ── */
+  .scr-recover-icon {
+    font-size: 2.5rem; text-align: center; margin: 8px 0 14px;
+  }
+  .scr-back-link {
+    background: none; border: none;
+    color: #b86b6b; cursor: pointer;
+    font-size: 0.88rem; padding: 0;
+    margin-bottom: 16px; align-self: flex-start;
+    text-decoration: underline;
+  }
+  .scr-back-link:hover { color: #7a3a3a; }
+  .scr-timer { font-size: 0.82rem; color: #aaa; margin-left: 6px; }
+  .scr-resend-row { display: flex; align-items: center; margin: 6px 0 14px; }
+  .scr-link-btn {
+    background: none; border: none;
+    color: #b86b6b; cursor: pointer;
+    font-size: 0.85rem; text-decoration: underline; padding: 0;
+  }
+  .scr-link-btn:hover { color: #7a3a3a; }
+  .scr-link-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── DRAWER CARRITO ── */
+  .scr-cart-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9000;
+    animation: scrFadeIn .18s ease;
+  }
+  .scr-cart-drawer {
+    position: fixed; top: 0; right: 0;
+    width: 380px; max-width: 100vw;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -8px 0 40px rgba(0,0,0,0.18);
+    z-index: 9001;
+    display: flex; flex-direction: column;
+    animation: scrSlideLeft .22s ease;
+    overflow: hidden;
+  }
+  @keyframes scrSlideLeft {
+    from { transform: translateX(60px); opacity:0 }
+    to   { transform: translateX(0);    opacity:1 }
+  }
+  .scr-cart-header {
+    background: #c8506a; color: #fff;
+    padding: 18px 20px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .scr-cart-title { font-family: 'Georgia', serif; font-size: 1.25rem; margin: 0; }
+  .scr-cart-close {
+    background: rgba(255,255,255,0.25); border: none; color: #fff;
+    border-radius: 50%; width: 30px; height: 30px;
+    font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+  }
+  .scr-cart-close:hover { background: rgba(255,255,255,0.45); }
+  .scr-cart-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+  .scr-cart-empty { text-align: center; color: #bbb; padding: 40px 0; font-size: 0.95rem; }
+  .scr-cart-item {
+    display: flex; gap: 12px; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid #f0dde0;
+  }
+  .scr-cart-item-img {
+    width: 60px; height: 60px; object-fit: cover;
+    border-radius: 8px; flex-shrink: 0;
+    background: #fdf2f4;
+  }
+  .scr-cart-item-info { flex: 1; }
+  .scr-cart-item-name { font-size: 0.88rem; color: #4a3030; font-weight: 600; margin-bottom: 2px; }
+  .scr-cart-item-price { font-size: 0.82rem; color: #c8506a; font-weight: 700; }
+  .scr-qty-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .scr-qty-btn {
+    background: #fdf2f4; border: 1px solid #e0c8cc;
+    color: #c8506a; width: 24px; height: 24px;
+    border-radius: 4px; cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+  }
+  .scr-qty-btn:hover { background: #f5e0e4; }
+  .scr-qty-val { font-size: 0.88rem; min-width: 20px; text-align: center; }
+  .scr-del-btn {
+    background: none; border: none; color: #daa;
+    cursor: pointer; font-size: 0.78rem;
+    text-decoration: underline;
+    transition: color .2s;
+  }
+  .scr-del-btn:hover { color: #c0392b; }
+  .scr-cart-footer {
+    padding: 16px 18px 20px;
+    border-top: 2px solid #f0dde0;
+    flex-shrink: 0;
+    background: #fdf7f8;
+  }
+  .scr-cart-total-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.95rem; color: #4a3030;
+    margin-bottom: 6px;
+  }
+  .scr-cart-total-row.big { font-weight: 700; font-size: 1.05rem; color: #c8506a; }
+  .scr-cart-pay-btn {
+    width: 100%; padding: 12px;
+    background: #c8506a; color: #fff;
+    border: none; border-radius: 6px;
+    font-family: 'Lato', sans-serif; font-weight: 700;
+    font-size: 14px; letter-spacing: 1px;
+    cursor: pointer; transition: background .2s;
+    margin-top: 12px;
+  }
+  .scr-cart-pay-btn:hover { background: #a83858; }
+
+  /* Responsive */
+  @media(max-width:600px) {
+    .scr-auth-card { flex-direction: column; min-height: auto; }
+    .scr-panel-left { flex: 0 0 auto; padding: 28px 20px 20px; }
+    .scr-panel-right { padding: 28px 20px; }
+    .scr-cart-drawer { width: 100vw; }
+  }
+`;
+
+// ─── ÍTEM CARRITO (componente pequeño) ──────────────────────────────────────
+function CartItem({ item, onQty, onDel }) {
+  return (
+    <div className="scr-cart-item">
+      <img
+        src={item.img}
+        alt={item.nombre}
+        className="scr-cart-item-img"
+        onError={e => { e.target.onerror = null; e.target.src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22%23fdf2f4%22 width=%2260%22 height=%2260%22/><text x=%2230%22 y=%2235%22 text-anchor=%22middle%22 font-size=%2220%22>🍰</text></svg>'; }}
+      />
+      <div className="scr-cart-item-info">
+        <div className="scr-cart-item-name">{item.nombre}</div>
+        <div className="scr-cart-item-price">S/ {item.precio.toFixed(2)}</div>
+        <div className="scr-qty-row">
+          <button className="scr-qty-btn" onClick={() => onQty(item.id, -1)}>−</button>
+          <span className="scr-qty-val">{item.cantidad}</span>
+          <button className="scr-qty-btn" onClick={() => onQty(item.id, +1)}>+</button>
+          <button className="scr-del-btn" onClick={() => onDel(item.id)}>Eliminar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MODAL DE AUTENTICACIÓN ──────────────────────────────────────────────────
+// pantalla: 'login' | 'registro' | 'olvide' | 'enviado'
+function AuthModal({ onClose }) {
+  const [pantalla, setPantalla] = useState('login');
+
+  // Login
+  const [loginCorreo, setLoginCorreo] = useState('');
+  const [loginPass, setLoginPass] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  // Registro
+  const [regNombre, setRegNombre] = useState('');
+  const [regCorreo, setRegCorreo] = useState('');
+  const [regPass, setRegPass] = useState('');
+  const [regConfirmar, setRegConfirmar] = useState('');
+  const [regError, setRegError] = useState('');
+  const [regLoading, setRegLoading] = useState(false);
+  const passOk = regConfirmar.length > 0 && regPass === regConfirmar;
+  const passMal = regConfirmar.length > 0 && regPass !== regConfirmar;
+
+  // Recuperar contraseña
+  const [recCorreo, setRecCorreo] = useState('');
+  const [recError, setRecError] = useState('');
+  const [recLoading, setRecLoading] = useState(false);
+  const [segundos, setSegundos] = useState(0);
+  const [reenvioMsg, setReenvioMsg] = useState('');
+  const correoGuardado = recCorreo || localStorage.getItem('correo_recuperacion') || '';
+
+  // Timer reenvío
+  useEffect(() => {
+    if (segundos <= 0) return;
+    const t = setTimeout(() => setSegundos(s => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [segundos]);
+
+  const fmt = (s) => {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sg = (s % 60).toString().padStart(2, '0');
+    return `(${m}:${sg})`;
+  };
+
+  // ── HANDLERS ──────────────────────────────
+  const handleLogin = async (e) => {
+    e?.preventDefault();
+    setLoginError('');
+    if (!loginCorreo || !loginPass) { setLoginError('Completa todos los campos.'); return; }
+    setLoginLoading(true);
+    try {
+      const res = await fetch('http://localhost:8081/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: loginCorreo, contrasena: loginPass }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        try {
+          const payload = JSON.parse(atob(data.token.split('.')[1]));
+          localStorage.setItem('correo', payload.sub || loginCorreo);
+          localStorage.setItem('rol', payload.rol || '');
+          localStorage.setItem('nombre', payload.nombre || '');
+        } catch (_) {}
+        onClose(true); // true = recargó sesión
+      } else {
+        setLoginError(data.error || 'Correo o contraseña incorrectos.');
+      }
+    } catch {
+      setLoginError('No se pudo conectar al servidor.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleRegistro = async (e) => {
+    e?.preventDefault();
+    setRegError('');
+    if (!regNombre || !regCorreo || !regPass || !regConfirmar) { setRegError('Completa todos los campos.'); return; }
+    if (regPass !== regConfirmar) { setRegError('Las contraseñas no coinciden.'); return; }
+    setRegLoading(true);
+    try {
+      const res = await fetch('http://localhost:8081/api/auth/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: regNombre, correo: regCorreo, contrasena: regPass }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPantalla('login');
+        setLoginError('¡Registro exitoso! Inicia sesión.');
+      } else {
+        setRegError(data.error || 'Error al registrarse. Intenta de nuevo.');
+      }
+    } catch {
+      setRegError('No se pudo conectar al servidor.');
+    } finally {
+      setRegLoading(false);
+    }
+  };
+
+  const handleOlvide = async (e) => {
+    e?.preventDefault();
+    setRecError('');
+    if (!recCorreo.trim()) { setRecError('Ingresa tu correo electrónico.'); return; }
+    setRecLoading(true);
+    try {
+      const res = await fetch('http://localhost:8081/api/auth/olvide-contrasena', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: recCorreo }),
+      });
+      if (res.ok) {
+        localStorage.setItem('correo_recuperacion', recCorreo);
+        setSegundos(48);
+        setPantalla('enviado');
+      } else {
+        const data = await res.json();
+        setRecError(data.error || 'Ocurrió un error. Intenta de nuevo.');
+      }
+    } catch {
+      setRecError('No se pudo conectar al servidor.');
+    } finally {
+      setRecLoading(false);
+    }
+  };
+
+  const handleReenviar = async () => {
+    if (segundos > 0) return;
+    setReenvioMsg('');
+    try {
+      await fetch('http://localhost:8081/api/auth/olvide-contrasena', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: correoGuardado }),
+      });
+      setSegundos(48);
+      setReenvioMsg('¡Enlace reenviado! Revisa tu bandeja de entrada.');
+    } catch {
+      setReenvioMsg('No se pudo reenviar. Intenta de nuevo.');
+    }
+  };
+
+  // ── RENDER PANEL IZQUIERDO ─────────────────
+  const renderLeft = () => (
+    <div className="scr-panel-left">
+      <button className="scr-close-btn" onClick={() => onClose(false)}>✕</button>
+      <div style={{ textAlign: 'center' }}>
+        <h2 className="scr-welcome-title">
+          Bienvenido a<br />
+          <span>Sweet Cream Rose</span>
+        </h2>
+        <p className="scr-welcome-desc">
+          Más que una torta, creamos momentos dulces que acompañan
+          tus mejores celebraciones, con sabor y dedicación.
+        </p>
+      </div>
+      <img
+        src="/imagenes/cupcake_sanvalentin.jpg"
+        alt="Postre"
+        className="scr-food-img"
+        onError={e => { e.target.style.display = 'none'; }}
+      />
+      {pantalla === 'login' && (
+        <button className="scr-btn-outline-white" onClick={() => setPantalla('registro')}>
+          Regístrate
+        </button>
+      )}
+      {(pantalla === 'registro') && (
+        <button className="scr-btn-outline-white" onClick={() => setPantalla('login')}>
+          Iniciar Sesión
+        </button>
+      )}
+      {(pantalla === 'olvide' || pantalla === 'enviado') && (
+        <button className="scr-btn-outline-white" onClick={() => setPantalla('registro')}>
+          Regístrate
+        </button>
+      )}
+    </div>
+  );
+
+  // ── RENDER PANEL DERECHO ───────────────────
+  const renderRight = () => {
+    if (pantalla === 'login') return (
+      <div className="scr-panel-right">
+        <button className="scr-close-btn dark" onClick={() => onClose(false)}>✕</button>
+        <div className="scr-form-wrap">
+          <h2 className="scr-form-title">Iniciar Sesión</h2>
+          <p className="scr-hint">Inicia sesión con tu correo y contraseña</p>
+          {loginError && <div className="scr-error">{loginError}</div>}
+          <input
+            className="scr-input" type="email" placeholder="Correo electrónico"
+            value={loginCorreo} onChange={e => setLoginCorreo(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleLogin(e)}
+          />
+          <input
+            className="scr-input" type="password" placeholder="Contraseña"
+            value={loginPass} onChange={e => setLoginPass(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleLogin(e)}
+          />
+          <div className="scr-forgot" onClick={() => setPantalla('olvide')}>
+            ¿Olvidaste tu contraseña?
+          </div>
+          <button className="scr-btn-main" onClick={handleLogin} disabled={loginLoading}>
+            {loginLoading ? 'Verificando...' : 'Iniciar sesión'}
+          </button>
+        </div>
+      </div>
+    );
+
+    if (pantalla === 'registro') return (
+      <div className="scr-panel-right">
+        <button className="scr-close-btn dark" onClick={() => onClose(false)}>✕</button>
+        <div className="scr-form-wrap">
+          <h2 className="scr-form-title">Registrarse</h2>
+          <p className="scr-hint">Crea tu cuenta con tu correo</p>
+          {regError && <div className="scr-error">{regError}</div>}
+          <input
+            className="scr-input" type="text" placeholder="Nombre completo"
+            value={regNombre} onChange={e => setRegNombre(e.target.value)}
+          />
+          <input
+            className="scr-input" type="email" placeholder="Correo electrónico"
+            value={regCorreo} onChange={e => setRegCorreo(e.target.value)}
+          />
+          <input
+            className="scr-input" type="password" placeholder="Contraseña"
+            value={regPass} onChange={e => setRegPass(e.target.value)}
+          />
+          <input
+            className={`scr-input ${passMal ? 'err' : passOk ? 'ok' : ''}`}
+            type="password" placeholder="Repetir contraseña"
+            value={regConfirmar} onChange={e => setRegConfirmar(e.target.value)}
+          />
+          {passMal && <p className="scr-pass-hint bad">✗ Las contraseñas no coinciden</p>}
+          {passOk && <p className="scr-pass-hint ok">✓ Las contraseñas coinciden</p>}
+          <button className="scr-btn-main" onClick={handleRegistro} disabled={regLoading || passMal}>
+            {regLoading ? 'Registrando...' : 'Registrarse'}
+          </button>
+        </div>
+      </div>
+    );
+
+    if (pantalla === 'olvide') return (
+      <div className="scr-panel-right">
+        <button className="scr-close-btn dark" onClick={() => onClose(false)}>✕</button>
+        <div className="scr-form-wrap" style={{ display: 'flex', flexDirection: 'column' }}>
+          <button className="scr-back-link" onClick={() => setPantalla('login')}>← Volver</button>
+          <div className="scr-recover-icon">🔒</div>
+          <h2 className="scr-form-title">Recuperar Contraseña</h2>
+          <p className="scr-hint">
+            Ingresa el correo de tu cuenta y te enviaremos un enlace de recuperación.
+          </p>
+          {recError && <div className="scr-error">{recError}</div>}
+          <input
+            className="scr-input" type="email" placeholder="ejemplo@correo.com"
+            value={recCorreo} onChange={e => setRecCorreo(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleOlvide(e)}
+          />
+          <button className="scr-btn-main" onClick={handleOlvide} disabled={recLoading}>
+            {recLoading ? 'Enviando...' : 'Enviar enlace de recuperación'}
+          </button>
+          <p className="scr-hint" style={{ marginTop: 16 }}>
+            ¿Recordaste tu contraseña?{' '}
+            <span className="scr-link-btn" style={{ cursor: 'pointer' }} onClick={() => setPantalla('login')}>
+              Iniciar Sesión
+            </span>
+          </p>
+        </div>
+      </div>
+    );
+
+    if (pantalla === 'enviado') return (
+      <div className="scr-panel-right">
+        <button className="scr-close-btn dark" onClick={() => onClose(false)}>✕</button>
+        <div className="scr-form-wrap" style={{ display: 'flex', flexDirection: 'column' }}>
+          <button className="scr-back-link" onClick={() => setPantalla('olvide')}>← Volver</button>
+          <div className="scr-recover-icon">✉️</div>
+          <h2 className="scr-form-title">Revisa tu correo</h2>
+          <p className="scr-hint">
+            Enviamos un enlace de recuperación a{' '}
+            <strong style={{ color: '#b86b6b' }}>{correoGuardado}</strong>.
+            Haz clic en el enlace para crear tu nueva contraseña.
+          </p>
+          {reenvioMsg && (
+            <div className="scr-error" style={{ background: '#e8f5e9', color: '#2e7d32' }}>
+              {reenvioMsg}
+            </div>
+          )}
+          <p className="scr-hint">¿No recibiste el correo?</p>
+          <div className="scr-resend-row">
+            <button
+              className="scr-link-btn"
+              onClick={handleReenviar}
+              disabled={segundos > 0}
+              style={{ opacity: segundos > 0 ? 0.5 : 1 }}
+            >
+              Reenviar enlace
+            </button>
+            {segundos > 0 && <span className="scr-timer">{fmt(segundos)}</span>}
+          </div>
+          <button className="scr-btn-main" onClick={() => setPantalla('login')}>
+            Volver al inicio de sesión
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div
+      className="scr-overlay"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(false); }}
+    >
+      <div className="scr-auth-card">
+        {pantalla === 'registro'
+          ? <>{renderRight()}{renderLeft()}</>
+          : <>{renderLeft()}{renderRight()}</>
+        }
+      </div>
+    </div>
+  );
+}
+
+// ─── DRAWER CARRITO ──────────────────────────────────────────────────────────
+function CartDrawer({ onClose }) {
+  const [items, setItems] = useState([
+    { id: 1, img: '/assets/products/torta_principal.jpg', nombre: 'Torta Triple Chocolate', precio: 48.00, cantidad: 1 },
+    { id: 2, img: '/assets/products/cupcake_arandano.png', nombre: 'Cupcake de Arándanos', precio: 16.00, cantidad: 2 },
+  ]);
+
+  const onQty = (id, delta) => {
+    setItems(prev => prev.map(it => {
+      if (it.id !== id) return it;
+      const nueva = it.cantidad + delta;
+      return nueva < 1 ? it : { ...it, cantidad: nueva };
+    }));
+  };
+  const onDel = (id) => setItems(prev => prev.filter(it => it.id !== id));
+
+  const subtotal = items.reduce((acc, it) => acc + it.precio * it.cantidad, 0);
+  const envio = items.length > 0 ? 8.00 : 0;
+  const igv = subtotal * 0.18;
+  const total = subtotal + envio + igv;
+
+  return (
+    <>
+      <div
+        className="scr-cart-overlay"
+        onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      />
+      <div className="scr-cart-drawer">
+        <div className="scr-cart-header">
+          <h3 className="scr-cart-title">🛒 Mi Carrito</h3>
+          <button className="scr-cart-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="scr-cart-body">
+          {items.length === 0
+            ? <p className="scr-cart-empty">Tu carrito está vacío 🍰</p>
+            : items.map(it => (
+                <CartItem key={it.id} item={it} onQty={onQty} onDel={onDel} />
+              ))
+          }
+        </div>
+        {items.length > 0 && (
+          <div className="scr-cart-footer">
+            <div className="scr-cart-total-row">
+              <span>Subtotal</span><span>S/ {subtotal.toFixed(2)}</span>
+            </div>
+            <div className="scr-cart-total-row">
+              <span>Envío</span><span>S/ {envio.toFixed(2)}</span>
+            </div>
+            <div className="scr-cart-total-row">
+              <span>IGV (18%)</span><span>S/ {igv.toFixed(2)}</span>
+            </div>
+            <div className="scr-cart-total-row big">
+              <span>TOTAL</span><span>S/ {total.toFixed(2)}</span>
+            </div>
+            <button className="scr-cart-pay-btn">IR A PAGAR →</button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+// ─── HEADER PRINCIPAL ────────────────────────────────────────────────────────
 const Header = ({ page, setPage }) => {
-  
-  // Función para calcular el estilo del botón dependiendo de si está activo o no
-  const estiloBoton = (rutaBoton) => ({
+  const [showAuth, setShowAuth] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const [usuario, setUsuario] = useState(() => localStorage.getItem('correo') || null);
+
+  // Actualizar nombre de usuario tras login/logout
+  const handleAuthClose = (loggedIn) => {
+    setShowAuth(false); // cierra la ventana flotante
+    if (loggedIn) {
+      setUsuario(localStorage.getItem('correo') || 'Usuario'); // Lee el usuario logeado
+      setPage('perfil'); // redirecciona a la vista de perfil
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('correo');
+    localStorage.removeItem('rol');
+    localStorage.removeItem('nombre');
+    setUsuario(null);
+  };
+
+  const estiloBoton = (ruta) => ({
     border: 'none',
     padding: '8px 20px',
-    // Aquí ocurre la magia: si la página actual coincide con el botón, color claro. Si no, oscuro.
-    backgroundColor: page === rutaBoton ? '#FFEFEF' : '#EAAFB8',
+    backgroundColor: page === ruta ? '#FFEFEF' : '#EAAFB8',
     color: '#5A3E41',
     fontFamily: 'Poppins-SemiBold',
     fontSize: '14px',
-    cursor: 'pointer'
+    cursor: 'pointer',
   });
 
-  return (
-    <header style={{ backgroundColor: '#C6676D', width: '100%', position: 'sticky', top: 0, zIndex: 1000 }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <img 
-          src={bannerPrincipal} 
-          alt="Sweet Cream Rose Logo" 
-          style={{ height: '45px', objectFit: 'contain', cursor: 'pointer' }} 
-          onClick={() => setPage('inicio')}
-        />
-        <nav style={{ display: 'flex', gap: '15px' }}>
-          <button onClick={() => setPage('inicio')} style={estiloBoton('inicio')}>INICIO</button>
-          <button onClick={() => setPage('productos')} style={estiloBoton('productos')}>PRODUCTOS</button>
-          <button onClick={() => setPage('ofertas')} style={estiloBoton('ofertas')}>OFERTAS</button>
-          <button onClick={() => setPage('nosotros')} style={estiloBoton('nosotros')}>NOSOTROS</button>
-        </nav>
+  // Contar ítems carrito (simplificado)
+  const cartCount = 2; // en producción leerías del estado global
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'white', borderRadius: '4px', padding: '0 10px', width: '220px' }}>
-            <input type="text" placeholder="Buscar..." style={{ border: 'none', outline: 'none', width: '100%', padding: '8px 0', backgroundColor: 'transparent', fontFamily: 'sans-serif' }} />
-            <img src={iconLupa} alt="Lupa" style={{ height: '16px', cursor: 'pointer', marginLeft: '5px' }} />
-          </div>
-          <img src={iconUser} alt="Usuario" style={{ height: '32px', cursor: 'pointer' }} />
-          <div style={{ position: 'relative', cursor: 'pointer' }}>
-            <img src={iconCart} alt="Carrito" style={{ height: '32px' }} />
-            <div style={{ position: 'absolute', top: '-4px', right: '-4px', backgroundColor: 'white', color: '#C6676D', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '10px', fontWeight: 'bold' }}>0</div>
+  return (
+    <>
+      {/* Inyectamos los estilos del modal una sola vez */}
+      <style>{modalCSS}</style>
+
+      <header style={{ backgroundColor: '#C6676D', width: '100%', position: 'sticky', top: 0, zIndex: 1000 }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+          {/* LOGO */}
+          <img
+            src={bannerPrincipal}
+            alt="Sweet Cream Rose Logo"
+            style={{ height: '45px', objectFit: 'contain', cursor: 'pointer' }}
+            onClick={() => setPage('inicio')}
+          />
+
+          {/* NAVEGACIÓN */}
+          <nav style={{ display: 'flex', gap: '15px' }}>
+            <button onClick={() => setPage('inicio')}    style={estiloBoton('inicio')}>INICIO</button>
+            <button onClick={() => setPage('productos')} style={estiloBoton('productos')}>PRODUCTOS</button>
+            <button onClick={() => setPage('ofertas')}   style={estiloBoton('ofertas')}>OFERTAS</button>
+            <button onClick={() => setPage('nosotros')}  style={estiloBoton('nosotros')}>NOSOTROS</button>
+          </nav>
+
+          {/* LADO DERECHO: buscador + usuario + carrito */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+
+            {/* Buscador */}
+            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'white', borderRadius: '4px', padding: '0 10px', width: '220px' }}>
+              <input
+                type="text"
+                placeholder="Buscar..."
+                style={{ border: 'none', outline: 'none', width: '100%', padding: '8px 0', backgroundColor: 'transparent', fontFamily: 'sans-serif' }}
+              />
+              <img src={iconLupa} alt="Lupa" style={{ height: '16px', cursor: 'pointer', marginLeft: '5px' }} />
+            </div>
+
+            {/* ICONO USUARIO — Lógica cíclica */}
+            {usuario ? (
+              <img
+                src={iconUser}
+                alt="Ir a mi perfil"
+                title="Ir a mi perfil"
+                style={{ height: '32px', cursor: 'pointer' }}
+                onClick={() => setPage('perfil')}
+              />
+            ) : (
+              <img
+                src={iconUser}
+                alt="Iniciar sesión"
+                title="Iniciar sesión / Registrarse"
+                style={{ height: '32px', cursor: 'pointer' }}
+                onClick={() => setShowAuth(true)}
+              />
+            )}
+
+            {/* ICONO CARRITO — abre drawer */}
+            <div
+              style={{ position: 'relative', cursor: 'pointer' }}
+              onClick={() => setShowCart(true)}
+              title="Ver carrito"
+            >
+              <img src={iconCart} alt="Carrito" style={{ height: '32px' }} />
+              <div style={{
+                position: 'absolute', top: '-4px', right: '-4px',
+                backgroundColor: 'white', color: '#C6676D',
+                borderRadius: '50%', width: '16px', height: '16px',
+                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                fontSize: '10px', fontWeight: 'bold',
+              }}>
+                {cartCount}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* MODAL AUTH */}
+      {showAuth && <AuthModal onClose={handleAuthClose} />}
+
+      {/* DRAWER CARRITO */}
+      {showCart && <CartDrawer onClose={() => setShowCart(false)} />}
+    </>
   );
 };
 

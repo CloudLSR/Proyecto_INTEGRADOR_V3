@@ -3,10 +3,17 @@ import React, { useState } from "react";
 // TUS COMPONENTES IMPORTADOS AQUÍ:
 import Header from './Header';
 import Footer from './Footer';
+
 import Inicio from './Inicio';
 import Productos from './Productos';
 import Ofertas from './Ofertas';
 import Nosotros from './Nosotros';
+import Perfil from './Perfil';
+
+import TerminosCondiciones from './TerminosCondiciones';
+import PreguntasFrecuentes from './PreguntasFrecuentes';
+import PoliticasPrivacidad from './PoliticasPrivacidad';
+import PoliticasEnvio from './PoliticasEnvio';
 
 // ─── GLOBAL CSS ──────────────────────────────────────────
 const globalCSS = `
@@ -71,6 +78,12 @@ export default function App() {
       {page === "productos" && <Productos setPage={navigateTo} />}
       {page === "ofertas"   && <Ofertas   setPage={navigateTo} />}
       {page === "nosotros"  && <Nosotros  setPage={navigateTo} />}
+      {page === "perfil"    && <Perfil    setPage={navigateTo} />}
+
+      {page === "preguntasFrecuentes"   && <PreguntasFrecuentes   setPage={navigateTo} />}
+      {page === "politicasEnvio"        && <PoliticasEnvio        setPage={navigateTo} />}
+      {page === "terminosCondiciones"   && <TerminosCondiciones   setPage={navigateTo} />}
+      {page === "politicasPrivacidad"   && <PoliticasPrivacidad   setPage={navigateTo} />}
 
       {/* FOOTER */}
       <Footer setPage={navigateTo} />
