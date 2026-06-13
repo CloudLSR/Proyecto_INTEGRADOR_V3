@@ -15,11 +15,6 @@ import PreguntasFrecuentes from './PreguntasFrecuentes';
 import PoliticasPrivacidad from './PoliticasPrivacidad';
 import PoliticasEnvio from './PoliticasEnvio';
 
-import TerminosCondiciones from './TerminosCondiciones';
-import PreguntasFrecuentes from './PreguntasFrecuentes';
-import PoliticasPrivacidad from './PoliticasPrivacidad';
-import PoliticasEnvio from './PoliticasEnvio';
-
 // ─── GLOBAL CSS ──────────────────────────────────────────
 const globalCSS = `
   * { box-sizing:border-box; margin:0; padding:0; }
