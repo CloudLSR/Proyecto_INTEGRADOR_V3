@@ -9,6 +9,7 @@ import CambiarPassword2 from './CambiarPassword2';
 import CambiarPassword3 from './CambiarPassword3';
 import CambiarPassword4 from './CambiarPassword4';
 import Perfil from './Perfil';
+import AdminMenu from './AdminMenu';
 // Productos
 import Productos from './Productos';
 
@@ -28,6 +29,7 @@ root.render(
       <Route path="/cambiar-password-3" element={<CambiarPassword3 />} />
       <Route path="/cambiar-password-4" element={<CambiarPassword4 />} />
       <Route path="/productos" element={<Productos />} />
+      <Route path="/adminmenu" element={<AdminMenu />} />
     </Routes>
   </BrowserRouter>
 );
