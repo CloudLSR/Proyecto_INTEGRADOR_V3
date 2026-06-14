@@ -1,13 +1,9 @@
-// Header.js — CON MODAL DE AUTH Y DRAWER DE CARRITO
-// Los modales se abren sin salir de la página actual (inicio, productos, ofertas, nosotros)
-// Cerrar: clic en ✕ o clic fuera del panel
-
 import React, { useState, useEffect, useRef } from 'react';
 import bannerPrincipal from './assets/banner.png';
 import iconUser from './assets/icon-user.png';
 import iconCart from './assets/icon-cart.png';
 import iconLupa from './assets/icon-lupa.png';
-
+ 
 // ─── ESTILOS INLINE DEL MODAL + DRAWER ─────────────────────────────────────
 const modalCSS = `
   /* ── Overlay oscuro ── */
@@ -19,7 +15,7 @@ const modalCSS = `
     animation: scrFadeIn .18s ease;
   }
   @keyframes scrFadeIn { from { opacity:0 } to { opacity:1 } }
-
+ 
   /* ── Tarjeta auth ── */
   .scr-auth-card {
     display: flex;
@@ -33,7 +29,7 @@ const modalCSS = `
     margin: 16px;
   }
   @keyframes scrSlideUp { from { transform:translateY(30px); opacity:0 } to { transform:translateY(0); opacity:1 } }
-
+ 
   /* ── Panel rosado izquierdo ── */
   .scr-panel-left {
     background: linear-gradient(160deg, #c8506a 0%, #a83858 100%);
@@ -52,7 +48,7 @@ const modalCSS = `
     padding: 40px 36px;
     position: relative;
   }
-
+ 
   /* ── Botón cerrar ── */
   .scr-close-btn {
     position: absolute; top: 14px; right: 14px;
@@ -69,7 +65,7 @@ const modalCSS = `
     background: #f0e4e8; color: #7a3a3a;
   }
   .scr-close-btn.dark:hover { background: #e8d0d8; }
-
+ 
   /* ── Textos panel izquierdo ── */
   .scr-welcome-title {
     font-family: 'Georgia', serif;
@@ -98,7 +94,7 @@ const modalCSS = `
     margin-top: 8px;
   }
   .scr-btn-outline-white:hover { background: rgba(255,255,255,0.2); }
-
+ 
   /* ── Formulario derecho ── */
   .scr-form-wrap { width: 100%; max-width: 320px; }
   .scr-form-title {
@@ -146,7 +142,7 @@ const modalCSS = `
   .scr-pass-hint { font-size: 0.82rem; margin: -6px 0 8px; }
   .scr-pass-hint.ok { color: #4caf50; }
   .scr-pass-hint.bad { color: #e53935; }
-
+ 
   /* ── Pantalla "Revisa tu correo" ── */
   .scr-recover-icon {
     font-size: 2.5rem; text-align: center; margin: 8px 0 14px;
@@ -168,7 +164,7 @@ const modalCSS = `
   }
   .scr-link-btn:hover { color: #7a3a3a; }
   .scr-link-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
+ 
   /* ── DRAWER CARRITO ── */
   .scr-cart-overlay {
     position: fixed; inset: 0;
@@ -259,7 +255,7 @@ const modalCSS = `
     margin-top: 12px;
   }
   .scr-cart-pay-btn:hover { background: #a83858; }
-
+ 
   /* Responsive */
   @media(max-width:600px) {
     .scr-auth-card { flex-direction: column; min-height: auto; }
@@ -268,7 +264,7 @@ const modalCSS = `
     .scr-cart-drawer { width: 100vw; }
   }
 `;
-
+ 
 // ─── ÍTEM CARRITO (componente pequeño) ──────────────────────────────────────
 function CartItem({ item, onQty, onDel }) {
   return (
@@ -286,26 +282,25 @@ function CartItem({ item, onQty, onDel }) {
           <button className="scr-qty-btn" onClick={() => onQty(item.id, -1)}>−</button>
           <span className="scr-qty-val">{item.cantidad}</span>
           <button className="scr-qty-btn" onClick={() => onQty(item.id, +1)}>+</button>
+          {/* ✅ CORRECCIÓN: Eliminar llama a onDel que borra del backend */}
           <button className="scr-del-btn" onClick={() => onDel(item.id)}>Eliminar</button>
         </div>
       </div>
     </div>
   );
 }
-
+ 
 // ─── MODAL DE AUTENTICACIÓN ──────────────────────────────────────────────────
-// pantalla: 'login' | 'registro' | 'olvide' | 'enviado'
 function AuthModal({ onClose }) {
   const [pantalla, setPantalla] = useState('login');
-
-  // Login
+ 
   const [loginCorreo, setLoginCorreo] = useState('');
   const [loginPass, setLoginPass] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
-
-  // Registro
+ 
   const [regNombre, setRegNombre] = useState('');
+  const [regApellido, setRegApellido] = useState('');
   const [regCorreo, setRegCorreo] = useState('');
   const [regPass, setRegPass] = useState('');
   const [regConfirmar, setRegConfirmar] = useState('');
@@ -313,29 +308,26 @@ function AuthModal({ onClose }) {
   const [regLoading, setRegLoading] = useState(false);
   const passOk = regConfirmar.length > 0 && regPass === regConfirmar;
   const passMal = regConfirmar.length > 0 && regPass !== regConfirmar;
-
-  // Recuperar contraseña
+ 
   const [recCorreo, setRecCorreo] = useState('');
   const [recError, setRecError] = useState('');
   const [recLoading, setRecLoading] = useState(false);
   const [segundos, setSegundos] = useState(0);
   const [reenvioMsg, setReenvioMsg] = useState('');
   const correoGuardado = recCorreo || localStorage.getItem('correo_recuperacion') || '';
-
-  // Timer reenvío
+ 
   useEffect(() => {
     if (segundos <= 0) return;
     const t = setTimeout(() => setSegundos(s => s - 1), 1000);
     return () => clearTimeout(t);
   }, [segundos]);
-
+ 
   const fmt = (s) => {
     const m = Math.floor(s / 60).toString().padStart(2, '0');
     const sg = (s % 60).toString().padStart(2, '0');
     return `(${m}:${sg})`;
   };
-
-  // ── HANDLERS ──────────────────────────────
+ 
   const handleLogin = async (e) => {
     e?.preventDefault();
     setLoginError('');
@@ -356,7 +348,7 @@ function AuthModal({ onClose }) {
           localStorage.setItem('rol', payload.rol || '');
           localStorage.setItem('nombre', payload.nombre || '');
         } catch (_) {}
-        onClose(true); // true = recargó sesión
+        onClose(true);
       } else {
         setLoginError(data.error || 'Correo o contraseña incorrectos.');
       }
@@ -366,18 +358,34 @@ function AuthModal({ onClose }) {
       setLoginLoading(false);
     }
   };
-
+ 
   const handleRegistro = async (e) => {
     e?.preventDefault();
     setRegError('');
-    if (!regNombre || !regCorreo || !regPass || !regConfirmar) { setRegError('Completa todos los campos.'); return; }
+    if (!regNombre || !regApellido || !regCorreo || !regPass || !regConfirmar) {
+      setRegError('Completa todos los campos.');
+      return;
+    }
+    if (!/^[A-ZÁÉÍÓÚÑ]/.test(regNombre.trim())) {
+      setRegError('El nombre debe comenzar con mayúscula.');
+      return;
+    }
+    if (!/^[A-ZÁÉÍÓÚÑ]/.test(regApellido.trim())) {
+      setRegError('El apellido debe comenzar con mayúscula.');
+      return;
+    }
     if (regPass !== regConfirmar) { setRegError('Las contraseñas no coinciden.'); return; }
     setRegLoading(true);
     try {
       const res = await fetch('http://localhost:8081/api/auth/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre: regNombre, correo: regCorreo, contrasena: regPass }),
+        body: JSON.stringify({
+          nombre: regNombre.trim(),
+          apellido: regApellido.trim(),
+          correo: regCorreo,
+          contrasena: regPass
+        }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -396,21 +404,20 @@ function AuthModal({ onClose }) {
   const handleOlvide = async (e) => {
     e?.preventDefault();
     setRecError('');
-    if (!recCorreo.trim()) { setRecError('Ingresa tu correo electrónico.'); return; }
+    if (!recCorreo) { setRecError('Ingresa tu correo.'); return; }
     setRecLoading(true);
     try {
-      const res = await fetch('http://localhost:8081/api/auth/olvide-contrasena', {
+      const res = await fetch('http://localhost:8081/api/auth/recuperar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: recCorreo }),
       });
       if (res.ok) {
         localStorage.setItem('correo_recuperacion', recCorreo);
-        setSegundos(48);
         setPantalla('enviado');
+        setSegundos(60);
       } else {
-        const data = await res.json();
-        setRecError(data.error || 'Ocurrió un error. Intenta de nuevo.');
+        setRecError('No se encontró ese correo.');
       }
     } catch {
       setRecError('No se pudo conectar al servidor.');
@@ -420,39 +427,34 @@ function AuthModal({ onClose }) {
   };
 
   const handleReenviar = async () => {
-    if (segundos > 0) return;
     setReenvioMsg('');
     try {
-      await fetch('http://localhost:8081/api/auth/olvide-contrasena', {
+      await fetch('http://localhost:8081/api/auth/recuperar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: correoGuardado }),
       });
-      setSegundos(48);
-      setReenvioMsg('¡Enlace reenviado! Revisa tu bandeja de entrada.');
+      setReenvioMsg('¡Enlace reenviado!');
+      setSegundos(60);
     } catch {
-      setReenvioMsg('No se pudo reenviar. Intenta de nuevo.');
+      setReenvioMsg('Error al reenviar.');
     }
   };
-
-  // ── RENDER PANEL IZQUIERDO ─────────────────
+ 
   const renderLeft = () => (
     <div className="scr-panel-left">
-      <button className="scr-close-btn" onClick={() => onClose(false)}>✕</button>
-      <div style={{ textAlign: 'center' }}>
+      <div>
         <h2 className="scr-welcome-title">
-          Bienvenido a<br />
-          <span>Sweet Cream Rose</span>
+          <span>🍰</span>Sweet Cream Rose
         </h2>
         <p className="scr-welcome-desc">
-          Más que una torta, creamos momentos dulces que acompañan
-          tus mejores celebraciones, con sabor y dedicación.
+          Repostería artesanal con amor, para cada momento especial.
         </p>
       </div>
       <img
-        src="/imagenes/cupcake_sanvalentin.jpg"
-        alt="Postre"
         className="scr-food-img"
+        src={bannerPrincipal}
+        alt="Dulces"
         onError={e => { e.target.style.display = 'none'; }}
       />
       {pantalla === 'login' && (
@@ -472,8 +474,7 @@ function AuthModal({ onClose }) {
       )}
     </div>
   );
-
-  // ── RENDER PANEL DERECHO ───────────────────
+ 
   const renderRight = () => {
     if (pantalla === 'login') return (
       <div className="scr-panel-right">
@@ -501,7 +502,7 @@ function AuthModal({ onClose }) {
         </div>
       </div>
     );
-
+ 
     if (pantalla === 'registro') return (
       <div className="scr-panel-right">
         <button className="scr-close-btn dark" onClick={() => onClose(false)}>✕</button>
@@ -510,8 +511,12 @@ function AuthModal({ onClose }) {
           <p className="scr-hint">Crea tu cuenta con tu correo</p>
           {regError && <div className="scr-error">{regError}</div>}
           <input
-            className="scr-input" type="text" placeholder="Nombre completo"
+            className="scr-input" type="text" placeholder="Nombre (ej: Oscar)"
             value={regNombre} onChange={e => setRegNombre(e.target.value)}
+          />
+          <input
+            className="scr-input" type="text" placeholder="Apellido (ej: Torres)"
+            value={regApellido} onChange={e => setRegApellido(e.target.value)}
           />
           <input
             className="scr-input" type="email" placeholder="Correo electrónico"
@@ -534,7 +539,7 @@ function AuthModal({ onClose }) {
         </div>
       </div>
     );
-
+ 
     if (pantalla === 'olvide') return (
       <div className="scr-panel-right">
         <button className="scr-close-btn dark" onClick={() => onClose(false)}>✕</button>
@@ -563,7 +568,7 @@ function AuthModal({ onClose }) {
         </div>
       </div>
     );
-
+ 
     if (pantalla === 'enviado') return (
       <div className="scr-panel-right">
         <button className="scr-close-btn dark" onClick={() => onClose(false)}>✕</button>
@@ -587,7 +592,6 @@ function AuthModal({ onClose }) {
               className="scr-link-btn"
               onClick={handleReenviar}
               disabled={segundos > 0}
-              style={{ opacity: segundos > 0 ? 0.5 : 1 }}
             >
               Reenviar enlace
             </button>
@@ -600,7 +604,7 @@ function AuthModal({ onClose }) {
       </div>
     );
   };
-
+ 
   return (
     <div
       className="scr-overlay"
@@ -615,14 +619,36 @@ function AuthModal({ onClose }) {
     </div>
   );
 }
-
+ 
 // ─── DRAWER CARRITO ──────────────────────────────────────────────────────────
-function CartDrawer({ onClose }) {
-  const [items, setItems] = useState([
-    { id: 1, img: '/assets/products/torta_principal.jpg', nombre: 'Torta Triple Chocolate', precio: 48.00, cantidad: 1 },
-    { id: 2, img: '/assets/products/cupcake_arandano.png', nombre: 'Cupcake de Arándanos', precio: 16.00, cantidad: 2 },
-  ]);
-
+const API_BASE_CART = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+ 
+// ✅ CORRECCIÓN: CartDrawer ahora recibe setPage para navegar al pago
+function CartDrawer({ onClose, setPage }) {
+  const [items, setItems] = useState([]);
+ 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    fetch(`${API_BASE_CART}/api/carrito`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => (res.ok ? res.json() : []))
+      .then(data => {
+        const mapeados = (Array.isArray(data) ? data : []).map(ci => ({
+          id:       ci.producto?.id,
+          img:      ci.producto?.imagenUrl
+                      ? `${API_BASE_CART}${ci.producto.imagenUrl}`
+                      : '/assets/products/logo.png',
+          nombre:   ci.producto?.nombre || 'Producto',
+          precio:   Number(ci.producto?.precio || 0),
+          cantidad: ci.cantidad || 1,
+        }));
+        setItems(mapeados);
+      })
+      .catch(() => {});
+  }, []);
+ 
   const onQty = (id, delta) => {
     setItems(prev => prev.map(it => {
       if (it.id !== id) return it;
@@ -630,13 +656,47 @@ function CartDrawer({ onClose }) {
       return nueva < 1 ? it : { ...it, cantidad: nueva };
     }));
   };
-  const onDel = (id) => setItems(prev => prev.filter(it => it.id !== id));
 
+  // ✅ CORRECCIÓN: onDel ahora llama al backend para eliminar el ítem
+  // y actualiza el badge del carrito. El ítem desaparece del drawer
+  // y si se vuelve a abrir el carrito tampoco aparece (porque ya no está en BD).
+  const onDel = (id) => {
+    const token = localStorage.getItem('token');
+    // Eliminar del estado local inmediatamente (UX rápido)
+    setItems(prev => {
+      const nuevos = prev.filter(it => it.id !== id);
+      // Actualizar badge
+      const totalItems = nuevos.reduce((acc, it) => acc + it.cantidad, 0);
+      localStorage.setItem('cartCount', String(totalItems));
+      window.dispatchEvent(new Event('cartUpdated'));
+      return nuevos;
+    });
+    // Eliminar del backend
+    if (token) {
+      fetch(`${API_BASE_CART}/api/carrito/eliminar/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+  };
+ 
   const subtotal = items.reduce((acc, it) => acc + it.precio * it.cantidad, 0);
   const envio = items.length > 0 ? 8.00 : 0;
   const igv = subtotal * 0.18;
   const total = subtotal + envio + igv;
 
+  // ✅ CORRECCIÓN: Ir a pagar cierra el drawer y navega a la página Carrito
+  const handleIrAPagar = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Debes iniciar sesión para pagar.');
+      onClose();
+      return;
+    }
+    onClose();
+    if (setPage) setPage('carrito');
+  };
+ 
   return (
     <>
       <div
@@ -670,37 +730,41 @@ function CartDrawer({ onClose }) {
             <div className="scr-cart-total-row big">
               <span>TOTAL</span><span>S/ {total.toFixed(2)}</span>
             </div>
-            <button className="scr-cart-pay-btn">IR A PAGAR →</button>
+            {/* ✅ CORRECCIÓN: botón ahora navega a la sección de pago */}
+            <button className="scr-cart-pay-btn" onClick={handleIrAPagar}>
+              IR A PAGAR →
+            </button>
           </div>
         )}
       </div>
     </>
   );
 }
-
+ 
 // ─── HEADER PRINCIPAL ────────────────────────────────────────────────────────
 const Header = ({ page, setPage }) => {
   const [showAuth, setShowAuth] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [usuario, setUsuario] = useState(() => localStorage.getItem('correo') || null);
-
-  // Actualizar nombre de usuario tras login/logout
+ 
   const handleAuthClose = (loggedIn) => {
-    setShowAuth(false); // cierra la ventana flotante
+    setShowAuth(false);
     if (loggedIn) {
-      setUsuario(localStorage.getItem('correo') || 'Usuario'); // Lee el usuario logeado
-      setPage('perfil'); // redirecciona a la vista de perfil
+      setUsuario(localStorage.getItem('correo') || 'Usuario');
+      setPage('perfil');
     }
   };
-
+ 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('correo');
     localStorage.removeItem('rol');
     localStorage.removeItem('nombre');
+    localStorage.removeItem('cartCount');
     setUsuario(null);
+    setCartCount(0);
   };
-
+ 
   const estiloBoton = (ruta) => ({
     border: 'none',
     padding: '8px 20px',
@@ -710,18 +774,40 @@ const Header = ({ page, setPage }) => {
     fontSize: '14px',
     cursor: 'pointer',
   });
-
-  // Contar ítems carrito (simplificado)
-  const cartCount = 2; // en producción leerías del estado global
-
+ 
+  const [cartCount, setCartCount] = useState(() => {
+    if (!localStorage.getItem('token')) return 0;
+    const saved = localStorage.getItem('cartCount');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+ 
+  useEffect(() => {
+    const onUpdate = () => {
+      const token = localStorage.getItem('token');
+      if (!token) { setCartCount(0); return; }
+      fetch((process.env.REACT_APP_API_URL || 'http://localhost:8080') + '/api/carrito', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(r => r.ok ? r.json() : [])
+        .then(data => {
+          const n = Array.isArray(data) ? data.reduce((a, ci) => a + (ci.cantidad || 1), 0) : 0;
+          setCartCount(n);
+          localStorage.setItem('cartCount', String(n));
+        })
+        .catch(() => {});
+    };
+    window.addEventListener('cartUpdated', onUpdate);
+    return () => window.removeEventListener('cartUpdated', onUpdate);
+  }, []);
+ 
+ 
   return (
     <>
-      {/* Inyectamos los estilos del modal una sola vez */}
       <style>{modalCSS}</style>
-
+ 
       <header style={{ backgroundColor: '#C6676D', width: '100%', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-
+ 
           {/* LOGO */}
           <img
             src={bannerPrincipal}
@@ -729,7 +815,7 @@ const Header = ({ page, setPage }) => {
             style={{ height: '45px', objectFit: 'contain', cursor: 'pointer' }}
             onClick={() => setPage('inicio')}
           />
-
+ 
           {/* NAVEGACIÓN */}
           <nav style={{ display: 'flex', gap: '15px' }}>
             <button onClick={() => setPage('inicio')}    style={estiloBoton('inicio')}>INICIO</button>
@@ -737,10 +823,10 @@ const Header = ({ page, setPage }) => {
             <button onClick={() => setPage('ofertas')}   style={estiloBoton('ofertas')}>OFERTAS</button>
             <button onClick={() => setPage('nosotros')}  style={estiloBoton('nosotros')}>NOSOTROS</button>
           </nav>
-
+ 
           {/* LADO DERECHO: buscador + usuario + carrito */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-
+ 
             {/* Buscador */}
             <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'white', borderRadius: '4px', padding: '0 10px', width: '220px' }}>
               <input
@@ -750,8 +836,8 @@ const Header = ({ page, setPage }) => {
               />
               <img src={iconLupa} alt="Lupa" style={{ height: '16px', cursor: 'pointer', marginLeft: '5px' }} />
             </div>
-
-            {/* ICONO USUARIO — Lógica cíclica */}
+ 
+            {/* ICONO USUARIO */}
             {usuario ? (
               <img
                 src={iconUser}
@@ -769,35 +855,42 @@ const Header = ({ page, setPage }) => {
                 onClick={() => setShowAuth(true)}
               />
             )}
-
-            {/* ICONO CARRITO — abre drawer */}
+ 
+            {/* ICONO CARRITO */}
             <div
               style={{ position: 'relative', cursor: 'pointer' }}
               onClick={() => setShowCart(true)}
               title="Ver carrito"
             >
               <img src={iconCart} alt="Carrito" style={{ height: '32px' }} />
-              <div style={{
-                position: 'absolute', top: '-4px', right: '-4px',
-                backgroundColor: 'white', color: '#C6676D',
-                borderRadius: '50%', width: '16px', height: '16px',
-                display: 'flex', justifyContent: 'center', alignItems: 'center',
-                fontSize: '10px', fontWeight: 'bold',
-              }}>
-                {cartCount}
-              </div>
+              {cartCount > 0 && (
+                <div style={{
+                  position: 'absolute', top: '-4px', right: '-4px',
+                  backgroundColor: 'white', color: '#C6676D',
+                  borderRadius: '50%', width: '16px', height: '16px',
+                  display: 'flex', justifyContent: 'center', alignItems: 'center',
+                  fontSize: '10px', fontWeight: 'bold',
+                }}>
+                  {cartCount}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </header>
-
+ 
       {/* MODAL AUTH */}
       {showAuth && <AuthModal onClose={handleAuthClose} />}
-
-      {/* DRAWER CARRITO */}
-      {showCart && <CartDrawer onClose={() => setShowCart(false)} />}
+ 
+      {/* ✅ CORRECCIÓN: CartDrawer ahora recibe setPage para que "IR A PAGAR" funcione */}
+      {showCart && (
+        <CartDrawer
+          onClose={() => setShowCart(false)}
+          setPage={setPage}
+        />
+      )}
     </>
   );
 };
-
+ 
 export default Header;

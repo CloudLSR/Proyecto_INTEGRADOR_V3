@@ -5,6 +5,7 @@ import './Auth.css';
 function Registro() {
   const navigate = useNavigate();
   const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [confirmar, setConfirmar] = useState('');
@@ -19,10 +20,23 @@ function Registro() {
     e.preventDefault();
     setError('');
 
-    if (!nombre || !correo || !password || !confirmar) {
+    if (!nombre || !apellido || !correo || !password || !confirmar) {
       setError('Por favor completa todos los campos.');
       return;
     }
+
+    // Validar que el apellido empiece con mayúscula
+    if (!/^[A-ZÁÉÍÓÚÑ]/.test(apellido.trim())) {
+      setError('El apellido debe comenzar con mayúscula.');
+      return;
+    }
+
+    // Validar que el nombre empiece con mayúscula
+    if (!/^[A-ZÁÉÍÓÚÑ]/.test(nombre.trim())) {
+      setError('El nombre debe comenzar con mayúscula.');
+      return;
+    }
+
     if (password !== confirmar) {
       setError('Las contraseñas no coinciden.');
       return;
@@ -30,12 +44,15 @@ function Registro() {
 
     setCargando(true);
     try {
-      // FIX: el endpoint correcto es /api/auth/registro (no /api/auth/registrar)
-      // FIX: el backend espera "contrasena" (no "password")
       const res = await fetch('http://localhost:8081/api/auth/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, correo, contrasena: password }),
+        body: JSON.stringify({
+          nombre: nombre.trim(),
+          apellido: apellido.trim(),
+          correo,
+          contrasena: password
+        }),
       });
 
       const data = await res.json();
@@ -71,14 +88,37 @@ function Registro() {
 
             {error && <div className="error-msg">{error}</div>}
 
-            <input className="auth-input" type="text" placeholder="Nombre"
-                   value={nombre} onChange={e => setNombre(e.target.value)} />
+            <input
+              className="auth-input"
+              type="text"
+              placeholder="Nombre (ej: Oscar)"
+              value={nombre}
+              onChange={e => setNombre(e.target.value)}
+            />
 
-            <input className="auth-input" type="email" placeholder="Gmail"
-                   value={correo} onChange={e => setCorreo(e.target.value)} />
+            <input
+              className="auth-input"
+              type="text"
+              placeholder="Apellido (ej: Rodriguez)"
+              value={apellido}
+              onChange={e => setApellido(e.target.value)}
+            />
 
-            <input className="auth-input" type="password" placeholder="Contraseña"
-                   value={password} onChange={e => setPassword(e.target.value)} />
+            <input
+              className="auth-input"
+              type="email"
+              placeholder="Gmail"
+              value={correo}
+              onChange={e => setCorreo(e.target.value)}
+            />
+
+            <input
+              className="auth-input"
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
 
             <input
               className={`auth-input ${passwordsNoCoinciden ? 'input-error' : passwordsCoinciden ? 'input-ok' : ''}`}
@@ -112,10 +152,10 @@ function Registro() {
           <div className="panel-top">
             <h2 className="welcome-title">
               Bienvenido a<br />
-              <span>Rosa Cream Sweet</span>
+              <span>Sweet Cream Rose</span>
             </h2>
             <p className="welcome-desc">
-              Donde Más que una torta, creamos momentos dulces que acompañan
+              Más que una torta, creamos momentos dulces que acompañan
               tus mejores celebraciones, con sabor, dedicación y un toque de
               felicidad en cada porción.
             </p>

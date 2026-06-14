@@ -5,6 +5,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import com.SweetCreamPink.demoSpringBoot.DTO.PerfilUsuarioDTO;
 import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.UsuarioRepository;
 import com.SweetCreamPink.demoSpringBoot.service.UsuarioService;
@@ -40,9 +41,14 @@ public class PerfilController {
         if (opt.isEmpty())
             return ResponseEntity.notFound().build();
 
+        // FIX: antes se devolvía la entidad Usuario directamente
+        // (u.setContrasena(null); return ResponseEntity.ok(u);).
+        // Usuario tiene @OneToMany lazy (direcciones, metodosPago, ordenes)
+        // que Jackson no puede serializar fuera de la sesión de Hibernate
+        // -> HttpMessageNotWritableException -> 500.
+        // Ahora se devuelve un DTO plano con solo los campos del perfil.
         Usuario u = opt.get();
-        u.setContrasena(null);  // nunca devolver la contraseña
-        return ResponseEntity.ok(u);
+        return ResponseEntity.ok(PerfilUsuarioDTO.fromEntity(u));
     }
 
     // ── GET /api/perfil/correo/{correo} ───────────────────────────────────────
@@ -79,8 +85,9 @@ public class PerfilController {
                                      @AuthenticationPrincipal UserDetails userDetails) {
         try {
             Usuario u = service.obtenerPerfil(usuarioId);
-            u.setContrasena(null);
-            return ResponseEntity.ok(u);
+            // FIX: devolver DTO en vez de la entidad completa (evita
+            // HttpMessageNotWritableException por colecciones lazy)
+            return ResponseEntity.ok(PerfilUsuarioDTO.fromEntity(u));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -97,8 +104,9 @@ public class PerfilController {
                     body.get("apellido"),
                     body.get("telefono")
             );
-            actualizado.setContrasena(null);
-            return ResponseEntity.ok(actualizado);
+            // FIX: devolver DTO en vez de la entidad completa (evita
+            // HttpMessageNotWritableException por colecciones lazy)
+            return ResponseEntity.ok(PerfilUsuarioDTO.fromEntity(actualizado));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

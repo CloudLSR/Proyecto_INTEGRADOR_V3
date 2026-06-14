@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,8 +31,7 @@ public class SecurityConfig {
     @Value("${cors.allowed-origins}")
     private String allowedOriginsRaw;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter,
-                          CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomUserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
     }
@@ -57,13 +55,11 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
                 .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/usuarios/registrar", "/registrar").permitAll()
                 .requestMatchers(HttpMethod.GET, "/", "/login", "/registro", "/error").permitAll()
                 .requestMatchers("/error").permitAll()
-
                 .requestMatchers("/uploads/**", "/assets/**").permitAll()
 
                 .requestMatchers(HttpMethod.POST,
@@ -71,23 +67,27 @@ public class SecurityConfig {
                         "/api/admin/auth/pin"
                 ).permitAll()
 
+                // ── Endpoints públicos de lectura ──────────────────────────
                 .requestMatchers(HttpMethod.GET,
                         "/api/productos/**",
                         "/api/comentarios/aprobados/**",
                         "/api/ofertas/vigentes"
                 ).permitAll()
 
+                // ── Reglas de administrador ────────────────────────────────
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/productos/guardar").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/productos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/comentarios/*/aprobar").hasRole("ADMIN")
 
+                // ── Reglas de cliente autenticado ──────────────────────────
                 .requestMatchers("/api/perfil/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/direcciones/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/metodos-pago/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/ordenes/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/carrito/**").hasAnyRole("CLIENTE", "ADMIN")
+                .requestMatchers("/api/favoritos/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/configuracion/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/comentarios/**").hasAnyRole("CLIENTE", "ADMIN")
 
@@ -101,22 +101,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        List<String> origenes = Arrays.stream(allowedOriginsRaw.split(","))
-                .map(String::trim)
-                .filter(origen -> !origen.isBlank())
-                .toList();
-
-        config.setAllowedOrigins(origenes);
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "http://127.0.0.1:*",
-                "http://[::1]:*"
-        ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(List.of("*"));
+        if (allowedOriginsRaw != null && !allowedOriginsRaw.isEmpty()) {
+            config.setAllowedOrigins(Arrays.asList(allowedOriginsRaw.split(",")));
+        } else {
+            config.setAllowedOrigins(List.of("http://localhost:3000"));
+        }
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         config.setAllowCredentials(true);
-        config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

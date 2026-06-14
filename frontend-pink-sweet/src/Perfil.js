@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logoPrincipal from './assets/logo.png';
 import dividerTitle from './assets/divider-title.png';
 
@@ -10,15 +10,28 @@ import Perfil4 from './Perfil4';
 import Perfil5 from './Perfil5';
 import Perfil6 from './Perfil6';
 
-// Datos básicos para la tarjeta del menú lateral
-const usuarioInfoSidebar = {
-  nombre: "María Rodríguez",
-  correo: "maria.rodriguez@gmail.com"
-};
-
 const Perfil = ({ setPage }) => {
-  // Estado que controla qué pestaña está activa
   const [activeTab, setActiveTab] = useState("info");
+  const [usuario, setUsuario] = useState({
+    nombre: "",
+    apellido: "",
+    correo: "",
+    telefono: "",
+    fechaNacimiento: "",
+    genero: "",
+    fechaRegistro: ""
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    fetch('http://localhost:8081/api/usuarios/perfil', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setUsuario(data); })
+      .catch(() => {});
+  }, []);
 
   const menuTabs = [
     { id: 'info', icon: 'fa-regular fa-user', label: 'Información personal' },
@@ -57,8 +70,12 @@ const Perfil = ({ setPage }) => {
             <div style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: '#FADADD', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '45px', color: '#C6676D', marginBottom: '15px' }}>
               <i className="fa-regular fa-user"></i>
             </div>
-            <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 5px 0' }}>{usuarioInfoSidebar.nombre}</h3>
-            <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#C6676D', margin: '0', textDecoration: 'underline' }}>{usuarioInfoSidebar.correo}</p>
+            <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 5px 0' }}>
+              {usuario.nombre ? `${usuario.nombre} ${usuario.apellido || ''}`.trim() : 'Mi cuenta'}
+            </h3>
+            <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#C6676D', margin: '0', textDecoration: 'underline' }}>
+              {usuario.correo || ''}
+            </p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -95,13 +112,10 @@ const Perfil = ({ setPage }) => {
             {/* CERRAR SESIÓN */}
             <button 
               onClick={() => {
-                // Borramos todos los datos de sesión
                 localStorage.removeItem('token');
                 localStorage.removeItem('correo');
                 localStorage.removeItem('rol');
                 localStorage.removeItem('nombre');
-                
-                // Refrescamos la página de golpe para que el Header lea que ya no hay usuario y se reinicie todo el estado
                 window.location.href = "/";
               }}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '15px', backgroundColor: 'transparent', border: 'none', padding: '14px 20px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', textAlign: 'left', cursor: 'pointer', borderRadius: '10px' }}
@@ -114,8 +128,7 @@ const Perfil = ({ setPage }) => {
         {/* COLUMNA DERECHA: RENDERIZADO CONDICIONAL DE COMPONENTES */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '25px', minWidth: '300px' }}>
           
-          {/* Si la pestaña activa es "info", cargamos el archivo Perfil1.js */}
-          {activeTab === "info" && <Perfil1 setActiveTab={setActiveTab} />}
+          {activeTab === "info" && <Perfil1 setActiveTab={setActiveTab} usuario={usuario} setUsuario={setUsuario} />}
           {activeTab === "pedidos" && <Perfil2 />}
           {activeTab === "direcciones" && <Perfil3 />}
           {activeTab === "pagos" && <Perfil4 />}

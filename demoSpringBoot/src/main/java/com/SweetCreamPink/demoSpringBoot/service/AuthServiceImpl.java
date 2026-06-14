@@ -22,11 +22,11 @@ public class AuthServiceImpl implements AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
-    private final UsuarioDAO      usuarioDAO;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil         jwtUtil;
+    private final UsuarioDAO        usuarioDAO;
+    private final PasswordEncoder   passwordEncoder;
+    private final JwtUtil           jwtUtil;
     private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository;
+    private final RolRepository     rolRepository;
 
     public AuthServiceImpl(UsuarioDAO usuarioDAO,
                            PasswordEncoder passwordEncoder,
@@ -40,27 +40,42 @@ public class AuthServiceImpl implements AuthService {
         this.rolRepository     = rolRepository;
     }
 
-    // ── REGISTRO ─────────────────────────────────────────────────────────────
     @Override
     public Usuario registrar(String nombre, String apellido,
                              String correo, String contrasena, String telefono) {
 
+        // ── Validaciones básicas ──────────────────────────────────────────────
         if (nombre == null || nombre.isBlank())
             throw new IllegalArgumentException("El nombre es obligatorio");
+
+        if (!Character.isUpperCase(nombre.charAt(0)))
+            throw new IllegalArgumentException("El nombre debe comenzar con mayúscula");
+
+        if (apellido == null || apellido.isBlank())
+            throw new IllegalArgumentException("El apellido es obligatorio");
+
+        if (!Character.isUpperCase(apellido.charAt(0)))
+            throw new IllegalArgumentException("El apellido debe comenzar con mayúscula");
+
         if (correo == null || correo.isBlank())
             throw new IllegalArgumentException("El correo es obligatorio");
+
+        if (!correo.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$"))
+            throw new IllegalArgumentException("El correo no tiene un formato válido");
+
         if (contrasena == null || contrasena.length() < 6)
             throw new IllegalArgumentException("La contraseña debe tener al menos 6 caracteres");
+
         if (usuarioDAO.existePorCorreo(correo))
             throw new IllegalArgumentException("Ya existe una cuenta con ese correo");
 
+        // ── Crear y guardar usuario ───────────────────────────────────────────
         Usuario u = new Usuario();
-        u.setNombre(nombre);
-        u.setApellido(apellido);
-        u.setCorreo(correo);
-        u.setTelefono(telefono);
+        u.setNombre(nombre.trim());
+        u.setApellido(apellido.trim());
+        u.setCorreo(correo.trim().toLowerCase());
+        u.setTelefono(telefono != null ? telefono.trim() : null);
         u.setContrasena(passwordEncoder.encode(contrasena));
-
         u.setRol(obtenerRolCliente());
 
         Usuario guardado = usuarioDAO.guardar(u);
@@ -77,7 +92,6 @@ public class AuthServiceImpl implements AuthService {
                 });
     }
 
-    // ── LOGIN ─────────────────────────────────────────────────────────────────
     @Override
     public String login(String correo, String contrasena) {
         Usuario u = usuarioDAO.buscarPorCorreo(correo)
@@ -95,7 +109,6 @@ public class AuthServiceImpl implements AuthService {
         return token;
     }
 
-    // ── RECUPERACIÓN DE CONTRASEÑA ────────────────────────────────────────────
     @Override
     public void solicitarRecuperacion(String correo) {
         Optional<Usuario> opt = usuarioDAO.buscarPorCorreo(correo);
@@ -103,13 +116,11 @@ public class AuthServiceImpl implements AuthService {
             log.info("Solicitud de recuperación para correo inexistente: {}", correo);
             return;
         }
-
         Usuario u = opt.get();
         String token = jwtUtil.generarTokenReset(correo);
         u.setResetToken(token);
         u.setResetTokenExpiry(LocalDateTime.now().plusMinutes(15));
         usuarioDAO.guardar(u);
-
         log.info("Token de recuperación para {}: {}", correo, token);
     }
 
