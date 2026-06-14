@@ -479,6 +479,17 @@ function AuthModal({ onClose }) {
     if (pantalla === 'login') return (
       <div className="scr-panel-right">
         <button className="scr-close-btn dark" onClick={() => onClose(false)}>✕</button>
+
+        {/* === EASTER EGG === */}
+        <div 
+          onClick={() => window.location.href = '/adminmenu'}
+          style={{ position: 'absolute', bottom: '15px', right: '15px', cursor: 'pointer', color: '#E0C8CC', fontSize: '14px', fontWeight: 'bold' }}
+          title="Acceso Administrativo"
+        >
+          ?
+        </div>
+        {/* ================== */}
+
         <div className="scr-form-wrap">
           <h2 className="scr-form-title">Iniciar Sesión</h2>
           <p className="scr-hint">Inicia sesión con tu correo y contraseña</p>
