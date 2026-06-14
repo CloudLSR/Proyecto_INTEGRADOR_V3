@@ -26,10 +26,30 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
   const [form, setForm] = useState({
     nombre:   usuario?.nombre   || '',
     apellido: usuario?.apellido || '',
-    telefono: usuario?.telefono || ''
+    telefono: usuario?.telefono || '',
+    fechaNacimiento: usuario?.fechaNacimiento || '',
+    genero:          usuario?.genero          || ''
   });
 
   const toggleWish = i => setWishlist(w => w.includes(i) ? w.filter(x => x !== i) : [...w, i]);
+
+  const formatearFechaRegistro = (f) => {
+    if (!f) return '—';
+    try {
+      const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      const d = new Date(f);
+      return `${d.getDate()} de ${meses[d.getMonth()]}, ${d.getFullYear()}`;
+    } catch { return '—'; }
+  };
+
+  const formatearFechaNac = (f) => {
+    if (!f) return '—';
+    try {
+      const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      const [a,m,d] = f.split('-');
+      return `${parseInt(d)} de ${meses[parseInt(m)-1]}, ${a}`;
+    } catch { return '—'; }
+  };
 
   const guardarCambios = async () => {
     if (form.nombre && form.nombre[0] !== form.nombre[0].toUpperCase()) {
@@ -67,7 +87,7 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
           </div>
           {!editando && (
             <button onClick={() => {
-                setForm({ nombre: usuario?.nombre || '', apellido: usuario?.apellido || '', telefono: usuario?.telefono || '' });
+                setForm({ nombre: usuario?.nombre || '', apellido: usuario?.apellido || '', telefono: usuario?.telefono || '', fechaNacimiento: usuario?.fechaNacimiento || '', genero: usuario?.genero || '' });
                 setEditando(true);
               }}
               style={{ backgroundColor: 'transparent', color: '#C6676D', border: '2px solid #EAAFB8', padding: '8px 20px', borderRadius: '20px', fontFamily: 'Poppins-Medium', fontSize: '13px', cursor: 'pointer' }}>
@@ -82,7 +102,9 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
             {[
               { label: 'Nombre',   key: 'nombre',   placeholder: 'Ej: Juan' },
               { label: 'Apellido', key: 'apellido', placeholder: 'Ej: Pérez' },
-              { label: 'Teléfono', key: 'telefono', placeholder: 'Ej: +51 999999999' }
+              { label: 'Teléfono', key: 'telefono', placeholder: 'Ej: +51 999999999' },
+              { label: 'Fecha de nacimiento', key: 'fechaNacimiento', placeholder: 'YYYY-MM-DD' },
+              { label: 'Género',   key: 'genero',   placeholder: 'Masculino / Femenino / Otro' }
             ].map(({ label, key, placeholder }) => (
               <div key={key} style={{ display: 'flex', alignItems: 'center', fontFamily: 'Poppins-Medium', fontSize: '14px' }}>
                 <div style={{ width: '250px', color: '#5A3E41' }}>{label}</div>
@@ -112,9 +134,9 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
               { label: "Nombre completo",    value: `${usuario?.nombre || ''} ${usuario?.apellido || ''}`.trim() || '—', icon: "fa-regular fa-user" },
               { label: "Correo electrónico", value: usuario?.correo    || '—', icon: "fa-regular fa-envelope" },
               { label: "Teléfono",           value: usuario?.telefono  || '—', icon: "fa-solid fa-phone" },
-              { label: "Fecha de nacimiento", value: "—", icon: "fa-regular fa-calendar" },
-              { label: "Genero",             value: "—", icon: "fa-solid fa-venus-mars" },
-              { label: "Fecha de registro",  value: "—", icon: "fa-regular fa-id-card" }
+              { label: "Fecha de nacimiento", value: formatearFechaNac(usuario?.fechaNacimiento), icon: "fa-regular fa-calendar" },
+              { label: "Genero",             value: usuario?.genero || '—', icon: "fa-solid fa-venus-mars" },
+              { label: "Fecha de registro",  value: formatearFechaRegistro(usuario?.fechaRegistro), icon: "fa-regular fa-id-card" }
             ].map((row, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', fontFamily: 'Poppins-Medium', fontSize: '14px' }}>
                 <div style={{ width: '250px', color: '#5A3E41', display: 'flex', alignItems: 'center', gap: '12px' }}>

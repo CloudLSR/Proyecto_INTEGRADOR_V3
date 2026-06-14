@@ -4,11 +4,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.SweetCreamPink.demoSpringBoot.DTO.PerfilUsuarioDTO;
 import com.SweetCreamPink.demoSpringBoot.Modelo.Usuario;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.UsuarioRepository;
 import com.SweetCreamPink.demoSpringBoot.Seguridad.JwtUtil;
 import com.SweetCreamPink.demoSpringBoot.service.AuthService;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,6 +34,7 @@ public class UsuarioApiController {
         this.jwtUtil         = jwtUtil;
     }
 
+    // ── REGISTRO ──────────────────────────────────────────────────────────────
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarUsuario(@RequestBody Map<String, String> body) {
         try {
@@ -42,13 +45,17 @@ public class UsuarioApiController {
                     body.get("contrasena"),
                     body.get("telefono")
             );
-            guardado.setContrasena(null);
-            return ResponseEntity.ok(guardado);
+            // fechaRegistro ya se asignó automáticamente con @PrePersist
+            // FIX: devolver DTO en vez de la entidad completa (evita
+            // HttpMessageNotWritableException por colecciones lazy
+            // direcciones/metodosPago/ordenes sin sesión activa)
+            return ResponseEntity.ok(PerfilUsuarioDTO.fromEntity(guardado));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
+    // ── LOGIN ─────────────────────────────────────────────────────────────────
     @PostMapping("/login")
     public ResponseEntity<?> loginUsuario(@RequestBody Usuario loginData) {
         Optional<Usuario> userOpt = usuarioRepo.findByCorreo(loginData.getCorreo());
@@ -60,16 +67,19 @@ public class UsuarioApiController {
                 u.getCorreo(),
                 u.getRol() != null ? u.getRol().getDescripcion().toUpperCase() : "CLIENTE"
             );
-            u.setContrasena(null);
+            // FIX: devolver DTO en vez de la entidad completa (evita
+            // HttpMessageNotWritableException por colecciones lazy
+            // direcciones/metodosPago/ordenes sin sesión activa)
             return ResponseEntity.ok(Map.of(
                 "token", token,
-                "usuario", u
+                "usuario", PerfilUsuarioDTO.fromEntity(u)
             ));
         } else {
             return ResponseEntity.status(401).body(Map.of("error", "Credenciales incorrectas"));
         }
     }
 
+    // ── VER PERFIL ────────────────────────────────────────────────────────────
     @GetMapping("/perfil")
     public ResponseEntity<?> obtenerPerfil(@RequestHeader("Authorization") String authHeader) {
         try {
@@ -78,13 +88,25 @@ public class UsuarioApiController {
 
             Usuario u = usuarioRepo.findByCorreo(correo)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            u.setContrasena(null);
-            return ResponseEntity.ok(u);
+
+            // FIX: antes se devolvía `u` directamente (ResponseEntity.ok(u)).
+            // Usuario.java tiene @OneToMany lazy (direcciones, metodosPago,
+            // ordenes). Al serializar fuera de la sesión de Hibernate,
+            // Jackson lanzaba:
+            //   HttpMessageNotWritableException: Could not write JSON:
+            //   failed to lazily initialize a collection of role:
+            //   ...Usuario.direcciones: could not initialize proxy - no Session
+            // -> esto causaba el 500 y por eso el perfil llegaba vacío.
+            // Ahora devolvemos un DTO plano con solo los campos del perfil.
+            return ResponseEntity.ok(PerfilUsuarioDTO.fromEntity(u));
         } catch (Exception e) {
             return ResponseEntity.status(401).body(Map.of("error", "Token inválido"));
         }
     }
 
+    // ── EDITAR PERFIL ─────────────────────────────────────────────────────────
+    // Campos que el usuario PUEDE editar: telefono, fechaNacimiento, genero
+    // Campos que NO se pueden editar aquí:  nombre, apellido, correo, fechaRegistro
     @PutMapping("/perfil")
     public ResponseEntity<?> actualizarPerfil(@RequestHeader("Authorization") String authHeader,
                                                @RequestBody Map<String, String> body) {
@@ -95,16 +117,29 @@ public class UsuarioApiController {
             Usuario u = usuarioRepo.findByCorreo(correo)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-            if (body.containsKey("nombre")   && !body.get("nombre").isBlank())
-                u.setNombre(body.get("nombre"));
-            if (body.containsKey("apellido") && !body.get("apellido").isBlank())
-                u.setApellido(body.get("apellido"));
+            // ── Campos editables ──────────────────────────────────────────────
             if (body.containsKey("telefono"))
                 u.setTelefono(body.get("telefono"));
 
-            usuarioRepo.save(u);
-            u.setContrasena(null);
-            return ResponseEntity.ok(u);
+            if (body.containsKey("fechaNacimiento") && body.get("fechaNacimiento") != null
+                    && !body.get("fechaNacimiento").isBlank()) {
+                u.setFechaNacimiento(LocalDate.parse(body.get("fechaNacimiento")));
+            }
+
+            if (body.containsKey("genero") && body.get("genero") != null
+                    && !body.get("genero").isBlank()) {
+                u.setGenero(body.get("genero"));
+            }
+
+            // ── nombre y apellido: NO se modifican aquí (vienen del registro) ─
+            // ── correo: NO se modifica aquí ───────────────────────────────────
+            // ── fechaRegistro: NO se modifica nunca (@updatable = false) ──────
+
+            Usuario actualizado = usuarioRepo.save(u);
+
+            // FIX: devolver DTO en vez de la entidad completa (evita
+            // HttpMessageNotWritableException por colecciones lazy)
+            return ResponseEntity.ok(PerfilUsuarioDTO.fromEntity(actualizado));
         } catch (Exception e) {
             return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
         }

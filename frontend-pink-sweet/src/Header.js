@@ -304,8 +304,9 @@ function AuthModal({ onClose }) {
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // Registro
+  // Registro — AHORA CON APELLIDO SEPARADO
   const [regNombre, setRegNombre] = useState('');
+  const [regApellido, setRegApellido] = useState('');   // ← NUEVO
   const [regCorreo, setRegCorreo] = useState('');
   const [regPass, setRegPass] = useState('');
   const [regConfirmar, setRegConfirmar] = useState('');
@@ -356,7 +357,7 @@ function AuthModal({ onClose }) {
           localStorage.setItem('rol', payload.rol || '');
           localStorage.setItem('nombre', payload.nombre || '');
         } catch (_) {}
-        onClose(true); // true = recargó sesión
+        onClose(true);
       } else {
         setLoginError(data.error || 'Correo o contraseña incorrectos.');
       }
@@ -370,14 +371,38 @@ function AuthModal({ onClose }) {
   const handleRegistro = async (e) => {
     e?.preventDefault();
     setRegError('');
-    if (!regNombre || !regCorreo || !regPass || !regConfirmar) { setRegError('Completa todos los campos.'); return; }
+
+    // Validar campos vacíos
+    if (!regNombre || !regApellido || !regCorreo || !regPass || !regConfirmar) {
+      setRegError('Completa todos los campos.');
+      return;
+    }
+
+    // Validar que el nombre empiece con mayúscula
+    if (!/^[A-ZÁÉÍÓÚÑ]/.test(regNombre.trim())) {
+      setRegError('El nombre debe comenzar con mayúscula.');
+      return;
+    }
+
+    // Validar que el apellido empiece con mayúscula
+    if (!/^[A-ZÁÉÍÓÚÑ]/.test(regApellido.trim())) {
+      setRegError('El apellido debe comenzar con mayúscula.');
+      return;
+    }
+
     if (regPass !== regConfirmar) { setRegError('Las contraseñas no coinciden.'); return; }
+
     setRegLoading(true);
     try {
       const res = await fetch('http://localhost:8081/api/auth/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre: regNombre, correo: regCorreo, contrasena: regPass }),
+        body: JSON.stringify({
+          nombre: regNombre.trim(),
+          apellido: regApellido.trim(),   // ← ENVIAMOS EL APELLIDO
+          correo: regCorreo,
+          contrasena: regPass
+        }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -509,10 +534,19 @@ function AuthModal({ onClose }) {
           <h2 className="scr-form-title">Registrarse</h2>
           <p className="scr-hint">Crea tu cuenta con tu correo</p>
           {regError && <div className="scr-error">{regError}</div>}
+
+          {/* NOMBRE */}
           <input
-            className="scr-input" type="text" placeholder="Nombre completo"
+            className="scr-input" type="text" placeholder="Nombre (ej: Oscar)"
             value={regNombre} onChange={e => setRegNombre(e.target.value)}
           />
+
+          {/* APELLIDO — campo nuevo separado */}
+          <input
+            className="scr-input" type="text" placeholder="Apellido (ej: Torres)"
+            value={regApellido} onChange={e => setRegApellido(e.target.value)}
+          />
+
           <input
             className="scr-input" type="email" placeholder="Correo electrónico"
             value={regCorreo} onChange={e => setRegCorreo(e.target.value)}
@@ -587,7 +621,6 @@ function AuthModal({ onClose }) {
               className="scr-link-btn"
               onClick={handleReenviar}
               disabled={segundos > 0}
-              style={{ opacity: segundos > 0 ? 0.5 : 1 }}
             >
               Reenviar enlace
             </button>
@@ -684,12 +717,11 @@ const Header = ({ page, setPage }) => {
   const [showCart, setShowCart] = useState(false);
   const [usuario, setUsuario] = useState(() => localStorage.getItem('correo') || null);
 
-  // Actualizar nombre de usuario tras login/logout
   const handleAuthClose = (loggedIn) => {
-    setShowAuth(false); // cierra la ventana flotante
+    setShowAuth(false);
     if (loggedIn) {
-      setUsuario(localStorage.getItem('correo') || 'Usuario'); // Lee el usuario logeado
-      setPage('perfil'); // redirecciona a la vista de perfil
+      setUsuario(localStorage.getItem('correo') || 'Usuario');
+      setPage('perfil');
     }
   };
 
@@ -711,12 +743,10 @@ const Header = ({ page, setPage }) => {
     cursor: 'pointer',
   });
 
-  // Contar ítems carrito (simplificado)
-  const cartCount = 2; // en producción leerías del estado global
+  const cartCount = 2;
 
   return (
     <>
-      {/* Inyectamos los estilos del modal una sola vez */}
       <style>{modalCSS}</style>
 
       <header style={{ backgroundColor: '#C6676D', width: '100%', position: 'sticky', top: 0, zIndex: 1000 }}>
@@ -751,7 +781,7 @@ const Header = ({ page, setPage }) => {
               <img src={iconLupa} alt="Lupa" style={{ height: '16px', cursor: 'pointer', marginLeft: '5px' }} />
             </div>
 
-            {/* ICONO USUARIO — Lógica cíclica */}
+            {/* ICONO USUARIO */}
             {usuario ? (
               <img
                 src={iconUser}
@@ -770,7 +800,7 @@ const Header = ({ page, setPage }) => {
               />
             )}
 
-            {/* ICONO CARRITO — abre drawer */}
+            {/* ICONO CARRITO */}
             <div
               style={{ position: 'relative', cursor: 'pointer' }}
               onClick={() => setShowCart(true)}
