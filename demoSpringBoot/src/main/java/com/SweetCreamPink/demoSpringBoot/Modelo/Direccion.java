@@ -1,47 +1,41 @@
 package com.SweetCreamPink.demoSpringBoot.Modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-//? dirección de envío de un usuario.
-//? un usuario puede tener N direcciones, solo una puede ser principal.
-//? direccionServiceImpl se encarga de desmarcar la anterior cuando se marca una nueva como principal.
 
 @Entity
 @Table(name = "usuario_direccion")
 @Getter
 @Setter
-@NoArgsConstructor
 public class Direccion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuId_fk", nullable = false)
-    private Usuario usuario;
-
-    @NotBlank(message = "La dirección no puede estar vacía")
-    @Column(nullable = false, length = 255)
+    @Column(name = "direccion", nullable = false, length = 255)
     private String direccion;
 
-    @Column(length = 100)
+    @Column(name = "distrito", nullable = false, length = 100)
     private String distrito;
 
-    @Column(length = 100)
-    private String ciudad;
+    @Column(name = "ciudad", length = 100)
+    private String ciudad = "Lima"; // Valor predeterminado para evitar nulos
 
-    @Column(length = 20)
-    private String codigoPostal;
+    @Column(name = "codigo_postal", length = 20)
+    private String codigoPostal = "15001";
 
-    /** Marca si es la dirección predeterminada del usuario */
-    @Column(nullable = false)
-    private boolean esPrincipal = false;
-
-    @Column(length = 100)
+    @Column(name = "referencia", length = 255)
     private String referencia;
+
+    @Column(name = "es_principal", nullable = false)
+    private boolean esPrincipal;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usu_id_fk", nullable = false)
+    @JsonIgnoreProperties({"direcciones", "metodosPago", "ordenes", "contrasena", "rol"})
+    private Usuario usuario;
 }

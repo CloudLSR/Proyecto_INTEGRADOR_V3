@@ -146,6 +146,17 @@ const Productos = () => {
   // cantidades por producto (id -> cantidad)
   const [cantidades, setCantidades] = useState({});
 
+  // ✅ NUEVO: set de IDs de productos marcados como favoritos
+  const [favoritos, setFavoritos] = useState(() => {
+    // Inicializar desde localStorage para persistencia entre páginas
+    try {
+      const saved = localStorage.getItem('favoritos_ids');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
   useEffect(() => {
     const cargarProductos = async () => {
       try {
@@ -215,6 +226,60 @@ const Productos = () => {
     } catch (err) {
       console.error('Error agregando al carrito:', err);
       alert('Ocurrió un error al agregar el producto al carrito.');
+    }
+  };
+
+  // ✅ NUEVO: Toggle favorito — llama al backend y actualiza estado local
+  const toggleFavorito = async (producto) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Debes iniciar sesión para guardar favoritos.');
+      return;
+    }
+    const esFavorito = favoritos.has(producto.id);
+    // Actualizar estado local inmediatamente (optimista)
+    setFavoritos(prev => {
+      const nuevo = new Set(prev);
+      if (esFavorito) {
+        nuevo.delete(producto.id);
+      } else {
+        nuevo.add(producto.id);
+      }
+      localStorage.setItem('favoritos_ids', JSON.stringify([...nuevo]));
+      // ✅ Notificar a Perfil5.js para que recargue la lista al instante
+      window.dispatchEvent(new Event('favoritosUpdated'));
+      return nuevo;
+    });
+    try {
+      if (esFavorito) {
+        // Quitar de favoritos
+        await fetch(`${API_BASE}/api/favoritos/${producto.id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else {
+        // Agregar a favoritos
+        await fetch(`${API_BASE}/api/favoritos`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ productoId: producto.id }),
+        });
+      }
+    } catch {
+      // Si falla el backend, revertir el cambio local
+      setFavoritos(prev => {
+        const revertido = new Set(prev);
+        if (esFavorito) {
+          revertido.add(producto.id);
+        } else {
+          revertido.delete(producto.id);
+        }
+        localStorage.setItem('favoritos_ids', JSON.stringify([...revertido]));
+        return revertido;
+      });
     }
   };
 
@@ -325,8 +390,15 @@ const Productos = () => {
                     <h2 style={{ color: '#5A3E41', fontSize: '32px', margin: '0 0 5px 0', fontFamily: 'Poppins-Bold' }}>{prod.nombre}</h2>
                     <img src={dividerProduct} alt="Divisor de Producto" style={{ width: '100%', height: '26px', marginTop: '-5px', objectFit: 'contain' }} />
                   </div>
-                  <div style={{ width: '45px', height: '45px', borderRadius: '100%', backgroundColor: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 0px 5px rgba(0,0,0,0.1)', cursor: 'pointer' }}>
-                    <span style={{ fontSize: '40px', color: '#C3666D', marginTop: '-2px' }}>♡</span>
+                  {/* ✅ CORRECCIÓN: corazón funcional — lleno si es favorito, vacío si no */}
+                  <div
+                    onClick={() => toggleFavorito(prod)}
+                    title={favoritos.has(prod.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                    style={{ width: '45px', height: '45px', borderRadius: '100%', backgroundColor: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 0px 5px rgba(0,0,0,0.1)', cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    <span style={{ fontSize: '28px', color: '#C3666D', marginTop: '-2px', lineHeight: 1 }}>
+                      {favoritos.has(prod.id) ? '♥' : '♡'}
+                    </span>
                   </div>
                 </div>
 

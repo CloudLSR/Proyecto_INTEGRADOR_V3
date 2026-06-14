@@ -32,7 +32,9 @@ public class DireccionServiceImpl implements DireccionService {
                              String ciudad, String codigoPostal, String referencia,
                              boolean esPrincipal) {
 
-        Preconditions.checkNotNull(usuarioId, "El ID de usuario es requerido");
+        if (usuarioId == null) {
+            throw new IllegalArgumentException("El ID de usuario es requerido");
+        }
         Preconditions.checkArgument(direccion != null && !direccion.isBlank(),
                 "La dirección no puede estar vacía");
 
@@ -70,10 +72,11 @@ public class DireccionServiceImpl implements DireccionService {
         Direccion existing = dao.buscarPorId(direccionId)
                 .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
 
-        // Verificar que la dirección pertenece al usuario autenticado
-        Preconditions.checkArgument(
-                existing.getUsuario().getId().equals(usuarioId),
-                "No tienes permiso para modificar esta dirección");
+        if (usuarioId == null || existing.getUsuario() == null
+                || existing.getUsuario().getId() == null
+                || !existing.getUsuario().getId().equals(usuarioId)) {
+            throw new IllegalArgumentException("No tienes permiso para modificar esta dirección");
+        }
 
         if (esPrincipal) desactivarPrincipalAnterior(usuarioId);
 
@@ -92,9 +95,11 @@ public class DireccionServiceImpl implements DireccionService {
         Direccion existing = dao.buscarPorId(direccionId)
                 .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
 
-        Preconditions.checkArgument(
-                existing.getUsuario().getId().equals(usuarioId),
-                "No tienes permiso para eliminar esta dirección");
+        if (usuarioId == null || existing.getUsuario() == null
+                || existing.getUsuario().getId() == null
+                || !existing.getUsuario().getId().equals(usuarioId)) {
+            throw new IllegalArgumentException("No tienes permiso para eliminar esta dirección");
+        }
 
         dao.eliminar(direccionId);
         log.info("Dirección {} eliminada para usuarioId: {}", direccionId, usuarioId);

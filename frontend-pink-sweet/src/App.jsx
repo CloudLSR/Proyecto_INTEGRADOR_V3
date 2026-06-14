@@ -9,6 +9,8 @@ import Productos from './Productos';
 import Ofertas from './Ofertas';
 import Nosotros from './Nosotros';
 import Perfil from './Perfil';
+// ✅ CORRECCIÓN: Importar Carrito para la ruta de pago
+import Carrito from './Carrito';
 
 import TerminosCondiciones from './TerminosCondiciones';
 import PreguntasFrecuentes from './PreguntasFrecuentes';
@@ -54,24 +56,29 @@ const globalCSS = `
   }
 `;
 
-// ─── ROOT APP (Donde ocurre la magia de la integración) ───
+// ─── ROOT APP ───────────────────────────────────────────────────────────────
 export default function App() {
   const [page, setPage] = useState("inicio");
-  const [cartCount] = useState(2);
 
-  const navigateTo = p => { 
-    setPage(p); 
-    window.scrollTo({ top:0, behavior:"smooth" }); 
+  // ✅ CORRECCIÓN: función de navegación actualiza el badge al volver al carrito
+  const navigateTo = p => {
+    setPage(p);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Función para actualizar el badge del carrito (se pasa al componente Carrito)
+  const handleCartUpdate = () => {
+    window.dispatchEvent(new Event('cartUpdated'));
   };
 
   return (
-    <div style={{ fontFamily:"'Playfair Display','Georgia',serif", background:"#fff", color:"#2d1a10", minHeight:"100vh" }}>
+    <div style={{ fontFamily: "'Playfair Display','Georgia',serif", background: "#fff", color: "#2d1a10", minHeight: "100vh" }}>
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
       <style>{globalCSS}</style>
 
       {/* HEADER */}
-      <Header page={page} setPage={navigateTo} cartCount={cartCount} />
+      <Header page={page} setPage={navigateTo} />
 
       {/* RUTAS */}
       {page === "inicio"    && <Inicio    setPage={navigateTo} />}
@@ -80,10 +87,13 @@ export default function App() {
       {page === "nosotros"  && <Nosotros  setPage={navigateTo} />}
       {page === "perfil"    && <Perfil    setPage={navigateTo} />}
 
-      {page === "preguntasFrecuentes"   && <PreguntasFrecuentes   setPage={navigateTo} />}
-      {page === "politicasEnvio"        && <PoliticasEnvio        setPage={navigateTo} />}
-      {page === "terminosCondiciones"   && <TerminosCondiciones   setPage={navigateTo} />}
-      {page === "politicasPrivacidad"   && <PoliticasPrivacidad   setPage={navigateTo} />}
+      {/* ✅ CORRECCIÓN: Ruta carrito — se muestra al presionar "IR A PAGAR" */}
+      {page === "carrito"   && (
+        <Carrito
+          setPage={navigateTo}
+          onCartUpdate={handleCartUpdate}
+        />
+      )}
 
       {page === "preguntasFrecuentes"   && <PreguntasFrecuentes   setPage={navigateTo} />}
       {page === "politicasEnvio"        && <PoliticasEnvio        setPage={navigateTo} />}
