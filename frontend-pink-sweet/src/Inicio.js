@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import logoPrincipal from './assets/logo.png';
+import dividerTitle from "./assets/divider-title.png";
 
 // Imágenes de Inicio
 import torta from "./assets/products/torta_principal.jpg";
@@ -68,9 +69,11 @@ const Inicio = ({ setPage }) => {
     <div style={{ backgroundColor: '#FFEFEF', fontFamily: 'sans-serif', minHeight: '100vh', paddingBottom: '80px' }}>
       
       {/* 1. LOGO SUPERIOR CENTRADO UNIVERSAL */}
-      <div style={{ textAlign: 'center', paddingTop: '40px', paddingBottom: '30px' }}>
-        <img src={logoPrincipal} alt="Logo Sweet Cream Rose" style={{ width: '230px', objectFit: 'contain' }} />
-      </div>
+      <section style={{ textAlign: 'center', paddingTop: '40px', paddingBottom: '20px' }}>
+        <img src={logoPrincipal} alt="Logo Sweet Cream Rose" style={{ width: '230px', objectFit: 'contain', marginBottom: '15px' }} />
+        <h1 style={{ color: '#5A3E41', margin: '10 0 5px 30', fontFamily: 'Poppins-Bold', fontSize: '30px', letterSpacing: '2px' }}>INICIO</h1>
+        <img src={dividerTitle} alt="divisor" style={{ width: '180px', height: 'auto', display: 'block', margin: '0 auto 10px auto' }} />
+      </section>
 
       {/* SECCIÓN HERO (BANNER PRINCIPAL) */}
       <section style={{ textAlign: 'center', padding: '0 20px' }}>
