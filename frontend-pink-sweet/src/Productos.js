@@ -137,6 +137,93 @@ const IMAGENES_FALLBACK = {
   cupcakes:   [imgCChocolate, imgCVainilla, imgCZanahoria, imgCFresa, imgCOreo, imgCArandano],
 };
 
+// ==============================================================================
+// CATÁLOGO DE RESPALDO
+// Si el backend está apagado, la app cargará esto para que no se rompa el diseño
+// ==============================================================================
+const CATALOGO_ESTATICO = {
+  entremets: [
+    { id: 'e1', nombre: "Limón", descripcion: "Suave entremet de limón con un corazón de curd de limón y un bizzocho de vainilla ligero y esponjoso.", precio: "12.00", img: imgELimon },
+    { id: 'e2', nombre: "Glaseado Espejo", descripcion: "Elegante entremet con mousse de frutos del bosque y un interior de crema de vainilla con mermelada de arándanos.", precio: "12.00", img: imgEGlaseadoEspejo },
+    { id: 'e3', nombre: "Fresa", descripcion: "Fusión perfecta de mousse de fresa cremosa y un interior suave de vainilla con gelée de fresa natural.", precio: "12.00", img: imgEFresa },
+    { id: 'e4', nombre: "Mora", descripcion: "Exquisito entremet de mora con mousse ligera y un corazón de gel de mora silvestre sobre bizcocho de chocolate.", precio: "12.00", img: imgEMora },
+    { id: 'e5', nombre: "Coco", descripcion: "Delicado entremet de coco con relleno tropical de maracuyá y bizcocho de vainilla húmedo.", precio: "12.00", img: imgECoco },
+    { id: 'e6', nombre: "Mini Entremets", descripcion: "Pequeños corazones de mousse y gelatina en diferentes sabores. Ideales para detalles únicos y celebraciones especiales.", precio: "15.00", img: imgEMiniEntremets },
+  ],
+  tortas: [
+    { id: 'tc1', nombre: "Triple Chocolate", descripcion: "Delicioso bizcocho de chocolate con relleno y cobertura de ganache, decorado con crema de chocolate.", precio: "45.00", img: imgTcTripleChocolate },
+    { id: 'tc2', nombre: "Vainilla con Frutas", descripcion: "Bizcocho de vainilla esponjoso con relleno de crema chantilly y frutas frescas de temporada.", precio: "40.00", img: imgTcVainillaConFrutas },
+    { id: 'tc3', nombre: "Zanahoria", descripcion: "Húmeda torta de zanahoria con nueces y pasas, cubierta con frosting de queso crema.", precio: "38.00", img: imgTcZanahoria },
+    { id: 'tc4', nombre: "Red Velvet", descripcion: "Clásica torta red velvet con capas de bizcocho rojo y frosting de queso crema.", precio: "42.00", img: imgTcRedVelvet },
+    { id: 'tc5', nombre: "Chocolate", descripcion: "Bizcocho de chocolate intenso con relleno y cobertura de ganache de chocolate belga.", precio: "35.00", img: imgTcChocolate },
+    { id: 'tc6', nombre: "Maracuyá", descripcion: "Suave bizcocho de vainilla con mousse de maracuyá y cobertura de pulpa natural.", precio: "38.00", img: imgTcMaracuya },
+  ],
+  galletas: [
+    { id: 'g1', nombre: "Fresa", descripcion: "Deliciosas galletas de fresa con copos de avena, mermelada en figuras y un toque de vainilla.", precio: "3.50", img: imgGFresa },
+    { id: 'g2', nombre: "Piña", descripcion: "Galletas deliciosas de piña, avena, bañadas en una crema de coco y vainilla para disfrutar el paladar.", precio: "3.50", img: imgGPina },
+    { id: 'g3', nombre: "Manzana", descripcion: "Deliciosas galletas de manzana, vainilla, nuez, almendras y avena bañadas en crema de caramelo.", precio: "3.50", img: imgGManzana },
+    { id: 'g4', nombre: "Chocolate", descripcion: "Galletas deliciosas de piña, avena, bañadas en una crema de coco y vainilla para disfrutar el paladar.", precio: "4.00", img: imgGChocolate },
+    { id: 'g5', nombre: "Avena y Pasas", descripcion: "Deliciosas galletas de manzana, vainilla, nuez, almendras y avena bañadas en crema de caramelo.", precio: "3.50", img: imgGAvenaYPasas },
+    { id: 'g6', nombre: "Personalizadas", descripcion: "Galletas artesanales personalizadas, decoradas con diseños únicos ideales para eventos.", precio: "5.00", img: imgGPersonalizadas },
+  ],
+  tequenos: [
+    { id: 'tv1', nombre: "Pollo", descripcion: "Deliciosos tequeños rellenos de pollo desmechado con un toque de especias. ¡Irresistibles!", precio: "8.00", img: imgTvPollo },
+    { id: 'tv2', nombre: "Clásicos", descripcion: "La receta tradicional que nunca falla. Rellenos de queso blanco llanero, crujientes por fuera.", precio: "7.00", img: imgTvClasicos },
+    { id: 'tv3', nombre: "Queso Gouda", descripcion: "Rellenos con cremoso queso gouda que se derrite perfectamente, creando un sabor suave.", precio: "9.00", img: imgTvQuesoGouda },
+    { id: 'tv4', nombre: "Guayaba y Queso", descripcion: "La combinación perfecta entre lo dulce y lo salado. Queso blanco llanero con dulce de guayaba.", precio: "8.50", img: imgTvGuayabaYQueso },
+    { id: 'tv5', nombre: "Jamón y Queso", descripcion: "Rellenos de jamón de calidad y queso derretido. Un clásico que siempre encanta.", precio: "8.50", img: imgTvJamonYQueso },
+    { id: 'tv6', nombre: "Nutella", descripcion: "Para los amantes de lo dulce. Rellenos de Nutella cremosa y envueltos en nuestra masa crujiente.", precio: "9.50", img: imgTvNuttela },
+  ],
+  sandwiches: [
+    { id: 'ms1', nombre: "Gourmet", descripcion: "Una selección de delgados mini sándwiches elaborados con ingredientes gourmet. ¡Perfectos!", precio: "10.00", img: imgMsMiniSandwichesGourmet },
+    { id: 'ms2', nombre: "Croissants Rellenos", descripcion: "Crujientes mini croissants rellenos de queso, jamón, tomate y lechuga fresca.", precio: "12.00", img: imgMsMiniCroissantsRellenos },
+    { id: 'ms3', nombre: "Delipe", descripcion: "Una selección de mágicos mini sándwiches elaborados con ingredientes premium.", precio: "9.00", img: imgMsMiniSandwichesDelipe },
+    { id: 'ms4', nombre: "Mini Baguettas", descripcion: "Mini baguettes rellenas de pollo, jamón, queso, lechuga, tomate y aderezos suaves.", precio: "11.00", img: imgMsMiniBaguettas },
+    { id: 'ms5', nombre: "Mini Wraps", descripcion: "Suaves wraps rellenos de pollo, jamón, queso crema y vegetales frescos.", precio: "10.50", img: imgMsMiniWraps },
+    { id: 'ms6', nombre: "Mini Ciabattas", descripcion: "Pan ciabatta artesanal con rellenos de jamón serrano, queso, rúcula y tomate seco.", precio: "11.50", img: imgMsMiniCiabattas },
+  ],
+  empanadas: [
+    { id: 'me1', nombre: "Pollo", descripcion: "Una selección de mini empanadas rellenas con jugoso pollo desmenuzado y especias.", precio: "5.00", img: imgMePollo },
+    { id: 'me2', nombre: "Queso", descripcion: "Deliciosas empanadas rellenas de queso fundido, cremosas por dentro y doradas por fuera.", precio: "5.00", img: imgMeQueso },
+    { id: 'me3', nombre: "Carne", descripcion: "Rellenas con carne molida sazonada, cebolla, ajíes y especias. ¡Sabor tradicional!", precio: "5.00", img: imgMeCarne },
+    { id: 'me4', nombre: "Espinaca y Queso", descripcion: "Una combinación perfecta de espinaca fresca y queso derretido en masa crujiente.", precio: "5.00", img: imgMeEspinacaYQueso },
+    { id: 'me5', nombre: "Jamón y Queso", descripcion: "Suaves mini empanadas rellenas de jamón cocido y queso derretido. Clásicas y deliciosas.", precio: "5.00", img: imgMeJamonYQueso },
+    { id: 'me6', nombre: "Champiñones", descripcion: "Rellenas de champiñones salteados con cebolla, ajo y crema. ¡Llenas de sabor!", precio: "5.00", img: imgMeChampinones },
+  ],
+  alfajores: [
+    { id: 'a1', nombre: "Clásico", descripcion: "Delicadas tapitas artesanales con un suave relleno de dulce de leche y un toque de azúcar en polvo.", precio: "2.50", img: imgAClasico },
+    { id: 'a2', nombre: "Chocolate", descripcion: "Exquisitas tapitas de cacao con un relleno cremoso de dulce de leche, bañadas en chocolate.", precio: "3.00", img: imgAChocolate },
+    { id: 'a3', nombre: "Coco", descripcion: "Tiernas tapitas rellenas de dulce de leche y cubiertas con baño de chocolate blanco y coco.", precio: "2.50", img: imgACoco },
+    { id: 'a4', nombre: "Manjar y Nueces", descripcion: "Relleno de manjar blanco cremoso y bordes cubiertos con crocantes nueces picadas.", precio: "3.50", img: imgAManjarYNueces },
+    { id: 'a5', nombre: "Chocolate Blanco", descripcion: "Relleno de dulce de leche cubierto con chocolate blanco y lineas de chocolate oscuro.", precio: "3.00", img: imgAChocolateBlanco },
+    { id: 'a6', nombre: "Colores", descripcion: "Clásico alfajor relleno de dulce de leche y decorado con coloridos granitos.", precio: "2.50", img: imgAColores },
+  ],
+  trufas: [
+    { id: 't1', nombre: "Clásicas", descripcion: "Deliciosas trufas de chocolate semi amargo con un interior suave y cremoso.", precio: "1.50", img: imgTClasicas },
+    { id: 't2', nombre: "Fresa", descripcion: "Chocolate negro relleno de una suave crema de fresa natural. Dulces e irresistibles.", precio: "1.50", img: imgTFresa },
+    { id: 't3', nombre: "Oreo", descripcion: "Combinación perfecta de chocolate blanco y galletas Oreo. Cremosas y crujientes.", precio: "2.00", img: imgTOreo },
+    { id: 't4', nombre: "Maracuyá", descripcion: "Chocolate blanco con un corazón cremoso de maracuyá. Dulce, tropical y refrescante.", precio: "1.50", img: imgTMaracuya },
+    { id: 't5', nombre: "Chocolate Belga", descripcion: "Intenso chocolate belga con un interior suave y sedoso. Para verdaderos amantes del cacao.", precio: "2.50", img: imgTChocolateBelga },
+    { id: 't6', nombre: "Coco", descripcion: "Chocolate blanco con un delicado relleno de coco. Suaves, cremosas y exóticas.", precio: "1.50", img: imgTCoco },
+  ],
+  postres: [
+    { id: 'pf1', nombre: "Mini 3 Leches Clásico", descripcion: "Suave bizcocho bañado en tres leches con crema chantilly y un toque de canela.", precio: "6.00", img: imgPfMini3LechesClasico },
+    { id: 'pf2', nombre: "3 Leches de Chocolate", descripcion: "Delicioso bizcocho de chocolate con tres leches, crema chantilly y virutas.", precio: "6.50", img: imgPfMini3LechesDeChocolate },
+    { id: 'pf3', nombre: "3 Leches de Fresa", descripcion: "Esponjoso bizcocho de vainilla con tres leches, crema chantilly y cubierta de fresa natural.", precio: "6.50", img: imgPfMini3LechesDeFresa },
+    { id: 'pf4', nombre: "3 Leches de Maracuyá", descripcion: "Bizcocho bañado en tres leches con crema chantilly y un toque tropical de maracuyá.", precio: "6.50", img: imgPfMini3LechesDeMaracuya },
+    { id: 'pf5', nombre: "Vasito Oreo Cream", descripcion: "Copas de crema de vainilla y trocitos de Oreo sobre base de chocolate húmedo.", precio: "5.50", img: imgPfVasitoDeOreoCream },
+    { id: 'pf6', nombre: "Vasito Fresa y Chantilly", descripcion: "Fresas frescas con crema chantilly y suave bizcocho de vanilla.", precio: "5.50", img: imgPfVasitoDeFresaYChantilly },
+  ],
+  cupcakes: [
+    { id: 'c1', nombre: "Chocolate", descripcion: "Bizcocho con betún de mantequilla o chocolate y chispas de azúcar.", precio: "4.50", img: imgCChocolate },
+    { id: 'c2', nombre: "Vainilla", descripcion: "Suave pastelito de miga fina con un toque de dulzor, ideal para decorar con crema batida.", precio: "4.00", img: imgCVainilla },
+    { id: 'c3', nombre: "Zanahoria", descripcion: "Relleno y decorado con betún de queso crema, mucha nuez y coco rallado.", precio: "5.00", img: imgCZanahoria },
+    { id: 'c4', nombre: "Fresa", descripcion: "Bizcocho con un toque de dulzor a fresa natural y crema batida.", precio: "4.50", img: imgCFresa },
+    { id: 'c5', nombre: "Oreo", descripcion: "Relleno y decorado con betún de queso crema y trozos de galleta oreo.", precio: "5.00", img: imgCOreo },
+    { id: 'c6', nombre: "Arándano", descripcion: "Pastelito de vainilla con arándanos frescos y crema suave.", precio: "5.00", img: imgCArandano },
+  ]
+};
+
 const Productos = () => {
   const [categoriaActiva, setCategoriaActiva] = useState('empanadas');
   const [productos, setProductos] = useState([]);
@@ -146,7 +233,7 @@ const Productos = () => {
   // cantidades por producto (id -> cantidad)
   const [cantidades, setCantidades] = useState({});
 
-  // ✅ NUEVO: set de IDs de productos marcados como favoritos
+  // NUEVO: set de IDs de productos marcados como favoritos
   const [favoritos, setFavoritos] = useState(() => {
     // Inicializar desde localStorage para persistencia entre páginas
     try {
@@ -162,13 +249,34 @@ const Productos = () => {
       try {
         setCargando(true);
         const resp = await fetch(`${API_BASE}/api/productos`);
-        if (!resp.ok) throw new Error('No se pudo cargar productos');
+        if (!resp.ok) throw new Error('Falló el backend');
         const data = await resp.json();
         setProductos(data);
         setError(null);
       } catch (err) {
-        console.error('Error cargando productos:', err);
-        setError('No se pudieron cargar los productos. Intenta nuevamente más tarde.');
+        console.warn('Backend inactivo, cargando catálogo estático de respaldo para maquetación...');
+        
+        // INYECCIÓN DE EMERGENCIA: Mapeamos el catálogo al formato del backend
+        let datosDeRespaldo = [];
+        CATEGORIAS_CONFIG.forEach(catConfig => {
+          const itemsEstaticos = CATALOGO_ESTATICO[catConfig.clave];
+          if (itemsEstaticos) {
+            itemsEstaticos.forEach(item => {
+              datosDeRespaldo.push({
+                id: item.id, // ID estático
+                nombre: item.nombre,
+                descripcion: item.descripcion,
+                precio: parseFloat(item.precio),
+                imagenUrl: null, // Forzamos a que use las imágenes locales
+                imagenLocalDirecta: item.img, // Pasamos la foto directamente
+                categoria: { id: catConfig.catId } // Relacionamos con la categoría correcta
+              });
+            });
+          }
+        });
+
+        setProductos(datosDeRespaldo);
+        setError(null); // Borramos el error para que deje ver la página
       } finally {
         setCargando(false);
       }
@@ -188,9 +296,15 @@ const Productos = () => {
   };
 
   const resolverImagen = (producto, claveCategoria, indice) => {
+    // Si usamos el catálogo estático, usamos la foto guardada directamente
+    if (producto.imagenLocalDirecta) {
+      return producto.imagenLocalDirecta;
+    }
+    // Si el backend sí devolvió una URL real
     if (producto.imagenUrl) {
       return `${API_BASE}${producto.imagenUrl}`;
     }
+    // Fallback por si el backend falla en cargar fotos
     const fallback = IMAGENES_FALLBACK[claveCategoria];
     if (fallback && fallback[indice % fallback.length]) {
       return fallback[indice % fallback.length];
@@ -229,7 +343,7 @@ const Productos = () => {
     }
   };
 
-  // ✅ NUEVO: Toggle favorito — llama al backend y actualiza estado local
+  // NUEVO: Toggle favorito — llama al backend y actualiza estado local
   const toggleFavorito = async (producto) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -237,19 +351,19 @@ const Productos = () => {
       return;
     }
     const esFavorito = favoritos.has(producto.id);
+
     // Actualizar estado local inmediatamente (optimista)
     setFavoritos(prev => {
       const nuevo = new Set(prev);
-      if (esFavorito) {
-        nuevo.delete(producto.id);
-      } else {
-        nuevo.add(producto.id);
-      }
+      if (esFavorito) nuevo.delete(producto.id);
+      else nuevo.add(producto.id);
+      
       localStorage.setItem('favoritos_ids', JSON.stringify([...nuevo]));
-      // ✅ Notificar a Perfil5.js para que recargue la lista al instante
+      // Notificar a Perfil5.js para que recargue la lista al instante
       window.dispatchEvent(new Event('favoritosUpdated'));
       return nuevo;
     });
+
     try {
       if (esFavorito) {
         // Quitar de favoritos
@@ -272,11 +386,8 @@ const Productos = () => {
       // Si falla el backend, revertir el cambio local
       setFavoritos(prev => {
         const revertido = new Set(prev);
-        if (esFavorito) {
-          revertido.add(producto.id);
-        } else {
-          revertido.delete(producto.id);
-        }
+        if (esFavorito) revertido.add(producto.id);
+        else revertido.delete(producto.id);
         localStorage.setItem('favoritos_ids', JSON.stringify([...revertido]));
         return revertido;
       });
@@ -390,7 +501,7 @@ const Productos = () => {
                     <h2 style={{ color: '#5A3E41', fontSize: '32px', margin: '0 0 5px 0', fontFamily: 'Poppins-Bold' }}>{prod.nombre}</h2>
                     <img src={dividerProduct} alt="Divisor de Producto" style={{ width: '100%', height: '26px', marginTop: '-5px', objectFit: 'contain' }} />
                   </div>
-                  {/* ✅ CORRECCIÓN: corazón funcional — lleno si es favorito, vacío si no */}
+                  {/* CORRECCIÓN: corazón funcional — lleno si es favorito, vacío si no */}
                   <div
                     onClick={() => toggleFavorito(prod)}
                     title={favoritos.has(prod.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}

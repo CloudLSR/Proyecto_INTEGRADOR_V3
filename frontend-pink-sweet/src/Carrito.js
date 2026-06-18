@@ -7,7 +7,6 @@
 // 5. La orden queda en perfil > Mis Pedidos como PENDIENTE hasta que el admin la cambie.
 
 import React, { useState, useEffect } from 'react';
-import './Stylee.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 const ENVIO = 8.00;
