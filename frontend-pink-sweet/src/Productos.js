@@ -224,7 +224,7 @@ const CATALOGO_ESTATICO = {
   ]
 };
 
-const Productos = () => {
+const Productos = ({ setPage }) => {
   const [categoriaActiva, setCategoriaActiva] = useState('empanadas');
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -499,17 +499,18 @@ const Productos = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: isEven ? 'row' : 'row-reverse' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: isEven ? 'flex-start' : 'flex-end' }}>
                     <h2 style={{ color: '#5A3E41', fontSize: '32px', margin: '0 0 5px 0', fontFamily: 'Poppins-Bold' }}>{prod.nombre}</h2>
-                    <img src={dividerProduct} alt="Divisor de Producto" style={{ width: '100%', height: '26px', marginTop: '-5px', objectFit: 'contain' }} />
+                    <img src={dividerProduct} alt="Divisor de Producto" style={{ width: '160px', height: '26px', marginTop: '-5px', objectFit: 'contain' }} />
                   </div>
-                  {/* CORRECCIÓN: corazón funcional — lleno si es favorito, vacío si no */}
+                  {/* NUEVO CORAZÓN FUNCIONAL */}
                   <div
                     onClick={() => toggleFavorito(prod)}
                     title={favoritos.has(prod.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                     style={{ width: '45px', height: '45px', borderRadius: '100%', backgroundColor: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 0px 5px rgba(0,0,0,0.1)', cursor: 'pointer', flexShrink: 0 }}
                   >
-                    <span style={{ fontSize: '28px', color: '#C3666D', marginTop: '-2px', lineHeight: 1 }}>
-                      {favoritos.has(prod.id) ? '♥' : '♡'}
-                    </span>
+                    <i 
+                      className={favoritos.has(prod.id) ? "fa-solid fa-heart" : "fa-regular fa-heart"} 
+                      style={{ color: '#C3666D', fontSize: '24px', marginTop: '2px' }}
+                    ></i>
                   </div>
                 </div>
 
@@ -556,7 +557,12 @@ const Productos = () => {
             <p style={{ margin: '0', color: '#B14B47', fontSize: '19px', fontFamily: 'Signika-Regular', maxWidth: '400px', lineHeight: '1.2' }}>Contáctanos y con gusto te ayudamos a crear el postre perfecto</p>
           </div>
         </div>
-        <button style={{ backgroundColor: '#C3666D', color: 'white', fontSize: '16px', fontFamily: 'Poppins-Bold', border: 'none', padding: '12px 30px', borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>CONTACTAR <span style={{ fontSize: '18px' }}>›</span></button>
+        <button 
+          onClick={() => setPage('nosotros')} 
+          style={{ backgroundColor: '#C3666D', color: 'white', fontSize: '16px', fontFamily: 'Poppins-Bold', border: 'none', padding: '12px 30px', borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}
+        >
+          CONTACTAR <span style={{ fontSize: '18px' }}>›</span>
+        </button>
       </section>
 
     </div>
