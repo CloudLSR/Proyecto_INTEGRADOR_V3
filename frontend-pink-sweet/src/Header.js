@@ -839,13 +839,25 @@ const Header = ({ page, setPage }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
  
             {/* Buscador */}
-            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'white', borderRadius: '4px', padding: '0 10px', width: '220px' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              backgroundColor: 'white', 
+              borderRadius: '4px', 
+              padding: '0 4px 0 12px', 
+              width: '220px',
+              marginRight: '4px'
+            }}>
               <input
                 type="text"
                 placeholder="Buscar..."
                 style={{ border: 'none', outline: 'none', width: '100%', padding: '8px 0', backgroundColor: 'transparent', fontFamily: 'sans-serif' }}
               />
-              <img src={iconLupa} alt="Lupa" style={{ height: '16px', cursor: 'pointer', marginLeft: '5px' }} />
+              <img 
+                src={iconLupa} 
+                alt="Lupa" 
+                style={{ width: '30px', height: '24px', objectFit: 'contain', cursor: 'pointer', marginLeft: '5px' }} 
+              />
             </div>
  
             {/* ICONO USUARIO */}
@@ -854,7 +866,7 @@ const Header = ({ page, setPage }) => {
                 src={iconUser}
                 alt="Ir a mi perfil"
                 title="Ir a mi perfil"
-                style={{ height: '32px', cursor: 'pointer' }}
+                style={{ width: '32px', height: '32px', objectFit: 'contain', cursor: 'pointer' }}
                 onClick={() => setPage('perfil')}
               />
             ) : (
@@ -862,18 +874,29 @@ const Header = ({ page, setPage }) => {
                 src={iconUser}
                 alt="Iniciar sesión"
                 title="Iniciar sesión / Registrarse"
-                style={{ height: '32px', cursor: 'pointer' }}
+                style={{ width: '32px', height: '32px', objectFit: 'contain', cursor: 'pointer' }}
                 onClick={() => setShowAuth(true)}
               />
             )}
  
             {/* ICONO CARRITO */}
             <div
-              style={{ position: 'relative', cursor: 'pointer' }}
+              style={{ 
+                position: 'relative', 
+                cursor: 'pointer',
+                width: '32px', 
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
               onClick={() => setShowCart(true)}
               title="Ver carrito"
             >
-              <img src={iconCart} alt="Carrito" style={{ height: '32px' }} />
+              <img src={iconCart}
+              alt="Carrito"
+              style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+              />
               {cartCount > 0 && (
                 <div style={{
                   position: 'absolute', top: '-4px', right: '-4px',
