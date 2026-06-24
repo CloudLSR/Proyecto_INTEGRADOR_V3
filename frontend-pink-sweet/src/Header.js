@@ -791,6 +791,29 @@ const Header = ({ page, setPage }) => {
     const saved = localStorage.getItem('cartCount');
     return saved ? parseInt(saved, 10) : 0;
   });
+
+  // SUBTÍTULO ROTATIVO
+  const frasesSubtitulo = [
+    "Repostería artesanal",
+    "Hecho con mucho amor",
+    "Endulzando tus momentos",
+    "Calidad en cada bocado",
+    "El capricho que mereces"
+  ];
+  const [fraseIdx, setFraseIdx] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      setFade(false); // Inicia el desvanecimiento (fade-out)
+      setTimeout(() => {
+        setFraseIdx((prev) => (prev + 1) % frasesSubtitulo.length);
+        setFade(true); // Vuelve a aparecer (fade-in) con el nuevo texto
+      }, 500); // 500ms es la duración de la transición
+    }, 8000); // Cambia de frase cada 8 segundos
+
+    return () => clearInterval(intervalo);
+  }, []);
  
   useEffect(() => {
     const onUpdate = () => {
@@ -819,13 +842,44 @@ const Header = ({ page, setPage }) => {
       <header style={{ backgroundColor: '#C6676D', width: '100%', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
  
-          {/* LOGO */}
-          <img
-            src={bannerPrincipal}
-            alt="Sweet Cream Rose Logo"
-            style={{ height: '45px', objectFit: 'contain', cursor: 'pointer' }}
+          {/* LOGO + SUBTÍTULO ROTATIVO */}
+          <div 
             onClick={() => setPage('inicio')}
-          />
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              width: '165px',
+              height: '45px' 
+            }}
+          >
+            <img
+              src={bannerPrincipal}
+              alt="Sweet Cream Rose Logo"
+              style={{ 
+                width: '100%', 
+                height: '28px', 
+                objectFit: 'contain' 
+              }}
+            />
+            <span style={{
+              color: '#f8d7dc',
+              fontSize: '10px',
+              fontFamily: 'Georgia, serif',
+              fontStyle: 'italic',
+              marginTop: '1px',
+              letterSpacing: '0.3px',
+              textAlign: 'center',
+              transition: 'opacity 0.5s ease-in-out',
+              opacity: fade ? 0.95 : 0,
+              whiteSpace: 'nowrap',
+              transform: 'translateX(-4px)' // esto es para ajustar el centrado moviéndolo un poco a la izquierda
+            }}>
+              {`• ${frasesSubtitulo[fraseIdx]} •`}
+            </span>
+          </div>
  
           {/* NAVEGACIÓN */}
           <nav style={{ display: 'flex', gap: '15px' }}>
@@ -839,13 +893,25 @@ const Header = ({ page, setPage }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
  
             {/* Buscador */}
-            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'white', borderRadius: '4px', padding: '0 10px', width: '220px' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              backgroundColor: 'white', 
+              borderRadius: '4px', 
+              padding: '0 4px 0 12px', 
+              width: '220px',
+              marginRight: '4px'
+            }}>
               <input
                 type="text"
                 placeholder="Buscar..."
                 style={{ border: 'none', outline: 'none', width: '100%', padding: '8px 0', backgroundColor: 'transparent', fontFamily: 'sans-serif' }}
               />
-              <img src={iconLupa} alt="Lupa" style={{ height: '16px', cursor: 'pointer', marginLeft: '5px' }} />
+              <img 
+                src={iconLupa} 
+                alt="Lupa" 
+                style={{ width: '30px', height: '24px', objectFit: 'contain', cursor: 'pointer', marginLeft: '5px' }} 
+              />
             </div>
  
             {/* ICONO USUARIO */}
@@ -854,7 +920,7 @@ const Header = ({ page, setPage }) => {
                 src={iconUser}
                 alt="Ir a mi perfil"
                 title="Ir a mi perfil"
-                style={{ height: '32px', cursor: 'pointer' }}
+                style={{ width: '32px', height: '32px', objectFit: 'contain', cursor: 'pointer' }}
                 onClick={() => setPage('perfil')}
               />
             ) : (
@@ -862,18 +928,29 @@ const Header = ({ page, setPage }) => {
                 src={iconUser}
                 alt="Iniciar sesión"
                 title="Iniciar sesión / Registrarse"
-                style={{ height: '32px', cursor: 'pointer' }}
+                style={{ width: '32px', height: '32px', objectFit: 'contain', cursor: 'pointer' }}
                 onClick={() => setShowAuth(true)}
               />
             )}
  
             {/* ICONO CARRITO */}
             <div
-              style={{ position: 'relative', cursor: 'pointer' }}
+              style={{ 
+                position: 'relative', 
+                cursor: 'pointer',
+                width: '32px', 
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
               onClick={() => setShowCart(true)}
               title="Ver carrito"
             >
-              <img src={iconCart} alt="Carrito" style={{ height: '32px' }} />
+              <img src={iconCart}
+              alt="Carrito"
+              style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+              />
               {cartCount > 0 && (
                 <div style={{
                   position: 'absolute', top: '-4px', right: '-4px',
