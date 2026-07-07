@@ -49,13 +49,13 @@ const AdminMenu11 = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%', width: '100%' }}>
 
-      {/* ========== TÍTULO ========== */}
+      {/* TÍTULO */}
       <div style={{ marginBottom: '30px' }}>
         <h1 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 5px 0' }}>Configuración</h1>
         <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777', margin: 0 }}>Administra la información básica del sistema.</p>
       </div>
 
-      {/* ========== KPIs ========== */}
+      {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '35px' }}>
         {kpis.map((kpi, index) => (
           <div key={index} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '25px', border: `2px solid ${kpi.border}`, display: 'flex', alignItems: 'flex-start', gap: '15px', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}>
@@ -71,7 +71,7 @@ const AdminMenu11 = () => {
         ))}
       </div>
 
-      {/* ========== BLOQUES DE INFORMACIÓN ========== */}
+      {/* BLOQUES DE INFORMACIÓN */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '25px' }}>
         
         {/* Información del negocio */}
@@ -111,7 +111,7 @@ const AdminMenu11 = () => {
 
       </div>
 
-      {/* ========== PREFERENCIAS OPERATIVAS ========== */}
+      {/* PREFERENCIAS OPERATIVAS */}
       <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', border: '1px solid #EAEAEA', marginBottom: '35px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
           <div style={{ color: '#F194B4', fontSize: '20px' }}><i className="fa-solid fa-gear"></i></div>
@@ -167,7 +167,7 @@ const AdminMenu11 = () => {
         </div>
       </div>
 
-      {/* ========== BANNER ¡EXCELENTE TRABAJO! ========== */}
+      {/* BANNER ¡EXCELENTE TRABAJO! */}
       <div style={{ backgroundColor: '#FFF6F7', borderRadius: '12px', padding: '30px', display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '40px' }}>
         <div style={{ color: '#F194B4', fontSize: '40px' }}>
           <i className="fa-solid fa-cupcake"></i>
@@ -178,7 +178,7 @@ const AdminMenu11 = () => {
         </div>
       </div>
 
-      {/* ========== FOOTER ========== */}
+      {/* FOOTER */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '0 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

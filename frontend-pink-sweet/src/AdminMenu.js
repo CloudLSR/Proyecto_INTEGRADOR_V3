@@ -39,7 +39,7 @@ const AdminMenu = () => {
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw', backgroundColor: '#FAFAFA', fontFamily: 'sans-serif', overflow: 'hidden' }}>
       
-      {/* ================= BARRA LATERAL IZQUIERDA ================= */}
+      {/* BARRA LATERAL IZQUIERDA */}
       <div style={{ 
         width: '300px',
         backgroundColor: '#C3666D', 
@@ -115,10 +115,10 @@ const AdminMenu = () => {
         </div>
       </div>
 
-      {/* ================= CONTENIDO DERECHO ================= */}
+      {/* CONTENIDO DERECHO */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
         
-        {/* ================= HEADER GLOBAL ================= */}
+        {/* HEADER GLOBAL */}
         <div style={{ padding: '40px 50px 0 50px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <button style={{ background: 'none', border: 'none', fontSize: '20px', color: '#5A3E41', cursor: 'pointer' }}>
@@ -146,7 +146,7 @@ const AdminMenu = () => {
           </div>
         </div>
 
-        {/* ================= RENDERIZADO DE PANTALLAS ================= */}
+        {/* RENDERIZADO DE PANTALLAS */}
         {activeTab === "dashboard" && <AdminMenu1 />}
         {activeTab === "pedidos" && <AdminMenu2 />}
         {activeTab === "productos" && <AdminMenu3 />}

@@ -30,7 +30,7 @@ const AdminMenu1 = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%' }}>
       
-      {/* ========== HEADER DEL DASHBOARD ========== */}
+      {/* HEADER DEL DASHBOARD */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '35px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
           <div>
@@ -52,7 +52,7 @@ const AdminMenu1 = () => {
         </div>
       </div>
 
-      {/* ========== TARJETAS DE MÉTRICAS (KPIs) ========== */}
+      {/* TARJETAS DE MÉTRICAS (KPIs) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '25px', marginBottom: '35px' }}>
         
         {/* Tarjeta 1 */}
@@ -100,7 +100,7 @@ const AdminMenu1 = () => {
         </div>
       </div>
 
-      {/* ========== SECCIÓN DE GRÁFICOS (SVG Estáticos) ========== */}
+      {/* SECCIÓN DE GRÁFICOS (SVG Estáticos) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '25px', marginBottom: '35px' }}>
         
         {/* Gráfico Ventas */}
@@ -197,7 +197,7 @@ const AdminMenu1 = () => {
 
       </div>
 
-      {/* ========== SECCIÓN LISTAS ========== */}
+      {/* SECCIÓN LISTAS */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '35px' }}>
         
         {/* Pedidos Recientes */}
@@ -259,7 +259,7 @@ const AdminMenu1 = () => {
 
       </div>
 
-      {/* ========== ACCIONES RÁPIDAS ========== */}
+      {/* ACCIONES RÁPIDAS */}
       <div style={{ backgroundColor: 'white', borderRadius: '15px', padding: '30px', border: '1px solid #EAEAEA', marginBottom: '40px' }}>
         <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 25px 0' }}>Acciones rápidas</h3>
         
@@ -283,7 +283,7 @@ const AdminMenu1 = () => {
         </div>
       </div>
 
-      {/* ========== FOOTER ========== */}
+      {/* FOOTER */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '0 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

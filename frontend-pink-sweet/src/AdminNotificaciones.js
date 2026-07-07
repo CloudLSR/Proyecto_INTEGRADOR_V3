@@ -39,13 +39,13 @@ const AdminNotificaciones = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%', width: '100%' }}>
       
-      {/* ========== TÍTULO ========== */}
+      {/* TÍTULO */}
       <div style={{ marginBottom: '30px' }}>
         <h1 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 5px 0' }}>Notificaciones</h1>
         <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777', margin: 0 }}>Revisa todas las notificaciones y novedades del sistema.</p>
       </div>
 
-      {/* ========== KPIs ========== */}
+      {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '35px' }}>
         {kpis.map((kpi, index) => (
           <div key={index} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '25px', border: `1.5px solid ${kpi.border}`, display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}>
@@ -61,10 +61,10 @@ const AdminNotificaciones = () => {
         ))}
       </div>
 
-      {/* ========== CONTENIDO PRINCIPAL (LISTA + FILTROS) ========== */}
+      {/* CONTENIDO PRINCIPAL (LISTA + FILTROS) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '25px', marginBottom: '35px' }}>
         
-        {/* === COLUMNA IZQUIERDA: LISTA DE NOTIFICACIONES === */}
+        {/* COLUMNA IZQUIERDA: LISTA DE NOTIFICACIONES */}
         <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', border: '1px solid #EAEAEA', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '30px' }}>
             <div style={{ color: '#F194B4', fontSize: '20px' }}><i className="fa-regular fa-bell"></i></div>
@@ -106,7 +106,7 @@ const AdminNotificaciones = () => {
           </div>
         </div>
 
-        {/* === COLUMNA DERECHA: FILTROS Y CONFIGURACIÓN === */}
+        {/* COLUMNA DERECHA: FILTROS Y CONFIGURACIÓN */}
         <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', border: '1px solid #EAEAEA', height: 'fit-content' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '30px' }}>
             <div style={{ color: '#F194B4', fontSize: '20px' }}><i className="fa-solid fa-filter"></i></div>
@@ -162,7 +162,7 @@ const AdminNotificaciones = () => {
         </div>
       </div>
 
-      {/* ========== BANNER INFERIOR ========== */}
+      {/* BANNER INFERIOR */}
       <div style={{ backgroundColor: '#FFF6F7', borderRadius: '12px', padding: '30px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #FADADD', marginBottom: '40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
           <div style={{ color: '#F194B4', fontSize: '60px' }}>
@@ -180,7 +180,7 @@ const AdminNotificaciones = () => {
         </div>
       </div>
 
-      {/* ========== FOOTER ========== */}
+      {/* FOOTER */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '0 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

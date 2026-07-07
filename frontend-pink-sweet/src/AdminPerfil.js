@@ -1,8 +1,5 @@
 import React from "react";
 
-// Puedes reemplazar esta importación con la ruta real de la foto de perfil si la tienes
-// import fotoPerfil from './assets/profile.png'; 
-
 const AdminPerfil = () => {
 
   // Data simulada para las tarjetas KPI superiores
@@ -32,13 +29,13 @@ const AdminPerfil = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%', width: '100%' }}>
       
-      {/* ========== TÍTULO ========== */}
+      {/* TÍTULO */}
       <div style={{ marginBottom: '30px' }}>
         <h1 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 5px 0' }}>Perfil de Usuario</h1>
         <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777', margin: 0 }}>Consulta la información de tu cuenta dentro del sistema.</p>
       </div>
 
-      {/* ========== TARJETAS SUPERIORES (KPIs) ========== */}
+      {/* TARJETAS SUPERIORES (KPIs) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '35px' }}>
         {kpis.map((kpi, index) => (
           <div key={index} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '20px 25px', border: `1.5px solid ${kpi.border}`, display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}>
@@ -53,10 +50,10 @@ const AdminPerfil = () => {
         ))}
       </div>
 
-      {/* ========== PANELES DE INFORMACIÓN PRINCIPAL ========== */}
+      {/* PANELES DE INFORMACIÓN PRINCIPAL */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '25px' }}>
         
-        {/* === COLUMNA IZQUIERDA === */}
+        {/* COLUMNA IZQUIERDA */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
           
           {/* Información Personal */}
@@ -174,7 +171,7 @@ const AdminPerfil = () => {
 
         </div>
 
-        {/* === COLUMNA DERECHA === */}
+        {/* COLUMNA DERECHA */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
           
           {/* Información de Acceso */}
@@ -250,7 +247,7 @@ const AdminPerfil = () => {
         </div>
       </div>
 
-      {/* ========== ACTIVIDAD RECIENTE ========== */}
+      {/* ACTIVIDAD RECIENTE */}
       <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', border: '1px solid #EAEAEA', marginBottom: '35px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
           <div style={{ color: '#F194B4', fontSize: '18px' }}><i className="fa-regular fa-clock"></i></div>
@@ -279,7 +276,7 @@ const AdminPerfil = () => {
         </table>
       </div>
 
-      {/* ========== BANNER ADMINISTRADOR PRINCIPAL ========== */}
+      {/* BANNER ADMINISTRADOR PRINCIPAL */}
       <div style={{ backgroundColor: '#FFF6F7', borderRadius: '12px', padding: '30px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #FADADD', marginBottom: '40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
           <div style={{ color: '#F194B4', fontSize: '60px' }}>
@@ -297,7 +294,7 @@ const AdminPerfil = () => {
         </div>
       </div>
 
-      {/* ========== FOOTER ========== */}
+      {/* FOOTER */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '0 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

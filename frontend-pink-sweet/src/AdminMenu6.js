@@ -61,7 +61,7 @@ const AdminMenu6 = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%', width: '100%' }}>
 
-      {/* ========== TÍTULO Y BOTÓN NUEVO HORARIO ========== */}
+      {/* TÍTULO Y BOTÓN NUEVO HORARIO */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
         <div>
           <h1 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 5px 0', textTransform: 'uppercase' }}>
@@ -76,7 +76,7 @@ const AdminMenu6 = () => {
         </button>
       </div>
 
-      {/* ========== BARRA DE BÚSQUEDA Y FILTROS ========== */}
+      {/* BARRA DE BÚSQUEDA Y FILTROS */}
       <div style={{ display: 'flex', gap: '15px', marginBottom: '35px' }}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1px solid #D9D9D9', borderRadius: '8px', padding: '0 15px', backgroundColor: 'white' }}>
           <i className="fa-solid fa-magnifying-glass" style={{ color: '#999', fontSize: '16px' }}></i>
@@ -103,7 +103,7 @@ const AdminMenu6 = () => {
         </button>
       </div>
 
-      {/* ========== TARJETAS DE MÉTRICAS (KPIs) ========== */}
+      {/* TARJETAS DE MÉTRICAS (KPIs) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
         {kpis.map((kpi, index) => (
           <div key={index} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '25px', border: `2px solid ${kpi.border}`, display: 'flex', alignItems: 'flex-start', gap: '15px', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}>
@@ -121,7 +121,7 @@ const AdminMenu6 = () => {
         ))}
       </div>
 
-      {/* ========== VISTA SEMANAL (TABLA CALENDARIO) ========== */}
+      {/* VISTA SEMANAL (TABLA CALENDARIO) */}
       <div style={{ marginBottom: '40px' }}>
         
         {/* Controles de la tabla semanal */}
@@ -208,7 +208,7 @@ const AdminMenu6 = () => {
         </div>
       </div>
 
-      {/* ========== HORARIOS PROGRAMADOS (TABLA INFERIOR) ========== */}
+      {/* HORARIOS PROGRAMADOS (TABLA INFERIOR) */}
       <div style={{ marginBottom: '30px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '20px', color: '#5A3E41', margin: 0 }}>Horarios programados</h3>
@@ -266,7 +266,7 @@ const AdminMenu6 = () => {
         </div>
       </div>
 
-      {/* ========== PAGINACIÓN ========== */}
+      {/* PAGINACIÓN */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
         <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: 0 }}>
           Mostrando de 1-5 de 12 registros
@@ -283,7 +283,7 @@ const AdminMenu6 = () => {
         </div>
       </div>
 
-      {/* ========== FOOTER ========== */}
+      {/* FOOTER */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '0 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

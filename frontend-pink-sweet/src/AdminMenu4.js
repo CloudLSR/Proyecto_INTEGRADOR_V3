@@ -40,7 +40,7 @@ const AdminMenu4 = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%', width: '100%' }}>
 
-      {/* ========== TÍTULO Y BOTÓN EXPORTAR ========== */}
+      {/* TÍTULO Y BOTÓN EXPORTAR */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
         <div>
           <h1 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 5px 0', textTransform: 'uppercase' }}>
@@ -55,7 +55,7 @@ const AdminMenu4 = () => {
         </button>
       </div>
 
-      {/* ========== TARJETAS DE MÉTRICAS (KPIs) ========== */}
+      {/* TARJETAS DE MÉTRICAS (KPIs) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '35px' }}>
         {kpis.map((kpi, index) => (
           <div key={index} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '25px', border: `2px solid ${kpi.border}`, display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}>
@@ -73,7 +73,7 @@ const AdminMenu4 = () => {
         ))}
       </div>
 
-      {/* ========== BARRA DE BÚSQUEDA Y FILTROS ========== */}
+      {/* BARRA DE BÚSQUEDA Y FILTROS */}
       <div style={{ display: 'flex', gap: '15px', marginBottom: '35px' }}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1px solid #D9D9D9', borderRadius: '8px', padding: '0 15px', backgroundColor: 'white' }}>
           <i className="fa-solid fa-magnifying-glass" style={{ color: '#999', fontSize: '16px' }}></i>
@@ -95,7 +95,7 @@ const AdminMenu4 = () => {
         </div>
       </div>
 
-      {/* ========== SECCIÓN DE GRÁFICOS ========== */}
+      {/* SECCIÓN DE GRÁFICOS */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px', marginBottom: '40px' }}>
         
         {/* Gráfico Ventas por Día */}
@@ -199,7 +199,7 @@ const AdminMenu4 = () => {
 
       </div>
 
-      {/* ========== TABLA DE VENTAS ========== */}
+      {/* TABLA DE VENTAS */}
       <div style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #EAEAEA', overflow: 'hidden', padding: '20px 30px', marginBottom: '30px' }}>
         
         {/* TABS DE LA TABLA */}
@@ -277,7 +277,7 @@ const AdminMenu4 = () => {
         </table>
       </div>
 
-      {/* ========== PAGINACIÓN ========== */}
+      {/* PAGINACIÓN */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
         <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: 0 }}>
           Mostrando de 1-8 de 42 ventas
@@ -301,7 +301,7 @@ const AdminMenu4 = () => {
         </div>
       </div>
 
-      {/* ========== FOOTER ========== */}
+      {/* FOOTER */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '0 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

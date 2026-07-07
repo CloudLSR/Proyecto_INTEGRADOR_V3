@@ -25,7 +25,7 @@ const AdminMenu9 = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%', width: '100%' }}>
 
-      {/* ========== TÍTULO ========== */}
+      {/* TÍTULO */}
       <div style={{ marginBottom: '30px' }}>
         <h1 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 5px 0', textTransform: 'uppercase' }}>
           REPORTES
@@ -35,7 +35,7 @@ const AdminMenu9 = () => {
         </p>
       </div>
 
-      {/* ========== CONTROLES (FECHA, TIPO, FILTROS) ========== */}
+      {/* CONTROLES (FECHA, TIPO, FILTROS) */}
       <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
         <div style={{ flex: 1, border: '1px solid #D9D9D9', borderRadius: '8px', padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '15px', backgroundColor: 'white', fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', cursor: 'pointer', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -55,7 +55,7 @@ const AdminMenu9 = () => {
         </button>
       </div>
 
-      {/* ========== TARJETAS DE MÉTRICAS (KPIs) ========== */}
+      {/* TARJETAS DE MÉTRICAS (KPIs) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
         {kpis.map((kpi, index) => (
           <div key={index} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '25px', border: `2px solid ${kpi.border}`, display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}>
@@ -81,7 +81,7 @@ const AdminMenu9 = () => {
         ))}
       </div>
 
-      {/* ========== TABLA "TODOS LOS REPORTES" ========== */}
+      {/* TABLA "TODOS LOS REPORTES" */}
       <div style={{ marginBottom: '40px' }}>
         <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 20px 0' }}>Todos los reportes</h3>
         <div style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #EAEAEA', overflow: 'hidden' }}>
@@ -128,7 +128,7 @@ const AdminMenu9 = () => {
         </div>
       </div>
 
-      {/* ========== BANNER INFORMACIÓN IMPORTANTE ========== */}
+      {/* BANNER INFORMACIÓN IMPORTANTE */}
       <div style={{ backgroundColor: '#FFF6F7', borderRadius: '15px', padding: '35px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #FADADD' }}>
         <div style={{ maxWidth: '600px' }}>
           <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#C6676D', margin: '0 0 15px 0' }}>Información importante</h3>
@@ -151,7 +151,7 @@ const AdminMenu9 = () => {
         </div>
       </div>
 
-      {/* ========== FOOTER ========== */}
+      {/* FOOTER */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '40px 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

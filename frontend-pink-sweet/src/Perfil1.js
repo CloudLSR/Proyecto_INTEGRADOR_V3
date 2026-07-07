@@ -14,7 +14,7 @@ const PEDIDOS_RECIENTES = [
 
 const PRODUCTOS_FAVORITOS = [
   { id: 1, nombre: "Torta Triple Chocolate", descripcion: "Delicioso bizcocho de chocolate con relleno y cobertura de ganache.", precio: "80.00", imagen: imgTcTripleChocolate },
-  { id: 2, nombre: "Trufas de Fresa",        descripcion: "Chocolate negro relleno de una suave crema de fresa natural.",       precio: "45.00", imagen: imgTFresa },
+  { id: 2, nombre: "Trufas de Fresa",        descripcion: "Chocolate negro relleno de una suave crema de fresa natural.",      precio: "45.00", imagen: imgTFresa },
   { id: 3, nombre: "Alfajor Clásico",        descripcion: "Delicadas tapitas con dulce de leche y azúcar en polvo.",            precio: "28.00", imagen: imgAClasico },
   { id: 4, nombre: "Cupcakes de Arándano",   descripcion: "Suave pastelito de miga fina ideal para decorar con crema batida.", precio: "42.00", imagen: imgCArandano }
 ];
@@ -32,6 +32,16 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
   });
 
   const toggleWish = i => setWishlist(w => w.includes(i) ? w.filter(x => x !== i) : [...w, i]);
+
+  // Funcionalidad añadida para los botones
+  const agregarAlCarrito = (producto) => {
+    alert(`${producto.nombre} ha sido añadido al carrito.`);
+  };
+
+  const handleContacto = () => {
+    // Puedes cambiar la URL por tu enlace de WhatsApp o email
+    window.open("https://wa.me/51999999999", "_blank");
+  };
 
   const formatearFechaRegistro = (f) => {
     if (!f) return '—';
@@ -100,7 +110,7 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
         {editando ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '40px' }}>
             {[
-              { label: 'Nombre',   key: 'nombre',   placeholder: 'Ej: Juan' },
+              { label: 'Nombre',  key: 'nombre',  placeholder: 'Ej: Juan' },
               { label: 'Apellido', key: 'apellido', placeholder: 'Ej: Pérez' },
               { label: 'Teléfono', key: 'telefono', placeholder: 'Ej: +51 999999999' },
               { label: 'Fecha de nacimiento', key: 'fechaNacimiento', placeholder: 'YYYY-MM-DD' },
@@ -128,7 +138,6 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
             </div>
           </div>
         ) : (
-          /* MODO LECTURA — mismo diseño que antes */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '25px', marginBottom: '50px' }}>
             {[
               { label: "Nombre completo",    value: `${usuario?.nombre || ''} ${usuario?.apellido || ''}`.trim() || '—', icon: "fa-regular fa-user" },
@@ -229,7 +238,7 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
                 <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '12px', color: '#5A3E41', margin: '0 0 5px 0' }}>{p.nombre}</h3>
                 <p style={{ fontFamily: 'Poppins-Medium', fontSize: '10px', color: '#644444', margin: '0 0 10px 0', lineHeight: '1.4', flexGrow: 1 }}>{p.descripcion}</p>
                 <div style={{ fontFamily: 'Poltawski-Nowy', fontSize: '16px', color: '#644444', marginBottom: '10px' }}>S/. {p.precio}</div>
-                <button style={{ backgroundColor: '#C6676D', color: '#FFFFFF', border: 'none', padding: '8px', borderRadius: '8px', fontFamily: 'Poppins-Medium', fontSize: '11px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', width: '100%' }}>
+                <button onClick={() => agregarAlCarrito(p)} style={{ backgroundColor: '#C6676D', color: '#FFFFFF', border: 'none', padding: '8px', borderRadius: '8px', fontFamily: 'Poppins-Medium', fontSize: '11px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', width: '100%' }}>
                   <i className="fa-solid fa-cart-shopping"></i> AÑADIR AL CARRITO
                 </button>
               </div>
@@ -249,7 +258,7 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
             <p style={{ margin: '0', color: '#B14B47', fontSize: '15px', fontFamily: 'Signika-Regular', maxWidth: '350px', lineHeight: '1.2' }}>Contáctanos y con gusto te ayudamos a crear el postre perfecto</p>
           </div>
         </div>
-        <button style={{ backgroundColor: '#C3666D', color: 'white', fontSize: '14px', fontFamily: 'Poppins-Bold', border: 'none', padding: '10px 25px', borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+        <button onClick={handleContacto} style={{ backgroundColor: '#C3666D', color: 'white', fontSize: '14px', fontFamily: 'Poppins-Bold', border: 'none', padding: '10px 25px', borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
           CONTACTAR <span style={{ fontSize: '16px' }}>›</span>
         </button>
       </div>
