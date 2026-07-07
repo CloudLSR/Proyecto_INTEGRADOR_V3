@@ -22,7 +22,7 @@ function CambiarPassword1() {
 
     setCargando(true);
     try {
-      // FIX: el endpoint correcto es /api/auth/olvide-contrasena (no /api/auth/recuperar)
+      // FIX: el endpoint correcto es /api/auth/olvide-contrasena (no /api/auth/olvide-contrasena)
       const res = await fetch('http://localhost:8081/api/auth/olvide-contrasena', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

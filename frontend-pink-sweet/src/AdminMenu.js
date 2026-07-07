@@ -146,21 +146,21 @@ const AdminMenu = () => {
           </div>
         </div>
 
-        {/* RENDERIZADO DE PANTALLAS */}
-        {activeTab === "dashboard" && <AdminMenu1 />}
-        {activeTab === "pedidos" && <AdminMenu2 />}
-        {activeTab === "productos" && <AdminMenu3 />}
-        {activeTab === "ventas" && <AdminMenu4 />}
-        {activeTab === "personal" && <AdminMenu5 />}
-        {activeTab === "horarios" && <AdminMenu6 />}
-        {activeTab === "ofertas" && <AdminMenu7 />}
-        {activeTab === "ganancias" && <AdminMenu8 />}
-        {activeTab === "reportes" && <AdminMenu9 />}
-        {activeTab === "comentarios" && <AdminMenu10 />}
-        {activeTab === "configuracion" && <AdminMenu11 />}
+        {/* ================= RENDERIZADO DE PANTALLAS ================= */}
+        {activeTab === "dashboard" && <AdminMenu1 setActiveTab={setActiveTab} />}
+        {activeTab === "pedidos" && <AdminMenu2 setActiveTab={setActiveTab} />}
+        {activeTab === "productos" && <AdminMenu3 setActiveTab={setActiveTab} />}
+        {activeTab === "ventas" && <AdminMenu4 setActiveTab={setActiveTab} />}
+        {activeTab === "personal" && <AdminMenu5 setActiveTab={setActiveTab} />}
+        {activeTab === "horarios" && <AdminMenu6 setActiveTab={setActiveTab} />}
+        {activeTab === "ofertas" && <AdminMenu7 setActiveTab={setActiveTab} />}
+        {activeTab === "ganancias" && <AdminMenu8 setActiveTab={setActiveTab} />}
+        {activeTab === "reportes" && <AdminMenu9 setActiveTab={setActiveTab} />}
+        {activeTab === "comentarios" && <AdminMenu10 setActiveTab={setActiveTab} />}
+        {activeTab === "configuracion" && <AdminMenu11 setActiveTab={setActiveTab} />}
         
-        {activeTab === "notificaciones" && <AdminNotificaciones />}
-        {activeTab === "perfil" && <AdminPerfil />}
+        {activeTab === "notificaciones" && <AdminNotificaciones setActiveTab={setActiveTab} />}
+        {activeTab === "perfil" && <AdminPerfil setActiveTab={setActiveTab} />}
 
       </div>
     </div>

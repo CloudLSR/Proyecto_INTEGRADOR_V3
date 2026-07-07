@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import iconShop from './assets/icon-shop.png';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8081';
 
 const obtenerEstilosEstado = (estado) => {
   switch ((estado || '').toUpperCase()) {

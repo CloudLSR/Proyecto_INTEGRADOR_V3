@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 
-const API_USUARIOS   = process.env.REACT_APP_API_URL  || "http://localhost:8081"; // 8081  → /api/usuarios/perfil  (para obtener el id del usuario)
-const API_DIRECCIONES = process.env.REACT_APP_API_URL || "http://localhost:8080"; // 8080  → /api/direcciones/**   (para CRUD de direcciones)
+/* IMPORTANTE: El backend usa dos puertos distintos:
+   - 8081  → /api/usuarios/perfil  (para obtener el id del usuario)
+   - 8080  → /api/direcciones/**   (para CRUD de direcciones) */
+const API_USUARIOS   = process.env.REACT_APP_API_URL  || "http://localhost:8081";
+const API_DIRECCIONES = process.env.REACT_APP_API_URL || "http://localhost:8081";
 
 /* Opciones de etiqueta con icono */
 const ETIQUETAS = [

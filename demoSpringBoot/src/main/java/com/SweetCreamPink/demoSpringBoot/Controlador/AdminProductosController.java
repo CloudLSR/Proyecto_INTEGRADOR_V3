@@ -62,6 +62,15 @@ public class AdminProductosController {
         if (datosNuevos.getCategoria() != null) {
             producto.setCategoria(datosNuevos.getCategoria());
         }
+        if (datosNuevos.getDescripcion() != null) {
+            producto.setDescripcion(datosNuevos.getDescripcion());
+        }
+        if (datosNuevos.getPrecio() != null) {
+            producto.setPrecio(datosNuevos.getPrecio());
+        }
+        if (datosNuevos.getImagenUrl() != null) {
+            producto.setImagenUrl(datosNuevos.getImagenUrl());
+        }
 
         Producto guardado = productoRepository.save(producto);
         return ResponseEntity.ok(Map.of(

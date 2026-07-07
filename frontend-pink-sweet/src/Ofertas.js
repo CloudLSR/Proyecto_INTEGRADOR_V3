@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { API_BASE, apiGet, authHeaders, getToken, notificarCarrito } from './api';
 
 import logoPrincipal from './assets/logo.png';
 import dividerTitle from "./assets/divider-title.png"; 
@@ -18,6 +19,29 @@ const Ofertas = ({ setPage }) => {
   const [wishlist, setWishlist] = useState([]);
   const toggleWish = i => setWishlist(w => w.includes(i) ? w.filter(x => x !== i) : [...w, i]);
 
+  // Ofertas reales del backend (si las hay); si no, se muestran las de ejemplo.
+  const [ofertasReales, setOfertasReales] = useState([]);
+  useEffect(() => {
+    apiGet('/api/ofertas/vigentes')
+      .then(data => setOfertasReales(Array.isArray(data) ? data : []))
+      .catch(() => setOfertasReales([]));
+  }, []);
+
+  const anadirAlCarrito = async (prodId) => {
+    if (!prodId) { setPage('productos'); return; }
+    if (!getToken()) { alert('Debes iniciar sesión para agregar productos al carrito.'); return; }
+    try {
+      const resp = await fetch(`${API_BASE}/api/carrito/agregar`, {
+        method: 'POST',
+        headers: authHeaders(true),
+        body: JSON.stringify({ productoId: prodId, cantidad: 1 }),
+      });
+      if (!resp.ok) throw new Error();
+      notificarCarrito();
+      alert('Producto agregado al carrito.');
+    } catch { alert('No se pudo agregar al carrito.'); }
+  };
+
   const offerProducts = [
     { id: 0, img: imgTcChocolate, name: "Torta Triple Chocolate", desc: "Delicioso bizcocho de chocolate con relleno y cobertura de ganache, decorado con crema de chocolate.", oldPrice: "80.00", newPrice: "64.00", discount: "-20%" },
     { id: 1, img: imgTvClasicos, name: "Tequeños Clásicos", desc: "La receta tradicional que nunca falla. Rellenos de queso blanco llanero, crujientes por fuera y derretidos por dentro.", oldPrice: "38.00", newPrice: "32.30", discount: "-15%" },
@@ -26,6 +50,19 @@ const Ofertas = ({ setPage }) => {
     { id: 4, img: imgAClasico, name: "Alfajor Clásico", desc: "Delicadas tapitas artesanales con un suave relleno de dulce de leche y un toque de azúcar en polvo.", oldPrice: "28.00", newPrice: "22.40", discount: "-20%" },
     { id: 5, img: imgCArandano, name: "Cupcakes de Arándano", desc: "Delicioso y suave pastelito de miga fina con un toque de dulzor a chocolate, es ideal para decorar con crema batida y/o fondant.", oldPrice: "42.00", newPrice: "37.80", discount: "-10%" },
   ];
+
+  const listaMostrar = ofertasReales.length > 0
+    ? ofertasReales.map((o, i) => ({
+        id: o.oferId ?? i,
+        prodId: o.producto?.id ?? null,
+        img: o.producto?.imagenUrl ? (o.producto.imagenUrl.startsWith('http') ? o.producto.imagenUrl : `${API_BASE}${o.producto.imagenUrl}`) : imgTcChocolate,
+        name: o.oferTitulo || o.producto?.nombre || 'Oferta',
+        desc: o.oferDescripcion || '',
+        oldPrice: o.producto?.precio != null ? Number(o.producto.precio).toFixed(2) : '',
+        newPrice: (o.producto?.precio != null && o.oferDescuento != null) ? (Number(o.producto.precio) * (1 - Number(o.oferDescuento) / 100)).toFixed(2) : '',
+        discount: o.oferDescuento != null ? `-${o.oferDescuento}%` : '',
+      }))
+    : offerProducts.map(p => ({ ...p, prodId: null }));
 
   return (
     <div style={{ backgroundColor: '#FFEFEF', fontFamily: 'sans-serif', minHeight: '100vh', paddingBottom: '80px' }}>
@@ -48,7 +85,7 @@ const Ofertas = ({ setPage }) => {
           <p style={{ fontFamily: 'Poppins-Medium', fontSize: '15px', color: '#5A3E41', margin: '0 0 30px 0', maxWidth: '350px', lineHeight: '1.5' }}>
             Aprovecha nuestras ofertas por tiempo limitado en tus productos favoritos.
           </p>
-          <button style={{ alignSelf: 'flex-start', backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '12px 35px', fontFamily: 'Poppins-Bold', fontSize: '14px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button onClick={() => setPage('productos')} style={{ alignSelf: 'flex-start', backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '12px 35px', fontFamily: 'Poppins-Bold', fontSize: '14px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
             APROVECHAR OFERTA <span style={{ fontSize: '18px' }}>→</span>
           </button>
         </div>
@@ -93,7 +130,7 @@ const Ofertas = ({ setPage }) => {
 
       {/* GRID DE PRODUCTOS */}
       <section style={{ maxWidth: '1100px', margin: '0 auto 60px auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', padding: '0 20px' }}>
-        {offerProducts.map((p) => (
+        {listaMostrar.map((p) => (
           <div key={p.id} style={{ border: '2px solid #EAAFB8', borderRadius: '25px', overflow: 'hidden', backgroundColor: '#FFEFEF', display: 'flex', flexDirection: 'column' }}>
             
             <div style={{ position: 'relative', height: '240px' }}>
@@ -132,11 +169,11 @@ const Ofertas = ({ setPage }) => {
               <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#644444', margin: '0 0 20px 0', lineHeight: '1.5' }}>{p.desc}</p>
               
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: 'auto', marginBottom: '20px' }}>
-                <span style={{ fontFamily: 'Poltawski-Nowy', fontSize: '20px', color: '#7C7978', textDecoration: 'line-through' }}>S/. {p.oldPrice}</span>
-                <span style={{ fontFamily: 'Poltawski-Nowy', fontSize: '20px', color: '#C6676D' }}>S/. {p.newPrice}</span>
+                {p.oldPrice && <span style={{ fontFamily: 'Poltawski-Nowy', fontSize: '20px', color: '#7C7978', textDecoration: 'line-through' }}>S/. {p.oldPrice}</span>}
+                {p.newPrice && <span style={{ fontFamily: 'Poltawski-Nowy', fontSize: '20px', color: '#C6676D' }}>S/. {p.newPrice}</span>}
               </div>
 
-              <button style={{ backgroundColor: '#C6676D', color: '#FFFFFF', border: 'none', padding: '12px', borderRadius: '10px', fontFamily: 'Poppins-Medium', fontSize: '18px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', width: '100%' }}>
+              <button onClick={() => anadirAlCarrito(p.prodId)} style={{ backgroundColor: '#C6676D', color: '#FFFFFF', border: 'none', padding: '12px', borderRadius: '10px', fontFamily: 'Poppins-Medium', fontSize: '18px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', width: '100%' }}>
                 <i className="fa-solid fa-cart-shopping"></i> AÑADIR AL CARRITO
               </button>
             </div>
@@ -155,7 +192,7 @@ const Ofertas = ({ setPage }) => {
             <p style={{ fontFamily: 'Poppins-Medium', fontSize: '15px', color: '#B14B47', margin: '0' }}>No te quedes sin tus favoritos.<br/>Promociones válidas hasta agotar stock</p>
           </div>
         </div>
-        <button style={{ backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '12px 30px', fontFamily: 'Poppins-Bold', fontSize: '15px', borderRadius: '8px', cursor: 'pointer' }}>
+        <button onClick={() => setPage('productos')} style={{ backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '12px 30px', fontFamily: 'Poppins-Bold', fontSize: '15px', borderRadius: '8px', cursor: 'pointer' }}>
           ¡APROVECHALOS YA!
         </button>
       </section>

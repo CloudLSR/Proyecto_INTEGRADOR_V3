@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { apiGet } from "./api";
 
 // IMÁGENES DE PRODUCTOS (Reutilizadas para los más vendidos)
 import imgTcTripleChocolate from './assets/products/tc-triple-chocolate.png';
@@ -7,7 +8,11 @@ import imgAClasico from './assets/products/a-clasico.png';
 import imgTFresa from './assets/products/t-fresa.png';
 import imgMeQueso from './assets/products/me-queso.png';
 
-const AdminMenu1 = () => {
+const AdminMenu1 = ({ setActiveTab }) => {
+  const ir = (t) => setActiveTab && setActiveTab(t);
+  const [kpi, setKpi] = useState(null);
+  useEffect(() => { apiGet("/api/admin/dashboard").then(setKpi).catch(() => {}); }, []);
+
   
   // Data simulada para Pedidos Recientes
   const pedidosRecientes = [
@@ -30,7 +35,7 @@ const AdminMenu1 = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%' }}>
       
-      {/* HEADER DEL DASHBOARD */}
+      {/* ========== HEADER DEL DASHBOARD ========== */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '35px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
           <div>
@@ -52,7 +57,7 @@ const AdminMenu1 = () => {
         </div>
       </div>
 
-      {/* TARJETAS DE MÉTRICAS (KPIs) */}
+      {/* ========== TARJETAS DE MÉTRICAS (KPIs) ========== */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '25px', marginBottom: '35px' }}>
         
         {/* Tarjeta 1 */}
@@ -61,9 +66,9 @@ const AdminMenu1 = () => {
             <i className="fa-solid fa-bag-shopping"></i>
           </div>
           <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#777', margin: '0 0 5px 0' }}>Pedidos activos</p>
-          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5A3E41', margin: '0 0 10px 0' }}>18</h2>
+          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5A3E41', margin: '0 0 10px 0' }}>{kpi ? (kpi.ordenesPendientes + kpi.ordenesPreparando) : "—"}</h2>
           <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#777', margin: '0 0 20px 0' }}><span style={{ color: '#27AE60' }}>+3 respecto a ayer ↑</span></p>
-          <a href="#" style={{ fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#F194B4', textDecoration: 'underline' }}>Ver pedidos</a>
+          <span onClick={() => ir("pedidos")} style={{ cursor:'pointer', fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#F194B4', textDecoration: 'underline' }}>Ver pedidos</span>
         </div>
 
         {/* Tarjeta 2 */}
@@ -72,9 +77,9 @@ const AdminMenu1 = () => {
             <i className="fa-solid fa-basket-shopping"></i>
           </div>
           <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#777', margin: '0 0 5px 0' }}>Ventas del día</p>
-          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5A3E41', margin: '0 0 10px 0' }}>S/1,285.00</h2>
+          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5A3E41', margin: '0 0 10px 0' }}>{kpi ? `S/ ${Number(kpi.ingresosMes||0).toFixed(2)}` : "—"}</h2>
           <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#777', margin: '0 0 20px 0' }}><span style={{ color: '#27AE60' }}>+12.5% respecto a ayer</span></p>
-          <a href="#" style={{ fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#F2C94C', textDecoration: 'underline' }}>Ver ventas</a>
+          <span onClick={() => ir("ventas")} style={{ cursor:'pointer', fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#F2C94C', textDecoration: 'underline' }}>Ver ventas</span>
         </div>
 
         {/* Tarjeta 3 */}
@@ -82,10 +87,10 @@ const AdminMenu1 = () => {
           <div style={{ width: '50px', height: '50px', backgroundColor: '#E9F7EF', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#27AE60', fontSize: '22px', marginBottom: '20px' }}>
             <i className="fa-solid fa-dollar-sign"></i>
           </div>
-          <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#777', margin: '0 0 5px 0' }}>Ganancias del día</p>
-          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5A3E41', margin: '0 0 10px 0' }}>S/862.50</h2>
+          <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#777', margin: '0 0 5px 0' }}>Clientes</p>
+          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5A3E41', margin: '0 0 10px 0' }}>{kpi ? kpi.totalClientes : "—"}</h2>
           <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#777', margin: '0 0 20px 0' }}><span style={{ color: '#27AE60' }}>+10.3% respecto a ayer</span></p>
-          <a href="#" style={{ fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#F194B4', textDecoration: 'underline' }}>Ver ganancias</a>
+          <span onClick={() => ir("ganancias")} style={{ cursor:'pointer', fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#F194B4', textDecoration: 'underline' }}>Ver clientes</span>
         </div>
 
         {/* Tarjeta 4 */}
@@ -93,14 +98,14 @@ const AdminMenu1 = () => {
           <div style={{ width: '50px', height: '50px', backgroundColor: '#F4ECF7', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#9B59B6', fontSize: '22px', marginBottom: '20px' }}>
             <i className="fa-solid fa-box-open"></i>
           </div>
-          <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#777', margin: '0 0 5px 0' }}>Productos bajos</p>
-          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5A3E41', margin: '0 0 10px 0' }}>7</h2>
+          <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#777', margin: '0 0 5px 0' }}>Productos</p>
+          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '36px', color: '#5A3E41', margin: '0 0 10px 0' }}>{kpi ? kpi.totalProductos : "—"}</h2>
           <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#777', margin: '0 0 20px 0' }}>requieren reposición</p>
-          <a href="#" style={{ fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#F194B4', textDecoration: 'underline' }}>Ver stock</a>
+          <span onClick={() => ir("productos")} style={{ cursor:'pointer', fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#F194B4', textDecoration: 'underline' }}>Ver productos</span>
         </div>
       </div>
 
-      {/* SECCIÓN DE GRÁFICOS (SVG Estáticos) */}
+      {/* ========== SECCIÓN DE GRÁFICOS (SVG Estáticos) ========== */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '25px', marginBottom: '35px' }}>
         
         {/* Gráfico Ventas */}
@@ -197,14 +202,14 @@ const AdminMenu1 = () => {
 
       </div>
 
-      {/* SECCIÓN LISTAS */}
+      {/* ========== SECCIÓN LISTAS ========== */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '35px' }}>
         
         {/* Pedidos Recientes */}
         <div style={{ backgroundColor: 'white', borderRadius: '15px', padding: '30px', border: '1px solid #EAEAEA' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
             <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: 0 }}>Pedidos recientes</h3>
-            <span style={{ color: '#C3666D', fontSize: '14px', fontFamily: 'Poppins-Medium', cursor: 'pointer' }}>Ver todos</span>
+            <span onClick={() => ir("pedidos")} style={{ color: '#C3666D', fontSize: '14px', fontFamily: 'Poppins-Medium', cursor: 'pointer' }}>Ver todos</span>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
@@ -227,7 +232,7 @@ const AdminMenu1 = () => {
             ))}
           </div>
           <div style={{ marginTop: '25px' }}>
-            <a href="#" style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C3666D', textDecoration: 'none' }}>Ir a pedidos {'>'}</a>
+            <span onClick={() => ir("pedidos")} style={{ cursor:'pointer', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C3666D', textDecoration: 'none' }}>Ir a pedidos {'>'}</span>
           </div>
         </div>
 
@@ -235,7 +240,7 @@ const AdminMenu1 = () => {
         <div style={{ backgroundColor: 'white', borderRadius: '15px', padding: '30px', border: '1px solid #EAEAEA' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
             <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: 0 }}>Productos más vendidos</h3>
-            <span style={{ color: '#C3666D', fontSize: '14px', fontFamily: 'Poppins-Medium', cursor: 'pointer' }}>Ver todos</span>
+            <span onClick={() => ir("productos")} style={{ color: '#C3666D', fontSize: '14px', fontFamily: 'Poppins-Medium', cursor: 'pointer' }}>Ver todos</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -259,20 +264,20 @@ const AdminMenu1 = () => {
 
       </div>
 
-      {/* ACCIONES RÁPIDAS */}
+      {/* ========== ACCIONES RÁPIDAS ========== */}
       <div style={{ backgroundColor: 'white', borderRadius: '15px', padding: '30px', border: '1px solid #EAEAEA', marginBottom: '40px' }}>
         <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 25px 0' }}>Acciones rápidas</h3>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '20px' }}>
           
           {[
-            { icon: 'fa-solid fa-cake-candles', text: 'Nuevo producto' },
-            { icon: 'fa-solid fa-bag-shopping', text: 'Nuevo pedido manual' },
-            { icon: 'fa-solid fa-dollar-sign', text: 'Registrar venta' },
-            { icon: 'fa-solid fa-user-plus', text: 'Agregar personal' },
-            { icon: 'fa-solid fa-file-invoice', text: 'Ver reportes' }
+            { icon: 'fa-solid fa-cake-candles', text: 'Nuevo producto', tab: 'productos' },
+            { icon: 'fa-solid fa-bag-shopping', text: 'Nuevo pedido manual', tab: 'pedidos' },
+            { icon: 'fa-solid fa-dollar-sign', text: 'Registrar venta', tab: 'ventas' },
+            { icon: 'fa-solid fa-user-plus', text: 'Agregar personal', tab: 'personal' },
+            { icon: 'fa-solid fa-file-invoice', text: 'Ver reportes', tab: 'reportes' }
           ].map((accion, i) => (
-            <div key={i} style={{ backgroundColor: '#FDF2F3', border: '2px solid #F194B4', borderRadius: '15px', padding: '25px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', transition: 'transform 0.2s' }}>
+            <div key={i} onClick={() => ir(accion.tab)} style={{ backgroundColor: '#FDF2F3', border: '2px solid #F194B4', borderRadius: '15px', padding: '25px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', transition: 'transform 0.2s' }}>
               <div style={{ width: '50px', height: '50px', border: '2px solid #F194B4', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#F194B4', fontSize: '24px', marginBottom: '15px' }}>
                 <i className={accion.icon}></i>
               </div>
@@ -283,7 +288,7 @@ const AdminMenu1 = () => {
         </div>
       </div>
 
-      {/* FOOTER */}
+      {/* ========== FOOTER ========== */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '0 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

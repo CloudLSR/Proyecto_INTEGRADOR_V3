@@ -4,12 +4,17 @@ import logoPrincipal from './assets/logo.png';
 const AdminMenu11 = () => {
 
   // Estado para los toggles (interruptores)
-  const [preferencias, setPreferencias] = useState({
-    web: true,
-    whatsapp: true,
-    stock: true,
-    notificaciones: true
+  const [preferencias, setPreferencias] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('adminPreferencias')) || { web: true, whatsapp: true, stock: true, notificaciones: true }; }
+    catch { return { web: true, whatsapp: true, stock: true, notificaciones: true }; }
   });
+  const [guardado, setGuardado] = useState(false);
+
+  const guardarPreferencias = () => {
+    localStorage.setItem('adminPreferencias', JSON.stringify(preferencias));
+    setGuardado(true);
+    setTimeout(() => setGuardado(false), 2500);
+  };
 
   const handleToggle = (key) => {
     setPreferencias(prev => ({ ...prev, [key]: !prev[key] }));
@@ -161,13 +166,13 @@ const AdminMenu11 = () => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '30px' }}>
-          <button style={{ backgroundColor: 'white', color: '#C6676D', border: '1.5px solid #C6676D', borderRadius: '8px', padding: '10px 25px', fontFamily: 'Poppins-Medium', fontSize: '13px', cursor: 'pointer' }}>
-            Guardar preferencias
+          <button onClick={guardarPreferencias} style={{ backgroundColor: guardado ? '#27AE60' : 'white', color: guardado ? 'white' : '#C6676D', border: `1.5px solid ${guardado ? '#27AE60' : '#C6676D'}`, borderRadius: '8px', padding: '10px 25px', fontFamily: 'Poppins-Medium', fontSize: '13px', cursor: 'pointer', transition: 'all .2s' }}>
+            {guardado ? '✓ Preferencias guardadas' : 'Guardar preferencias'}
           </button>
         </div>
       </div>
 
-      {/* BANNER ¡EXCELENTE TRABAJO! */}
+      {/* BANNER */}
       <div style={{ backgroundColor: '#FFF6F7', borderRadius: '12px', padding: '30px', display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '40px' }}>
         <div style={{ color: '#F194B4', fontSize: '40px' }}>
           <i className="fa-solid fa-cupcake"></i>
