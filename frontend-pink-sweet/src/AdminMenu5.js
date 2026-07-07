@@ -42,7 +42,7 @@ const AdminMenu5 = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%', width: '100%' }}>
 
-      {/* ========== TÍTULO Y BOTÓN AGREGAR ========== */}
+      {/* TÍTULO Y BOTÓN AGREGAR */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
         <div>
           <h1 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 5px 0', textTransform: 'uppercase' }}>
@@ -57,7 +57,7 @@ const AdminMenu5 = () => {
         </button>
       </div>
 
-      {/* ========== TARJETAS DE MÉTRICAS (KPIs) ========== */}
+      {/* TARJETAS DE MÉTRICAS (KPIs) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '35px' }}>
         {kpis.map((kpi, index) => (
           <div key={index} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '25px', border: `2px solid ${kpi.border}`, display: 'flex', flexDirection: 'column', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}>
@@ -73,7 +73,7 @@ const AdminMenu5 = () => {
         ))}
       </div>
 
-      {/* ========== SECCIÓN PRINCIPAL (LISTA + INFO) ========== */}
+      {/* SECCIÓN PRINCIPAL (LISTA + INFO) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '25px', marginBottom: '35px' }}>
         
         {/* Lado Izquierdo: Miembros del Equipo */}
@@ -158,7 +158,7 @@ const AdminMenu5 = () => {
 
       </div>
 
-      {/* ========== DISTRIBUCIÓN POR CARGO ========== */}
+      {/* DISTRIBUCIÓN POR CARGO */}
       <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', border: '1px solid #EAEAEA', marginBottom: '30px' }}>
         <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 25px 0' }}>Distribución por cargo</h3>
         
@@ -178,7 +178,7 @@ const AdminMenu5 = () => {
         </div>
       </div>
 
-      {/* ========== FOOTER ========== */}
+      {/* FOOTER */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '0 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

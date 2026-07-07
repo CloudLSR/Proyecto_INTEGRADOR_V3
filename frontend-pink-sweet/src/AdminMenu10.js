@@ -71,13 +71,13 @@ const AdminMenu10 = () => {
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%', width: '100%' }}>
 
-      {/* ========== TÍTULO ========== */}
+      {/* TÍTULO */}
       <div style={{ marginBottom: '25px' }}>
         <h1 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 5px 0' }}>Comentarios</h1>
         <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777', margin: 0 }}>Gestiona las opiniones de tus clientes sobre sus pedidos.</p>
       </div>
 
-      {/* ========== CONTROLES ========== */}
+      {/* CONTROLES */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           <div style={{ border: '1px solid #D9D9D9', borderRadius: '8px', padding: '10px 15px', display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: 'white', fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', cursor: 'pointer', width: '280px', justifyContent: 'space-between' }}>
@@ -95,7 +95,7 @@ const AdminMenu10 = () => {
         </button>
       </div>
 
-      {/* ========== KPIs ========== */}
+      {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
         {kpis.map((kpi, index) => (
           <div key={index} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '25px', border: `2px solid ${kpi.border}`, display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}>
@@ -114,7 +114,7 @@ const AdminMenu10 = () => {
         ))}
       </div>
 
-      {/* ========== TEMAS MÁS MENCIONADOS ========== */}
+      {/* TEMAS MÁS MENCIONADOS */}
       <div style={{ marginBottom: '40px' }}>
         <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 15px 0' }}>Temas más mencionados</h3>
         <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
@@ -132,7 +132,7 @@ const AdminMenu10 = () => {
         </div>
       </div>
 
-      {/* ========== COMENTARIOS RECIENTES ========== */}
+      {/* COMENTARIOS RECIENTES */}
       <div style={{ marginBottom: '30px' }}>
         <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 15px 0' }}>Comentarios recientes</h3>
         
@@ -203,7 +203,7 @@ const AdminMenu10 = () => {
         </div>
       </div>
 
-      {/* ========== PAGINACIÓN ========== */}
+      {/* PAGINACIÓN */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
         <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: 0 }}>
           Mostrando de 1 a 8 de 128 comentarios
@@ -219,7 +219,7 @@ const AdminMenu10 = () => {
         </div>
       </div>
 
-      {/* ========== PANELES INFERIORES ========== */}
+      {/* PANELES INFERIORES */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '40px' }}>
         
         {/* Productos más mencionados positivamente */}
@@ -266,7 +266,7 @@ const AdminMenu10 = () => {
 
       </div>
 
-      {/* ========== FOOTER ========== */}
+      {/* FOOTER */}
       <p style={{ textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#999', margin: '0 0 20px 0' }}>
         <span style={{ color: '#C3666D' }}>♥</span> Gracias por endulzar cada día con tu trabajo
       </p>

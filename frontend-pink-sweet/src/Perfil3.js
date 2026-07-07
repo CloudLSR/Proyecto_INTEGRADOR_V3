@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-/* ══════════════════════════════════════════════════════════════════════════
-   IMPORTANTE: El backend usa dos puertos distintos:
-   - 8081  → /api/usuarios/perfil  (para obtener el id del usuario)
-   - 8080  → /api/direcciones/**   (para CRUD de direcciones)
-   ══════════════════════════════════════════════════════════════════════════ */
-const API_USUARIOS   = process.env.REACT_APP_API_URL  || "http://localhost:8081";
-const API_DIRECCIONES = process.env.REACT_APP_API_URL || "http://localhost:8080";
+const API_USUARIOS   = process.env.REACT_APP_API_URL  || "http://localhost:8081"; // 8081  → /api/usuarios/perfil  (para obtener el id del usuario)
+const API_DIRECCIONES = process.env.REACT_APP_API_URL || "http://localhost:8080"; // 8080  → /api/direcciones/**   (para CRUD de direcciones)
 
-/* ── Opciones de etiqueta con icono ─────────────────────────────────────── */
+/* Opciones de etiqueta con icono */
 const ETIQUETAS = [
   { valor: "Casa",               icono: "fa-solid fa-house" },
   { valor: "Trabajo",            icono: "fa-solid fa-building" },
@@ -30,9 +25,7 @@ const FORM_VACIO = {
   esPrincipal: false,
 };
 
-/* ══════════════════════════════════════════════════════════════════════════
-   COMPONENTE PRINCIPAL
-   ══════════════════════════════════════════════════════════════════════════ */
+/* COMPONENTE PRINCIPAL */
 const Perfil3 = () => {
   const [direcciones,  setDirecciones]  = useState([]);
   const [usuarioId,    setUsuarioId]    = useState(null);
@@ -51,7 +44,7 @@ const Perfil3 = () => {
 
   const getToken = () => localStorage.getItem("token");
 
-  /* ── Paso 1: obtener usuarioId (primero localStorage, sino llama al perfil) */
+  /* Paso 1: obtener usuarioId (primero localStorage, sino llama al perfil) */
   useEffect(() => {
     const token = getToken();
     if (!token) { setCargando(false); return; }
@@ -84,7 +77,7 @@ const Perfil3 = () => {
       });
   }, []);
 
-  /* ── Paso 2: cargar direcciones cuando ya tenemos el usuarioId ─────────── */
+  /* Paso 2: cargar direcciones cuando ya tenemos el usuarioId */
   useEffect(() => {
     if (!usuarioId) return;
     cargarDirecciones(usuarioId);
@@ -108,7 +101,7 @@ const Perfil3 = () => {
     }
   };
 
-  /* ── Abrir modal AGREGAR ──────────────────────────────────────────────── */
+  /* Abrir modal AGREGAR */
   const abrirAgregar = () => {
     setForm(FORM_VACIO);
     setEditandoId(null);
@@ -116,7 +109,7 @@ const Perfil3 = () => {
     setModal("agregar");
   };
 
-  /* ── Abrir modal EDITAR ───────────────────────────────────────────────── */
+  /* Abrir modal EDITAR */
   const abrirEditar = (item) => {
     setForm({
       etiqueta:    item.ciudad       || "Casa",
@@ -133,7 +126,7 @@ const Perfil3 = () => {
 
   const cerrarModal = () => { setModal(null); setError(""); };
 
-  /* ── Guardar (agregar o editar) ──────────────────────────────────────── */
+  /* Guardar (agregar o editar) */
   const guardar = async () => {
     if (!usuarioId) {
       setError("No se pudo identificar tu usuario. Recarga la página o vuelve a iniciar sesión.");
@@ -188,7 +181,7 @@ const Perfil3 = () => {
     }
   };
 
-  /* ── Eliminar ─────────────────────────────────────────────────────────── */
+  /* Eliminar */
   const eliminar = async (id) => {
     const token = getToken();
     try {
@@ -204,12 +197,10 @@ const Perfil3 = () => {
     }
   };
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     RENDER
-     ══════════════════════════════════════════════════════════════════════════ */
+  /* RENDER */
   return (
     <>
-      {/* ── CONTENEDOR PRINCIPAL ────────────────────────────────────────── */}
+      {/* CONTENEDOR PRINCIPAL */}
       <div style={{ backgroundColor: "white", border: "2px solid #EAAFB8", borderRadius: "20px", padding: "40px" }}>
 
         {/* Cabecera */}
@@ -336,9 +327,7 @@ const Perfil3 = () => {
         )}
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════
-          MODAL — Agregar / Editar
-          ══════════════════════════════════════════════════════════════════ */}
+      {/* MODAL — Agregar / Editar */}
       {(modal === "agregar" || modal === "editar") && (
         <div
           onClick={cerrarModal}
@@ -425,9 +414,7 @@ const Perfil3 = () => {
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════
-          MODAL — Confirmar eliminación
-          ══════════════════════════════════════════════════════════════════ */}
+      {/* MODAL — Confirmar eliminación */}
       {confirmId !== null && (
         <div
           onClick={() => setConfirmId(null)}
@@ -457,7 +444,7 @@ const Perfil3 = () => {
   );
 };
 
-/* ── Subcomponente campo de texto ───────────────────────────────────────── */
+/* Subcomponente campo de texto */
 const CampoTexto = ({ label, placeholder, value, onChange, icono }) => (
   <div style={{ marginBottom: "18px" }}>
     <label style={estiloLabel}>{label}</label>

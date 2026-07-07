@@ -1,10 +1,3 @@
-// Perfil2.js — MIS PEDIDOS
-// CORRECCIONES:
-// 1. Se eliminó la lista LISTA_PEDIDOS hardcodeada con 5 pedidos ficticios.
-// 2. Ahora carga los pedidos reales del usuario autenticado desde el backend.
-// 3. Una cuenta nueva mostrará "No tienes pedidos aún" correctamente.
-// 4. Los pedidos aparecen solo después de haber confirmado una compra.
-
 import React, { useState, useEffect } from "react";
 import iconShop from './assets/icon-shop.png';
 
@@ -46,7 +39,7 @@ const Perfil2 = () => {
   const [error, setError]       = useState(null);
   const [filtro, setFiltro]     = useState("Todos");
 
-  // ── Cargar pedidos reales del backend ────────────────────────────────────
+  // Cargar pedidos reales del backend
   useEffect(() => {
     const token      = localStorage.getItem('token');
     const usuarioStr = localStorage.getItem('usuario');
@@ -93,7 +86,7 @@ const Perfil2 = () => {
       .finally(() => setCargando(false));
   };
 
-  // ── Filtrar pedidos ──────────────────────────────────────────────────────
+  // Filtrar pedidos
   const pedidosFiltrados = pedidos.filter(p => {
     if (filtro === "Todos") return true;
     const estadoNorm = (p.estado || '').toUpperCase();

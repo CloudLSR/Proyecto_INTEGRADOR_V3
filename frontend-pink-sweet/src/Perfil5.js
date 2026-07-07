@@ -1,10 +1,3 @@
-// Perfil5.js — MIS FAVORITOS
-// CORRECCIÓN DEFINITIVA:
-// Lee los IDs de favoritos desde localStorage (guardados por Productos.js),
-// luego carga los datos completos de cada producto desde el backend.
-// Escucha el evento 'favoritosUpdated' para actualizarse cuando el usuario
-// agrega un favorito desde la página de Productos sin necesidad de recargar.
-
 import React, { useState, useEffect, useCallback } from 'react';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
@@ -24,7 +17,7 @@ const Perfil5 = () => {
   const [cargando, setCargando]       = useState(true);
   const [hoveredCard, setHoveredCard] = useState(null);
 
-  // ── Carga los productos completos a partir de los IDs en localStorage ────
+  // Carga los productos completos a partir de los IDs en localStorage
   const cargarFavoritos = useCallback(async () => {
     setCargando(true);
     const ids = leerIdsDesdeStorage();
@@ -71,7 +64,7 @@ const Perfil5 = () => {
     return () => window.removeEventListener('favoritosUpdated', onUpdate);
   }, [cargarFavoritos]);
 
-  // ── Quitar un favorito ────────────────────────────────────────────────────
+  // Quitar un favorito
   const quitarFavorito = (productoId) => {
     // 1. Quitar del estado visual
     setFavoritos(prev => prev.filter(p => p.id !== productoId));
@@ -90,7 +83,7 @@ const Perfil5 = () => {
     }
   };
 
-  // ── Eliminar TODOS los favoritos ─────────────────────────────────────────
+  // Eliminar TODOS los favoritos
   const eliminarTodos = () => {
     if (favoritos.length === 0) return;
 
@@ -110,7 +103,7 @@ const Perfil5 = () => {
     }
   };
 
-  // ── Añadir al carrito desde favoritos ────────────────────────────────────
+  // Añadir al carrito desde favoritos
   const añadirAlCarrito = async (producto) => {
     const token = localStorage.getItem('token');
     if (!token) {
