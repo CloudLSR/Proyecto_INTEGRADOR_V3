@@ -407,7 +407,7 @@ function AuthModal({ onClose }) {
     if (!recCorreo) { setRecError('Ingresa tu correo.'); return; }
     setRecLoading(true);
     try {
-      const res = await fetch('http://localhost:8081/api/auth/recuperar', {
+      const res = await fetch('http://localhost:8081/api/auth/olvide-contrasena', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: recCorreo }),
@@ -429,7 +429,7 @@ function AuthModal({ onClose }) {
   const handleReenviar = async () => {
     setReenvioMsg('');
     try {
-      await fetch('http://localhost:8081/api/auth/recuperar', {
+      await fetch('http://localhost:8081/api/auth/olvide-contrasena', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: correoGuardado }),
@@ -632,7 +632,7 @@ function AuthModal({ onClose }) {
 }
  
 // ─── DRAWER CARRITO ──────────────────────────────────────────────────────────
-const API_BASE_CART = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE_CART = process.env.REACT_APP_API_URL || 'http://localhost:8081';
  
 // ✅ CORRECCIÓN: CartDrawer ahora recibe setPage para navegar al pago
 function CartDrawer({ onClose, setPage }) {
@@ -819,7 +819,7 @@ const Header = ({ page, setPage }) => {
     const onUpdate = () => {
       const token = localStorage.getItem('token');
       if (!token) { setCartCount(0); return; }
-      fetch((process.env.REACT_APP_API_URL || 'http://localhost:8080') + '/api/carrito', {
+      fetch((process.env.REACT_APP_API_URL || 'http://localhost:8081') + '/api/carrito', {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then(r => r.ok ? r.json() : [])

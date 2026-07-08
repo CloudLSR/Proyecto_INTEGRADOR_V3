@@ -1,25 +1,86 @@
-import React from "react";
-import logoPrincipal from './assets/logo.png'; 
+import React, { useState, useEffect } from "react";
+// Importamos apiGet
+import { apiGet } from "./api"; 
+
+// Periodos listos para el backend
+const PERIODOS = [
+  { id: "mensual", label: "Último Mes", path: "/api/admin/reportes/mensual" },
+  { id: "semanal", label: "Última Semana", path: "/api/admin/reportes/semanal" },
+  { id: "anual", label: "Último Año", path: "/api/admin/reportes/anual" },
+];
 
 const AdminMenu9 = () => {
+  // Lógica
+  const [periodo, setPeriodo] = useState("mensual");
+  const [rep, setRep] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
 
-  // Data simulada para las tarjetas KPI
+  useEffect(() => {
+    setCargando(true);
+    const p = PERIODOS.find(x => x.id === periodo) || PERIODOS[0];
+    
+    // Llamada real al backend
+    apiGet(p.path)
+      .then(d => { 
+        setRep(d); 
+        setError(""); 
+      })
+      .catch(() => {
+        // Si falla (no hay backend conectado), ponemos valores en 0
+        setError("");
+        setRep({
+          generados: 0,
+          descargados: 0,
+          ultimoFecha: "--",
+          ultimoHora: "--",
+          tiposDisponibles: 7
+        });
+      })
+      .finally(() => setCargando(false));
+  }, [periodo]);
+
+  // Funciones de Descarga para que los botones sean interactivos
+  const exportarExcel = (nombreReporte) => {
+    // Genera un CSV simulado
+    const rows = [["Reporte", nombreReporte], ["Periodo", periodo], ["Total", "0"]];
+    const csv = rows.map(r => r.map(x => `"${x}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+    const a = document.createElement("a"); 
+    a.href = url; 
+    a.download = `Reporte_${nombreReporte.replace(/ /g, "_")}.csv`; 
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportarPDF = (nombreReporte) => {
+    // Genera un Blob simulando un PDF (Usar jsPDF)
+    const contenido = `Reporte: ${nombreReporte}\nPeriodo: ${periodo}\nStatus: Sin datos reales (Valores en 0)\n\n-- Documento generado por Sweet Cream Rose --`;
+    const url = URL.createObjectURL(new Blob([contenido], { type: "application/pdf" }));
+    const a = document.createElement("a"); 
+    a.href = url; 
+    a.download = `Reporte_${nombreReporte.replace(/ /g, "_")}.pdf`; 
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Data dinámica adaptada a la maqueta (Si rep es null, muestra 0)
   const kpis = [
-    { valor: "8", subtitulo: "Reportes generados", detalle: "en este periodo", icon: "fa-regular fa-file-lines", color: "#F194B4", border: "#FADADD", bg: "#FDF2F3" },
-    { valor: "8", subtitulo: "Descargados en", detalle: "este periodo", icon: "fa-solid fa-download", color: "#27AE60", border: "#A9DFBF", bg: "#E9F7EF" },
-    { especial: true, titulo: "Ultimo reporte", valor: "18 may. 2026", detalle: "10:30 am", icon: "fa-regular fa-clock", color: "#9B59B6", border: "#D7BDE2", bg: "#F4ECF7" },
-    { valor: "7", subtitulo: "Tipos de reportes", detalle: "disponibles", icon: "fa-solid fa-chart-pie", color: "#F2C94C", border: "#FDE49E", bg: "#FFF9E6" },
+    { valor: rep?.generados ?? "0", subtitulo: "Reportes generados", detalle: "en este periodo", icon: "fa-regular fa-file-lines", color: "#F194B4", border: "#FADADD", bg: "#FDF2F3" },
+    { valor: rep?.descargados ?? "0", subtitulo: "Descargados en", detalle: "este periodo", icon: "fa-solid fa-download", color: "#27AE60", border: "#A9DFBF", bg: "#E9F7EF" },
+    { especial: true, titulo: "Ultimo reporte", valor: rep?.ultimoFecha ?? "-", detalle: rep?.ultimoHora ?? "-", icon: "fa-regular fa-clock", color: "#9B59B6", border: "#D7BDE2", bg: "#F4ECF7" },
+    { valor: rep?.tiposDisponibles ?? "7", subtitulo: "Tipos de reportes", detalle: "disponibles", icon: "fa-solid fa-chart-pie", color: "#F2C94C", border: "#FDE49E", bg: "#FFF9E6" },
   ];
 
-  // Data simulada para la tabla de reportes
+  // Data de la tabla
   const reportesData = [
-    { id: 1, nombre: "Reporte de ventas", descripcion: "Resumen de todas las ventas realizadas en el período.", periodo: "12 may. - 18 may. 2026", icon: "fas fa-chart-bar", color: "#F194B4", bg: "#FDF2F3" },
-    { id: 2, nombre: "Reporte de ganancias", descripcion: "Detalle de ingresos, costos y ganancias del negocio.", periodo: "12 may. - 18 may. 2026", icon: "fa-dollar", color: "#27AE60", bg: "#E9F7EF" },
-    { id: 3, nombre: "Reporte de productos", descripcion: "Productos más vendidos y rendimiento por producto.", periodo: "12 may. - 18 may. 2026", icon: "fa-solid fa-box", color: "#F2C94C", bg: "#FFF9E6" },
-    { id: 4, nombre: "Reporte de pedidos", descripcion: "Historial y estado de todos los pedidos realizados.", periodo: "12 may. - 18 may. 2026", icon: "fa-solid fa-bag-shopping", color: "#9B59B6", bg: "#F4ECF7" },
-    { id: 5, nombre: "Reporte de personal", descripcion: "Información y rendimiento del personal del negocio.", periodo: "12 may. - 18 may. 2026", icon: "fa-solid fa-user-group", color: "#F194B4", bg: "#FDF2F3" },
-    { id: 6, nombre: "Reporte de horarios", descripcion: "Horarios programados y turnos del personal.", periodo: "12 may. - 18 may. 2026", icon: "fa-regular fa-calendar-days", color: "#5DADE2", bg: "#EBF5FB" },
-    { id: 7, nombre: "Reporte de ofertas", descripcion: "Rendimiento de ofertas y descuentos aplicados.", periodo: "12 may. - 18 may. 2026", icon: "fa-solid fa-tag", color: "#E67E22", bg: "#FEF5E7" },
+    { id: 1, nombre: "Reporte de ventas", descripcion: "Resumen de todas las ventas realizadas en el período.", periodo: periodo === "mensual" ? "Último Mes" : periodo === "semanal" ? "Última Semana" : "Último Año", icon: "fas fa-chart-bar", color: "#F194B4", bg: "#FDF2F3" },
+    { id: 2, nombre: "Reporte de ganancias", descripcion: "Detalle de ingresos, costos y ganancias del negocio.", periodo: periodo === "mensual" ? "Último Mes" : periodo === "semanal" ? "Última Semana" : "Último Año", icon: "fa-dollar", color: "#27AE60", bg: "#E9F7EF" },
+    { id: 3, nombre: "Reporte de productos", descripcion: "Productos más vendidos y rendimiento por producto.", periodo: periodo === "mensual" ? "Último Mes" : periodo === "semanal" ? "Última Semana" : "Último Año", icon: "fa-solid fa-box", color: "#F2C94C", bg: "#FFF9E6" },
+    { id: 4, nombre: "Reporte de pedidos", descripcion: "Historial y estado de todos los pedidos realizados.", periodo: periodo === "mensual" ? "Último Mes" : periodo === "semanal" ? "Última Semana" : "Último Año", icon: "fa-solid fa-bag-shopping", color: "#9B59B6", bg: "#F4ECF7" },
+    { id: 5, nombre: "Reporte de personal", descripcion: "Información y rendimiento del personal del negocio.", periodo: periodo === "mensual" ? "Último Mes" : periodo === "semanal" ? "Última Semana" : "Último Año", icon: "fa-solid fa-user-group", color: "#F194B4", bg: "#FDF2F3" },
+    { id: 6, nombre: "Reporte de horarios", descripcion: "Horarios programados y turnos del personal.", periodo: periodo === "mensual" ? "Último Mes" : periodo === "semanal" ? "Última Semana" : "Último Año", icon: "fa-regular fa-calendar-days", color: "#5DADE2", bg: "#EBF5FB" },
+    { id: 7, nombre: "Reporte de ofertas", descripcion: "Rendimiento de ofertas y descuentos aplicados.", periodo: periodo === "mensual" ? "Último Mes" : periodo === "semanal" ? "Última Semana" : "Último Año", icon: "fa-solid fa-tag", color: "#E67E22", bg: "#FEF5E7" },
   ];
 
   return (
@@ -37,12 +98,24 @@ const AdminMenu9 = () => {
 
       {/* CONTROLES (FECHA, TIPO, FILTROS) */}
       <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
-        <div style={{ flex: 1, border: '1px solid #D9D9D9', borderRadius: '8px', padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '15px', backgroundColor: 'white', fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', cursor: 'pointer', justifyContent: 'space-between' }}>
+        
+        {/* Selector de periodo que respeta el diseño pero es funcional */}
+        <div style={{ flex: 1, position: 'relative', border: '1px solid #D9D9D9', borderRadius: '8px', padding: '10px 20px', display: 'flex', alignItems: 'center', backgroundColor: 'white', fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', cursor: 'pointer', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <i className="fa-regular fa-calendar" style={{ color: '#777', fontSize: '16px' }}></i>
-            12 de may. 2026 - 19 de may. 2026
+            {PERIODOS.find(p => p.id === periodo)?.label} {cargando && "(Cargando...)"}
           </div>
           <i className="fa-solid fa-chevron-down" style={{ fontSize: '10px', color: '#999' }}></i>
+          {/* Select invisible superpuesto para funcionalidad */}
+          <select 
+            value={periodo} 
+            onChange={(e) => setPeriodo(e.target.value)}
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
+          >
+            {PERIODOS.map(p => (
+              <option key={p.id} value={p.id}>{p.label}</option>
+            ))}
+          </select>
         </div>
 
         <div style={{ width: '250px', border: '1px solid #D9D9D9', borderRadius: '8px', padding: '10px 20px', display: 'flex', alignItems: 'center', backgroundColor: 'white', fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', cursor: 'pointer', justifyContent: 'space-between' }}>
@@ -113,10 +186,16 @@ const AdminMenu9 = () => {
                   </td>
                   <td style={{ padding: '20px 30px' }}>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                      <button style={{ backgroundColor: 'white', color: '#27AE60', border: '1.5px solid #27AE60', borderRadius: '6px', padding: '6px 15px', fontFamily: 'Poppins-Medium', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <button 
+                        onClick={() => exportarExcel(rep.nombre)}
+                        style={{ backgroundColor: 'white', color: '#27AE60', border: '1.5px solid #27AE60', borderRadius: '6px', padding: '6px 15px', fontFamily: 'Poppins-Medium', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      >
                         <i className="fa-solid fa-download"></i> Excel
                       </button>
-                      <button style={{ backgroundColor: 'white', color: '#C6676D', border: '1.5px solid #C6676D', borderRadius: '6px', padding: '6px 15px', fontFamily: 'Poppins-Medium', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <button 
+                        onClick={() => exportarPDF(rep.nombre)}
+                        style={{ backgroundColor: 'white', color: '#C6676D', border: '1.5px solid #C6676D', borderRadius: '6px', padding: '6px 15px', fontFamily: 'Poppins-Medium', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      >
                         <i className="fa-solid fa-download"></i> PDF
                       </button>
                     </div>

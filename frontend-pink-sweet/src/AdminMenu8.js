@@ -1,45 +1,103 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { apiGet } from "./api";
 import logoPrincipal from './assets/logo.png'; 
 
-// IMÁGENES DE PRODUCTOS (Reutilizadas para las categorías)
+// IMÁGENES DE PRODUCTOS (Fallbacks visuales)
 import imgTcTripleChocolate from './assets/products/tc-triple-chocolate.png';
 import imgCArandano from './assets/products/c-arandano.png';
 import imgAClasico from './assets/products/a-clasico.png';
 import imgTFresa from './assets/products/t-fresa.png';
-import imgMeQueso from './assets/products/me-queso.png';
-import imgTvClasicos from './assets/products/tv-clasicos.png';
+
+const PERIODOS = [
+  { id: "semana", label: "Esta semana", path: "/api/admin/ventas/semana" },
+  { id: "mes", label: "Este mes", path: "/api/admin/ventas/mes" },
+  { id: "anio", label: "Este año", path: "/api/admin/ventas/anio" },
+];
+
+const MARGEN_ESTIMADO = 0.60; // 60% de margen de ganancia por defecto
 
 const AdminMenu8 = () => {
 
-  // Data simulada para las tarjetas KPI
+  // LÓGICA DE ESTADOS
+  const [periodo, setPeriodo] = useState("mes");
+  const [menuPeriodoAbierto, setMenuPeriodoAbierto] = useState(false);
+  
+  const [dataGanancias, setDataGanancias] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
+
+  // LLAMADAS A LA API
+  useEffect(() => {
+    setCargando(true);
+    const p = PERIODOS.find(x => x.id === periodo);
+    apiGet(p.path)
+      .then(d => { setDataGanancias(d); setError(""); })
+      .catch(() => setError("No se pudieron cargar las ganancias. Verificando conexión..."))
+      .finally(() => setCargando(false));
+  }, [periodo]);
+
+  // MATEMÁTICAS BÁSICAS
+  const ingresos = Number(dataGanancias?.totalIngresos || 0);
+  const ganancia = ingresos * MARGEN_ESTIMADO;
+  const costos = ingresos - ganancia;
+
+  // KPIs DINÁMICOS
   const kpis = [
-    { titulo: "Ingresos totales", valor: "S/5,680.00", porcentaje: "↑ 18.6%", extra: "vs. 05 May - 11 May", icon: "S/", customIcon: true, color: "#F194B4", border: "#FADADD" },
-    { titulo: "Costos totales", valor: "S/2,350.00", porcentaje: "↑ 8.3%", extra: "vs. 05 May - 11 May", icon: "fa-solid fa-cart-shopping", color: "#F2C94C", border: "#FDE49E" },
-    { titulo: "Ganancia neta", valor: "S/3,330.00", porcentaje: "↑ 26.4%", extra: "vs. 05 May - 11 May", icon: "fa-dollar", color: "#27AE60", border: "#A9DFBF" },
-    { titulo: "Margen de ganancia", valor: "58.6%", porcentaje: "↑ 3.2%", extra: "vs. 05 May - 11 May", icon: "fa-solid fa-chart-column", color: "#9B59B6", border: "#D7BDE2" },
+    { titulo: "Ingresos totales", valor: `S/ ${ingresos.toFixed(2)}`, porcentaje: "0%", extra: "vs periodo ant.", icon: "S/", customIcon: true, color: "#F194B4", border: "#FADADD" },
+    { titulo: "Costos totales", valor: `S/ ${costos.toFixed(2)}`, porcentaje: "0%", extra: "vs periodo ant.", icon: "fa-solid fa-cart-shopping", color: "#F2C94C", border: "#FDE49E" },
+    { titulo: "Ganancia neta", valor: `S/ ${ganancia.toFixed(2)}`, porcentaje: "0%", extra: "vs periodo ant.", icon: "fa-dollar", color: "#27AE60", border: "#A9DFBF" },
+    { titulo: "Margen de ganancia", valor: `${(MARGEN_ESTIMADO * 100).toFixed(1)}%`, porcentaje: "0%", extra: "vs periodo ant.", icon: "fa-solid fa-chart-column", color: "#9B59B6", border: "#D7BDE2" },
   ];
 
-  // Data simulada para la tabla de categorías
-  const categoriasData = [
-    { nombre: "Entremets", img: imgTFresa, ingresos: "S/3,200.00", costos: "S/1,280.00", ganancia: "S/1,920.00", margen: "60.0%" },
-    { nombre: "Tortas Clásicas", img: imgTcTripleChocolate, ingresos: "S/1,150.00", costos: "S/520.00", ganancia: "S/730.00", margen: "58.4%" },
-    { nombre: "Galletas", img: imgAClasico, ingresos: "S/720.00", costos: "S/300.00", ganancia: "S/420.00", margen: "58.3%" },
-    { nombre: "Tequeños", img: imgTvClasicos, ingresos: "S/510.00", costos: "S/250.00", ganancia: "S/260.00", margen: "51.0%" },
-    { nombre: "Mini Sandwiches", img: imgMeQueso, ingresos: "S/3,200.00", costos: "S/1,280.00", ganancia: "S/1,920.00", margen: "60%" },
-    { nombre: "Mini Empanadas", img: imgMeQueso, ingresos: "S/3,200.00", costos: "S/1,280.00", ganancia: "S/1,920.00", margen: "60%" },
-    { nombre: "Alfajores", img: imgAClasico, ingresos: "S/3,200.00", costos: "S/1,280.00", ganancia: "S/1,920.00", margen: "60%" },
-    { nombre: "Trufas", img: imgTFresa, ingresos: "S/3,200.00", costos: "S/1,280.00", ganancia: "S/1,920.00", margen: "60%" },
-    { nombre: "Postres Fríos", img: imgTcTripleChocolate, ingresos: "S/3,200.00", costos: "S/1,280.00", ganancia: "S/1,920.00", margen: "60%" },
-    { nombre: "Cupcakes", img: imgCArandano, ingresos: "S/3,200.00", costos: "S/1,280.00", ganancia: "S/1,920.00", margen: "60%" },
-  ];
+  // GRÁFICO DE LÍNEAS DINÁMICO
+  const chartDays = ['1', '2', '3', '4', '5', '6', '7']; // El backend debería enviar etiquetas reales
+  const chartValues = dataGanancias?.gananciasPorDia || [0, 0, 0, 0, 0, 0, 0];
+  const maxGrafico = 1200; // Ajustar según volumen real de ventas
+  
+  const puntosSVG = chartValues.map((val, i) => {
+    const x = 90 + (i * 95);
+    const y = 220 - ((Math.min(val, maxGrafico) / maxGrafico) * 200); 
+    return { x, y, val };
+  });
 
+  const pathD = `M 90 220 ` + puntosSVG.map(pt => `L ${pt.x} ${pt.y}`).join(" ") + ` L 660 220 Z`;
+  const pathLineD = `M 90 ${puntosSVG[0].y} ` + puntosSVG.map(pt => `L ${pt.x} ${pt.y}`).join(" ");
+
+  // GRÁFICO CIRCULAR DINÁMICO
+  const desgloseData = dataGanancias?.desglosePorCategoria || [
+    { nombre: 'Productos de pastelería', monto: 0, pct: 0, color: '#F194B4' },
+    { nombre: 'Bebidas y extras', monto: 0, pct: 0, color: '#F2C94C' },
+    { nombre: 'Personalizados', monto: 0, pct: 0, color: '#D7BDE2' }
+  ];
+  const hasPieData = desgloseData.some(d => d.pct > 0);
+  let currentPieOffset = 0;
+
+  // TABLAS Y RESÚMENES (Vaciados por defecto)
+  const categoriasData = dataGanancias?.categorias || [];
+  
   const resumenGeneral = [
-    { etiqueta: "Total de pedidos", valor: "152" },
-    { etiqueta: "Ticket promedio", valor: "S/37.37" },
-    { etiqueta: "Productos vendidos", valor: "438" },
-    { etiqueta: "Devoluciones", valor: "S/120.00" },
-    { etiqueta: "Descuentos aplicados", valor: "S/250.00" },
+    { etiqueta: "Total de pedidos", valor: dataGanancias?.totalOrdenes || "0" },
+    { etiqueta: "Ticket promedio", valor: ingresos > 0 && dataGanancias?.totalOrdenes ? `S/${(ingresos / dataGanancias.totalOrdenes).toFixed(2)}` : "S/0.00" },
+    { etiqueta: "Productos vendidos", valor: dataGanancias?.productosVendidos || "0" },
+    { etiqueta: "Devoluciones", valor: "S/0.00" },
+    { etiqueta: "Descuentos aplicados", valor: "S/0.00" },
   ];
+
+  // EXPORTAR CSV
+  const exportarCSV = () => {
+    const rows = [
+      ["Métrica", "Valor"],
+      ["Ingresos Totales", `S/ ${ingresos.toFixed(2)}`],
+      ["Costos Totales", `S/ ${costos.toFixed(2)}`],
+      ["Ganancia Neta", `S/ ${ganancia.toFixed(2)}`],
+      ["Margen", `${(MARGEN_ESTIMADO * 100).toFixed(1)}%`],
+      ["Total de Pedidos", dataGanancias?.totalOrdenes || "0"]
+    ];
+    const csv = rows.map(r => r.map(x => `"${x}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+    const a = document.createElement("a"); a.href = url; a.download = `ganancias_${periodo}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div style={{ padding: '40px 50px', boxSizing: 'border-box', backgroundColor: '#FAFAFA', minHeight: '100%', width: '100%' }}>
@@ -55,24 +113,39 @@ const AdminMenu8 = () => {
       </div>
 
       {/* CONTROLES (FECHA, FILTROS, EXPORTAR) */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ border: '1px solid #D9D9D9', borderRadius: '8px', padding: '10px 15px', display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: 'white', fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', cursor: 'pointer', width: '280px', justifyContent: 'space-between' }}>
+          
+          <div onClick={() => setMenuPeriodoAbierto(!menuPeriodoAbierto)} style={{ border: '1px solid #D9D9D9', borderRadius: '8px', padding: '10px 15px', display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: 'white', fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', cursor: 'pointer', width: '280px', justifyContent: 'space-between', boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <i className="fa-regular fa-calendar"></i>
-              12 de may. 2026 - 19 de may. 2026
+              {PERIODOS.find(p => p.id === periodo)?.label}
             </div>
             <i className="fa-solid fa-chevron-down" style={{ fontSize: '10px' }}></i>
           </div>
-          <button style={{ backgroundColor: 'white', color: '#C3666D', border: '1.5px solid #C3666D', borderRadius: '8px', padding: '0 25px', height: '42px', fontFamily: 'Poppins-Medium', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+
+          {menuPeriodoAbierto && (
+            <div style={{ position: 'absolute', top: '50px', left: 0, backgroundColor: 'white', borderRadius: '12px', boxShadow: '0px 10px 30px rgba(0,0,0,0.15)', padding: '10px 0', width: '280px', zIndex: 100, border: '1px solid #EAEAEA' }}>
+              {PERIODOS.map(p => (
+                <button key={p.id} onClick={() => { setPeriodo(p.id); setMenuPeriodoAbierto(false); }} style={{ width: '100%', background: 'none', border: 'none', padding: '10px 20px', textAlign: 'left', fontFamily: periodo === p.id ? 'Poppins-Bold' : 'Poppins-Medium', fontSize: '13px', color: periodo === p.id ? '#C3666D' : '#5A3E41', cursor: 'pointer' }}>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <button style={{ backgroundColor: 'white', color: '#C3666D', border: '1.5px solid #C3666D', borderRadius: '8px', padding: '0 25px', height: '42px', fontFamily: 'Poppins-Medium', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxSizing: 'border-box' }}>
             <i className="fa-solid fa-filter"></i> Filtros
           </button>
         </div>
 
-        <button style={{ backgroundColor: '#FCF0F2', color: '#C3666D', border: '1.5px solid #FADADD', borderRadius: '8px', padding: '10px 20px', fontFamily: 'Poppins-SemiBold', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+        <button onClick={exportarCSV} style={{ backgroundColor: '#FCF0F2', color: '#C3666D', border: '1.5px solid #FADADD', borderRadius: '8px', padding: '10px 20px', fontFamily: 'Poppins-SemiBold', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
           <i className="fa-solid fa-download"></i> Exportar reporte
         </button>
       </div>
+
+      {cargando && <p style={{ color: '#999', fontFamily: 'Poppins-Regular', textAlign: 'center' }}>Calculando ganancias...</p>}
+      {error && <p style={{ color: '#C6676D', fontFamily: 'Poppins-Medium', textAlign: 'center' }}>{error}</p>}
 
       {/* TARJETAS DE MÉTRICAS (KPIs) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '35px' }}>
@@ -85,14 +158,14 @@ const AdminMenu8 = () => {
               <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#777', margin: '0 0 5px 0' }}>{kpi.titulo}</p>
               <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '26px', color: '#5A3E41', margin: '0 0 8px 0', lineHeight: '1' }}>{kpi.valor}</h2>
               <p style={{ fontFamily: 'Poppins-Medium', fontSize: '12px', color: '#777', margin: 0 }}>
-                <span style={{ color: '#27AE60' }}>{kpi.porcentaje}</span> {kpi.extra}
+                <span style={{ color: '#999' }}>- {kpi.porcentaje}</span> {kpi.extra}
               </p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* GRÁFICO PRINCIPAL (SVG Estático) */}
+      {/* GRÁFICO PRINCIPAL (Líneas) */}
       <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', border: '1px solid #EAEAEA', marginBottom: '30px' }}>
         <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 20px 0' }}>Ganancia neta</h3>
         
@@ -117,28 +190,17 @@ const AdminMenu8 = () => {
             ))}
 
             {/* Eje X */}
-            {['12 may.', '13 may.', '14 may.', '15 may.', '16 may.', '17 may.', '18 may.'].map((day, i) => (
-              <text key={i} x={90 + (i * 95)} y="245" fill="#999" fontSize="12" fontFamily="Poppins-Medium" textAnchor="middle">{day}</text>
+            {chartDays.map((day, i) => (
+              <text key={i} x={90 + (i * 95)} y="245" fill="#999" fontSize="12" fontFamily="Poppins-Medium" textAnchor="middle">Día {day}</text>
             ))}
 
-            {/* Área con gradiente (Líneas Rectas) */}
-            <path 
-              d="M 90 87 L 185 137 L 280 95 L 375 45 L 470 79 L 565 62 L 660 112 L 660 220 L 90 220 Z" 
-              fill="url(#gananciaGradient)" 
-            />
-            
-            {/* Línea Principal (Recta) */}
-            <path 
-              d="M 90 87 L 185 137 L 280 95 L 375 45 L 470 79 L 565 62 L 660 112" 
-              fill="none" stroke="#C6676D" strokeWidth="3" 
-            />
+            {/* Área y Línea */}
+            <path d={pathD} fill="url(#gananciaGradient)" />
+            <path d={pathLineD} fill="none" stroke="#C6676D" strokeWidth="3" />
 
-            {/* Puntos (Sólidos) */}
-            {[
-              { cx: 90, cy: 87 }, { cx: 185, cy: 137 }, { cx: 280, cy: 95 },
-              { cx: 375, cy: 45 }, { cx: 470, cy: 79 }, { cx: 565, cy: 62 }, { cx: 660, cy: 112 }
-            ].map((pt, i) => (
-              <circle key={i} cx={pt.cx} cy={pt.cy} r="5" fill="#C6676D" />
+            {/* Puntos */}
+            {puntosSVG.map((pt, i) => (
+              <circle key={i} cx={pt.x} cy={pt.y} r="5" fill="#C6676D" />
             ))}
           </svg>
         </div>
@@ -147,54 +209,42 @@ const AdminMenu8 = () => {
       {/* GRÁFICO DONA Y COMPARACIÓN */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '25px', marginBottom: '40px' }}>
         
-        {/* Desglose de ganancias */}
+        {/* Desglose de ganancias (Dona Inteligente) */}
         <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', border: '1px solid #EAEAEA' }}>
           <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: '0 0 20px 0' }}>Desglose de ganancias</h3>
-          
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: '20px' }}>
             
-            {/* Contenedor Donut SVG */}
-            <div style={{ width: '220px', height: '220px', position: 'relative' }}>
+            <div style={{ width: '220px', height: '260px', position: 'relative' }}>
               <svg viewBox="0 0 32 32" style={{ transform: 'rotate(-90deg)', width: '100%', height: '100%', overflow: 'visible', filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.05))' }}>
-                {/* 64.6% Productos de pastelería */}
-                <circle r="15.915" cx="16" cy="16" fill="transparent" stroke="#F194B4" strokeWidth="8" strokeDasharray="64.6 35.4" strokeDashoffset="0" />
-                {/* 20.4% Bebidas y extras */}
-                <circle r="15.915" cx="16" cy="16" fill="transparent" stroke="#F2C94C" strokeWidth="8" strokeDasharray="20.4 79.6" strokeDashoffset="-64.6" />
-                {/* 15.0% Personalizados */}
-                <circle r="15.915" cx="16" cy="16" fill="transparent" stroke="#D7BDE2" strokeWidth="8" strokeDasharray="15 85" strokeDashoffset="-85" />
+                {!hasPieData ? (
+                  <circle r="15.915" cx="16" cy="16" fill="transparent" stroke="#F5F5F5" strokeWidth="8" strokeDasharray="100 0" />
+                ) : (
+                  desgloseData.map((d, i) => {
+                    const dashArray = `${d.pct} ${100 - d.pct}`;
+                    const offset = -currentPieOffset;
+                    currentPieOffset += d.pct;
+                    return (
+                      <circle key={i} r="15.915" cx="16" cy="16" fill="transparent" stroke={d.color} strokeWidth="8" strokeDasharray={dashArray} strokeDashoffset={offset} />
+                    );
+                  })
+                )}
               </svg>
-              {/* Texto Central */}
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                 <span style={{ fontSize: '15px', color: '#5A3E41', fontFamily: 'Poppins-Medium' }}>Total</span>
-                <span style={{ fontSize: '24px', color: '#5A3E41', fontFamily: 'Poppins-Bold', lineHeight: '1.2' }}>S/ 3,330.00</span>
+                <span style={{ fontSize: '24px', color: '#5A3E41', fontFamily: 'Poppins-Bold', lineHeight: '1.2' }}>S/ {ganancia.toFixed(2)}</span>
               </div>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                <span style={{ color: '#F194B4', fontSize: '16px', marginTop: '2px' }}>●</span>
-                <div>
-                  <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', margin: '0 0 2px 0' }}>Productos de pastelería</p>
-                  <p style={{ fontFamily: 'Poppins-Regular', fontSize: '12px', color: '#777', margin: 0 }}>S/ 2,150.00 (64.6%)</p>
+              {desgloseData.map((item, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                  <span style={{ color: item.color, fontSize: '16px', marginTop: '2px' }}>●</span>
+                  <div>
+                    <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', margin: '0 0 2px 0' }}>{item.nombre}</p>
+                    <p style={{ fontFamily: 'Poppins-Regular', fontSize: '12px', color: '#777', margin: 0 }}>S/ {item.monto.toFixed(2)} ({item.pct}%)</p>
+                  </div>
                 </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                <span style={{ color: '#F2C94C', fontSize: '16px', marginTop: '2px' }}>●</span>
-                <div>
-                  <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', margin: '0 0 2px 0' }}>Bebidas y extras</p>
-                  <p style={{ fontFamily: 'Poppins-Regular', fontSize: '12px', color: '#777', margin: 0 }}>S/ 680.00 (20.4%)</p>
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                <span style={{ color: '#D7BDE2', fontSize: '16px', marginTop: '2px' }}>●</span>
-                <div>
-                  <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', margin: '0 0 2px 0' }}>Personalizados</p>
-                  <p style={{ fontFamily: 'Poppins-Regular', fontSize: '12px', color: '#777', margin: 0 }}>S/ 500.00 (15.0%)</p>
-                </div>
-              </div>
-              <button style={{ alignSelf: 'flex-start', background: 'none', border: '1px solid #C3666D', color: '#C3666D', borderRadius: '6px', padding: '6px 15px', fontFamily: 'Poppins-Medium', fontSize: '13px', cursor: 'pointer', marginTop: '10px' }}>
-                Ver detalles
-              </button>
+              ))}
             </div>
           </div>
         </div>
@@ -206,8 +256,7 @@ const AdminMenu8 = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
               <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', margin: '0 0 2px 0' }}>Este periodo</p>
-              <p style={{ fontFamily: 'Poppins-Regular', fontSize: '11px', color: '#777', margin: '0 0 8px 0' }}>12 may. - 15 may. 2026</p>
-              <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#C6676D', margin: 0 }}>S/3,330.00</h4>
+              <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#C6676D', margin: 0 }}>S/ {ganancia.toFixed(2)}</h4>
             </div>
             <div style={{ width: '40px', height: '40px', backgroundColor: '#F194B4', color: 'white', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '16px' }}>
               <i className="fa-solid fa-arrow-trend-up"></i>
@@ -217,27 +266,20 @@ const AdminMenu8 = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
             <div>
               <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', margin: '0 0 2px 0' }}>Periodo anterior</p>
-              <p style={{ fontFamily: 'Poppins-Regular', fontSize: '11px', color: '#777', margin: '0 0 8px 0' }}>05 may. - 11 may. 2026</p>
-              <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: 0 }}>S/2,950.00</h4>
+              <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#5A3E41', margin: 0 }}>S/ 0.00</h4>
             </div>
             <div style={{ width: '40px', height: '40px', backgroundColor: '#EAEAEA', color: '#777', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '16px' }}>
-              <i className="fa-solid fa-arrow-trend-up"></i>
+              <i className="fa-solid fa-minus"></i>
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #EAEAEA', paddingTop: '20px' }}>
             <div>
               <p style={{ fontFamily: 'Poppins-Medium', fontSize: '12px', color: '#777', margin: '0 0 5px 0' }}>Variación</p>
-              <p style={{ fontFamily: 'Poppins-Bold', fontSize: '16px', color: '#27AE60', margin: '0 0 2px 0' }}>↑ +12.9%</p>
-              <p style={{ fontFamily: 'Poppins-Regular', fontSize: '11px', color: '#777', margin: 0 }}>S/380.00 más</p>
-            </div>
-            <div style={{ width: '40px', height: '40px', border: '1.5px solid #27AE60', color: '#27AE60', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '18px' }}>
-              <i className="fa-solid fa-arrow-up"></i>
+              <p style={{ fontFamily: 'Poppins-Bold', fontSize: '16px', color: '#999', margin: '0 0 2px 0' }}>0.0%</p>
             </div>
           </div>
-
         </div>
-
       </div>
 
       {/* RESUMEN POR CATEGORÍA */}
@@ -255,25 +297,29 @@ const AdminMenu8 = () => {
               </tr>
             </thead>
             <tbody>
-              {categoriasData.map((cat, index) => (
-                <tr key={index} style={{ borderBottom: '1px solid #F5F5F5' }}>
-                  <td style={{ padding: '15px 30px', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <img src={cat.img} alt={cat.nombre} style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} onError={e => e.target.style.display='none'} />
-                    <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41' }}>{cat.nombre}</span>
-                  </td>
-                  <td style={{ padding: '15px 30px', fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777' }}>{cat.ingresos}</td>
-                  <td style={{ padding: '15px 30px', fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777' }}>{cat.costos}</td>
-                  <td style={{ padding: '15px 30px', fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777' }}>{cat.ganancia}</td>
-                  <td style={{ padding: '15px 30px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#27AE60' }}>{cat.margen}</td>
-                </tr>
-              ))}
-              {/* Fila de Total */}
+              {categoriasData.length === 0 ? (
+                <tr><td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#999', fontFamily: 'Poppins-Regular' }}>A la espera de datos.</td></tr>
+              ) : (
+                categoriasData.map((cat, index) => (
+                  <tr key={index} style={{ borderBottom: '1px solid #F5F5F5' }}>
+                    <td style={{ padding: '15px 30px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                      <img src={cat.imgUrl || imgAClasico} alt={cat.nombre} style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} onError={e => e.target.style.display='none'} />
+                      <span style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41' }}>{cat.nombre}</span>
+                    </td>
+                    <td style={{ padding: '15px 30px', fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777' }}>S/ {cat.ingresos}</td>
+                    <td style={{ padding: '15px 30px', fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777' }}>S/ {cat.costos}</td>
+                    <td style={{ padding: '15px 30px', fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777' }}>S/ {cat.ganancia}</td>
+                    <td style={{ padding: '15px 30px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#27AE60' }}>{cat.margen}%</td>
+                  </tr>
+                ))
+              )}
+              {/* Fila de Total Dinámica */}
               <tr style={{ backgroundColor: '#FAFAFA', borderTop: '2px solid #EAEAEA' }}>
                 <td style={{ padding: '20px 30px', fontFamily: 'Poppins-Bold', fontSize: '16px', color: '#5A3E41', textAlign: 'center' }}>Total</td>
-                <td style={{ padding: '20px 30px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41' }}>S/24,880.00</td>
-                <td style={{ padding: '20px 30px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41' }}>S/10,030.00</td>
-                <td style={{ padding: '20px 30px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41' }}>S/14,850.00</td>
-                <td style={{ padding: '20px 30px', fontFamily: 'Poppins-Bold', fontSize: '14px', color: '#27AE60' }}>59.7%</td>
+                <td style={{ padding: '20px 30px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41' }}>S/ {ingresos.toFixed(2)}</td>
+                <td style={{ padding: '20px 30px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41' }}>S/ {costos.toFixed(2)}</td>
+                <td style={{ padding: '20px 30px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#5A3E41' }}>S/ {ganancia.toFixed(2)}</td>
+                <td style={{ padding: '20px 30px', fontFamily: 'Poppins-Bold', fontSize: '14px', color: '#27AE60' }}>{(MARGEN_ESTIMADO * 100).toFixed(1)}%</td>
               </tr>
             </tbody>
           </table>
@@ -300,7 +346,7 @@ const AdminMenu8 = () => {
         </div>
         <div>
           <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#C6676D', margin: '0 0 5px 0' }}>¡Buen trabajo!</h3>
-          <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', margin: 0 }}>Tu ganancia neta aumentó 26.4% en comparación con el periodo anterior.</p>
+          <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', margin: 0 }}>Recuerda que tu ganancia neta debe aumentar en comparación con el periodo anterior.</p>
         </div>
       </div>
 
