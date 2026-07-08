@@ -3,11 +3,15 @@ import logoPrincipal from './assets/logo.png';
 
 const AdminMenu11 = () => {
 
-  // Estado para los toggles (interruptores)
+  // Uso de localStorage para persistir las preferencias de la vista
   const [preferencias, setPreferencias] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('adminPreferencias')) || { web: true, whatsapp: true, stock: true, notificaciones: true }; }
-    catch { return { web: true, whatsapp: true, stock: true, notificaciones: true }; }
+    try { 
+      return JSON.parse(localStorage.getItem('adminPreferencias')) || { web: true, whatsapp: true, stock: true, notificaciones: true }; 
+    } catch { 
+      return { web: true, whatsapp: true, stock: true, notificaciones: true }; 
+    }
   });
+
   const [guardado, setGuardado] = useState(false);
 
   const guardarPreferencias = () => {
@@ -20,28 +24,30 @@ const AdminMenu11 = () => {
     setPreferencias(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Data simulada para las tarjetas KPI
+  // KPIs EN CERO
   const kpis = [
-    { titulo: "Información del negocio", valor: "5", detalle: "datos registrados", icon: "fa-solid fa-store", color: "#F194B4", border: "#FADADD" },
-    { titulo: "Preferencias activas", valor: "24", detalle: "configuraciones activas", icon: "fa-solid fa-gear", color: "#27AE60", border: "#A9DFBF" },
-    { titulo: "Ultimo respaldo", valor: "14/06/26", detalle: "10:35 AM", icon: "fa-solid fa-database", color: "#F2C94C", border: "#FDE49E" },
-    { titulo: "Estado del sistema", valor: "Activo", detalle: "100% operativo", icon: "fa-solid fa-desktop", color: "#9B59B6", border: "#D7BDE2", valorColor: "#27AE60" },
+    { titulo: "Información del negocio", valor: "0", detalle: "datos registrados", icon: "fa-solid fa-store", color: "#F194B4", border: "#FADADD" },
+    { titulo: "Preferencias activas", valor: "0", detalle: "configuraciones activas", icon: "fa-solid fa-gear", color: "#27AE60", border: "#A9DFBF" }, 
+    { titulo: "Ultimo respaldo", valor: "--/--/--", detalle: "Sin datos", icon: "fa-solid fa-database", color: "#F2C94C", border: "#FDE49E" },
+    { titulo: "Estado del sistema", valor: "Desconectado", detalle: "A la espera de BD", icon: "fa-solid fa-desktop", color: "#9B59B6", border: "#D7BDE2", valorColor: "#777" },
   ];
 
+  // DATOS REALES
   const infoNegocio = [
     { label: "Nombre comercial", valor: "Sweet Cream Rose", icon: "fa-regular fa-id-card", color: "#F194B4" },
-    { label: "RUC", valor: "10620226462", icon: "fa-regular fa-envelope", color: "#F194B4" }, // Nota: Ícono visual referencial
+    { label: "RUC", valor: "10620226462", icon: "fa-regular fa-envelope", color: "#F194B4" }, 
     { label: "Teléfono", valor: "+51 992 376 537", icon: "fa-solid fa-phone", color: "#F194B4" },
-    { label: "Correo electrónico", valor: "sweetcreamrose@gmail.com", icon: "fa-regular fa-calendar", color: "#F194B4" }, // Nota: Ícono visual referencial
+    { label: "Correo electrónico", valor: "sweetcreamrose@gmail.com", icon: "fa-regular fa-calendar", color: "#F194B4" }, 
     { label: "Dirección", valor: "Lima, Perú", icon: "fa-solid fa-location-dot", color: "#F194B4" },
   ];
 
+  // DATOS DE SISTEMA EN CERO/ESPERA
   const infoSistema = [
-    { label: "Versión del sistema", valor: "1.0.0", isSuccess: false },
-    { label: "Última actualización", valor: "13/06/2026", isSuccess: false },
-    { label: "Base de datos", valor: "Conectada", isSuccess: true },
-    { label: "Estado del sistema", valor: "Activo", isSuccess: true },
-    { label: "Servidor", valor: "En línea", isSuccess: true },
+    { label: "Versión del sistema", valor: "0.0.0", isSuccess: false },
+    { label: "Última actualización", valor: "--/--/----", isSuccess: false },
+    { label: "Base de datos", valor: "0 (Desconectada)", isSuccess: false },
+    { label: "Estado del sistema", valor: "0 (Sin conexión)", isSuccess: false },
+    { label: "Servidor", valor: "0", isSuccess: false }, 
   ];
 
   const toggleConfig = [
@@ -166,13 +172,26 @@ const AdminMenu11 = () => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '30px' }}>
-          <button onClick={guardarPreferencias} style={{ backgroundColor: guardado ? '#27AE60' : 'white', color: guardado ? 'white' : '#C6676D', border: `1.5px solid ${guardado ? '#27AE60' : '#C6676D'}`, borderRadius: '8px', padding: '10px 25px', fontFamily: 'Poppins-Medium', fontSize: '13px', cursor: 'pointer', transition: 'all .2s' }}>
+          <button 
+            onClick={guardarPreferencias} 
+            style={{ 
+              backgroundColor: guardado ? '#27AE60' : 'white', 
+              color: guardado ? 'white' : '#C6676D', 
+              border: `1.5px solid ${guardado ? '#27AE60' : '#C6676D'}`, 
+              borderRadius: '8px', 
+              padding: '10px 25px', 
+              fontFamily: 'Poppins-Medium', 
+              fontSize: '13px', 
+              cursor: 'pointer', 
+              transition: 'all .2s' 
+            }}
+          >
             {guardado ? '✓ Preferencias guardadas' : 'Guardar preferencias'}
           </button>
         </div>
       </div>
 
-      {/* BANNER */}
+      {/* BANNER ¡EXCELENTE TRABAJO! */}
       <div style={{ backgroundColor: '#FFF6F7', borderRadius: '12px', padding: '30px', display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '40px' }}>
         <div style={{ color: '#F194B4', fontSize: '40px' }}>
           <i className="fa-solid fa-cupcake"></i>
