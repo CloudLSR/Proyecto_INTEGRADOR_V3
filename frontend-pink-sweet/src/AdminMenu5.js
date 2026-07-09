@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { apiGet, apiPost, apiPut, apiDelete } from "./api";
 
+const ROLES = [
+  { value: "Administrador", label: "Administrador(a)" },
+  { value: "Repostero",     label: "Repostero(a)" },
+  { value: "Repartidor",    label: "Repartidor(a)" },
+  { value: "Atencion",      label: "Atención al cliente" },
+  { value: "Caja",          label: "Cajero(a)" },
+];
+const labelRol = (valor) => ROLES.find(r => r.value === valor)?.label || "Sin cargo asignado";
+
 const AdminMenu5 = () => {
   // LÓGICA DE ESTADOS
   const [personal, setPersonal] = useState([]);
@@ -28,12 +37,12 @@ const AdminMenu5 = () => {
 
   const guardar = async (form) => {
     const body = {
-      perNombre: form.nombre, 
+      perNombre: form.nombre,
       perApellido: form.apellido,
-      perCorreo: form.correo, 
+      perCorreo: form.correo,
       perTelefono: form.telefono,
-      rol: form.rol, // Añadido para respetar tu diseño
-      perEstado: form.estado // Añadido para respetar tu diseño
+      perRol: form.rol,
+      perEstado: form.estado
     };
     try {
       if (personaAEditar) await apiPut(`/api/admin/personal/${personaAEditar.perId}`, body);
@@ -69,7 +78,7 @@ const AdminMenu5 = () => {
     return personal.filter(p =>
       `${p.perNombre || ""} ${p.perApellido || ""}`.toLowerCase().includes(q) ||
       (p.perCorreo || "").toLowerCase().includes(q) ||
-      (p.rol || "").toLowerCase().includes(q)
+      labelRol(p.perRol).toLowerCase().includes(q)
     );
   }, [personal, busqueda]);
 
@@ -190,7 +199,7 @@ const AdminMenu5 = () => {
                     <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&background=random&color=fff&size=128`} alt={nombreCompleto} style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' }} />
                     <div>
                       <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '15px', color: '#5A3E41', margin: '0 0 2px 0' }}>{nombreCompleto}</h4>
-                      <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', margin: '0 0 2px 0' }}>{persona.rol || "Sin cargo asignado"}</p>
+                      <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', margin: '0 0 2px 0' }}>{labelRol(persona.perRol)}</p>
                       <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: 0 }}>{persona.perCorreo || "-"}</p>
                     </div>
                   </div>
@@ -309,11 +318,11 @@ const AdminMenu5 = () => {
 // Componente Modal adaptado a tu Diseño UI
 function ModalPersonal({ persona, onCancelar, onGuardar }) {
   const [form, setForm] = useState({
-    nombre: persona?.perNombre || "", 
+    nombre: persona?.perNombre || "",
     apellido: persona?.perApellido || "",
-    correo: persona?.perCorreo || "", 
+    correo: persona?.perCorreo || "",
     telefono: persona?.perTelefono || "",
-    rol: persona?.rol || "",
+    rol: persona?.perRol || "",
     estado: persona?.perEstado || "Activo"
   });
   
@@ -343,10 +352,7 @@ function ModalPersonal({ persona, onCancelar, onGuardar }) {
           <input value={form.telefono} onChange={e => set('telefono', e.target.value)} placeholder="Teléfono" style={input} />
           <select value={form.rol} onChange={e => set('rol', e.target.value)} style={input}>
             <option value="">-- Seleccionar Cargo --</option>
-            <option value="Administradora">Administrador(a)</option>
-            <option value="Repostera">Repostero(a)</option>
-            <option value="Decoradora">Decorador(a)</option>
-            <option value="At. al cliente">At. al cliente</option>
+            {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
           </select>
         </div>
 

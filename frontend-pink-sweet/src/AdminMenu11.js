@@ -3,10 +3,10 @@ import logoPrincipal from './assets/logo.png';
 
 const AdminMenu11 = () => {
 
-  // Uso de localStorage para persistir las preferencias de la vista
+  // Uso de sessionStorage para persistir las preferencias de la vista
   const [preferencias, setPreferencias] = useState(() => {
     try { 
-      return JSON.parse(localStorage.getItem('adminPreferencias')) || { web: true, whatsapp: true, stock: true, notificaciones: true }; 
+      return JSON.parse(sessionStorage.getItem('adminPreferencias')) || { web: true, whatsapp: true, stock: true, notificaciones: true }; 
     } catch { 
       return { web: true, whatsapp: true, stock: true, notificaciones: true }; 
     }
@@ -15,7 +15,7 @@ const AdminMenu11 = () => {
   const [guardado, setGuardado] = useState(false);
 
   const guardarPreferencias = () => {
-    localStorage.setItem('adminPreferencias', JSON.stringify(preferencias));
+    sessionStorage.setItem('adminPreferencias', JSON.stringify(preferencias));
     setGuardado(true);
     setTimeout(() => setGuardado(false), 2500);
   };

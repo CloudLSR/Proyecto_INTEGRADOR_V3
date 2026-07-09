@@ -87,14 +87,41 @@ public class AdminVentasController {
             .map(o -> BigDecimal.valueOf(o.getTotal() != null ? o.getTotal() : 0.0))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // ── ventasPorDia: el frontend espera un ARREGLO de números (para
+        // graficar con .map()), no un objeto/mapa. Se arma en orden
+        // cronológico con los días que sí tuvieron ventas.
         DateTimeFormatter diaFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        Map<String, Double> porDia = new LinkedHashMap<>();
+        Map<String, Double> porDiaMap = new TreeMap<>(); // TreeMap = orden cronológico
         for (Orden o : validas) {
             if (o.getFecha() != null) {
                 String dia = o.getFecha().format(diaFmt);
-                porDia.merge(dia, o.getTotal() != null ? o.getTotal() : 0.0, Double::sum);
+                porDiaMap.merge(dia, o.getTotal() != null ? o.getTotal() : 0.0, Double::sum);
             }
         }
+        List<Double> ventasPorDia = new ArrayList<>(porDiaMap.values());
+        if (ventasPorDia.isEmpty()) {
+            ventasPorDia = Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        }
+
+        // ── listaVentas: shape que consume la tabla de AdminMenu4.js
+        // (id, cliente, total, estado). Antes se mandaba "ordenes" crudo
+        // y la tabla nunca encontraba el campo "listaVentas".
+        List<Map<String, Object>> listaVentas = ordenes.stream().map(o -> {
+            Map<String, Object> fila = new LinkedHashMap<>();
+            fila.put("id", o.getId());
+            String cliente = "Cliente";
+            if (o.getUsuario() != null) {
+                String nombre   = o.getUsuario().getNombre()   != null ? o.getUsuario().getNombre()   : "";
+                String apellido = o.getUsuario().getApellido() != null ? o.getUsuario().getApellido() : "";
+                cliente = (nombre + " " + apellido).trim();
+                if (cliente.isBlank()) cliente = o.getUsuario().getCorreo();
+            }
+            fila.put("cliente", cliente);
+            fila.put("total", o.getTotal() != null ? o.getTotal() : 0.0);
+            fila.put("estado", o.getEstado() != null ? o.getEstado().name() : "Pendiente");
+            fila.put("fecha", o.getFecha());
+            return fila;
+        }).collect(Collectors.toList());
 
         Map<String, Object> resultado = new LinkedHashMap<>();
         resultado.put("tipo",              tipo);
@@ -104,8 +131,8 @@ public class AdminVentasController {
         resultado.put("ordenesValidas",    validas.size());
         resultado.put("ordenesCanceladas", ordenes.size() - validas.size());
         resultado.put("totalIngresos",     total);
-        resultado.put("ventasPorDia",      porDia);
-        resultado.put("ordenes",           ordenes);
+        resultado.put("ventasPorDia",      ventasPorDia);
+        resultado.put("listaVentas",       listaVentas);
 
         return resultado;
     }

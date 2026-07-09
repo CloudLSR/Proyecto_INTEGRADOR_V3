@@ -26,7 +26,7 @@ function CambiarPassword3() {
 
   // FIX: leer el token JWT de recuperación desde la URL (?token=XXX)
   // Si viene desde el enlace del correo, el token estará en los query params.
-  // También se guarda en localStorage como fallback para el flujo de desarrollo.
+  // También se guarda en sessionStorage como fallback para el flujo de desarrollo.
   const [token, setToken] = useState('');
 
   useEffect(() => {
@@ -34,10 +34,10 @@ function CambiarPassword3() {
     const tokenUrl = params.get('token');
     if (tokenUrl) {
       setToken(tokenUrl);
-      localStorage.setItem('reset_token', tokenUrl);
+      sessionStorage.setItem('reset_token', tokenUrl);
     } else {
-      // Fallback: intentar desde localStorage (para pruebas)
-      const tokenGuardado = localStorage.getItem('reset_token');
+      // Fallback: intentar desde sessionStorage (para pruebas)
+      const tokenGuardado = sessionStorage.getItem('reset_token');
       if (tokenGuardado) setToken(tokenGuardado);
       else setError('Enlace de recuperación inválido o expirado. Solicita uno nuevo.');
     }
@@ -73,8 +73,8 @@ function CambiarPassword3() {
         body: JSON.stringify({ token, nuevaContrasena: password }),
       });
       if (res.ok) {
-        localStorage.removeItem('reset_token');
-        localStorage.removeItem('correo_recuperacion');
+        sessionStorage.removeItem('reset_token');
+        sessionStorage.removeItem('correo_recuperacion');
         navigate('/cambiar-password-4');
       } else {
         const data = await res.json();

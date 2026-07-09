@@ -31,12 +31,12 @@ function Login() {
 
       if (res.ok) {
         // FIX: el backend devuelve { token: "..." }, guardar el JWT correctamente
-        localStorage.setItem('token', data.token);
+        sessionStorage.setItem('token', data.token);
         // Decodificar el payload del JWT para saber nombre/rol sin llamada extra
         try {
           const payload = JSON.parse(atob(data.token.split('.')[1]));
-          localStorage.setItem('correo', payload.sub || correo);
-          localStorage.setItem('rol', payload.rol || '');
+          sessionStorage.setItem('correo', payload.sub || correo);
+          sessionStorage.setItem('rol', payload.rol || '');
         } catch (_) { /* si el decode falla, no es crítico */ }
         navigate('/');
       } else {

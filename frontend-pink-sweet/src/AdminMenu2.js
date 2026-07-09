@@ -4,6 +4,12 @@ import { apiGet, apiPut } from "./api";
 // Estados válidos del backend
 const ESTADOS = ["Pendiente", "Preparando", "Enviado", "Entregado", "Cancelado"];
 
+const ETIQUETAS_ENTREGA = {
+  Delivery:     { texto: 'Envío a domicilio', icono: 'fa-solid fa-motorcycle' },
+  Recojo:       { texto: 'Recojo en tienda', icono: 'fa-solid fa-store' },
+  ConsumoLocal: { texto: 'Consumo en local', icono: 'fa-solid fa-mug-saucer' },
+};
+
 // Función original para estilos
 const obtenerEstilosEstado = (estado) => {
   switch (estado) {
@@ -218,7 +224,8 @@ const AdminMenu2 = () => {
                     S/ {precioTotal}
                   </div>
                   <div style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#C3666D', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <i className="fa-solid fa-motorcycle"></i> {pedido.delivery || 'Delivery'}
+                    <i className={ETIQUETAS_ENTREGA[pedido.tipoEntrega]?.icono || 'fa-solid fa-store'}></i>
+                    {ETIQUETAS_ENTREGA[pedido.tipoEntrega]?.texto || 'Recojo en tienda'}
                   </div>
                 </div>
 

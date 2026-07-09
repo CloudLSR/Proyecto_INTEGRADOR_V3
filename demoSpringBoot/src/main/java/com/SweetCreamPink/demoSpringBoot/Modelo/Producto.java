@@ -40,4 +40,8 @@ public class Producto {
 
     @Column(name = "imagenUrl", length = 300)
     private String imagenUrl;
+
+    // NUEVO: controla si el producto es visible para clientes.
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean activo = true;
 }

@@ -1,5 +1,6 @@
 package com.SweetCreamPink.demoSpringBoot.Modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ public class DetalleOrden {
     @Column(name = "detoId")
     private Integer id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ordId_fk")
     private Orden orden;  //* a que orden pertenece este detalle

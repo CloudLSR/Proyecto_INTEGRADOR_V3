@@ -1,5 +1,6 @@
 package com.SweetCreamPink.demoSpringBoot.Modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -39,6 +40,7 @@ public class Personal {
     private LocalDate perFechaIngreso;
 
     @OneToMany(mappedBy = "personal", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<HorarioPersonal> horarios;
 
     // --- Enums internos ---

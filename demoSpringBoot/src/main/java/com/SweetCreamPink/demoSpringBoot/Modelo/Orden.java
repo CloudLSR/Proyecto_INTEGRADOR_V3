@@ -26,7 +26,7 @@ public class Orden {
     @Column(name = "ordId")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "usuId_fk")
     private Usuario usuario;
 
@@ -43,16 +43,24 @@ public class Orden {
     @Column(name = "ordMetodoPago", length = 30)
     private MetodoPagoOrden metodoPago;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ordTipoEntrega", length = 20)
+    private TipoEntrega tipoEntrega = TipoEntrega.Recojo;
+
     //* el admin cambia el estado desde AdminPedidosController
     @Enumerated(EnumType.STRING)
     @Column(name = "ordEstado", length = 20)
     private EstadoOrden estado = EstadoOrden.Pendiente;
 
-    @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<DetalleOrden> detalles = new ArrayList<>();
 
     public enum MetodoPagoOrden {
         Efectivo, Transferencia, Tarjeta, Yape
+    }
+
+    public enum TipoEntrega {
+        Delivery, Recojo, ConsumoLocal
     }
 
     public enum EstadoOrden {

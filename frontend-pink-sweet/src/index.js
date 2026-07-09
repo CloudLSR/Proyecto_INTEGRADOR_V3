@@ -10,6 +10,7 @@ import CambiarPassword3 from './CambiarPassword3';
 import CambiarPassword4 from './CambiarPassword4';
 import Perfil from './Perfil';
 import AdminMenu from './AdminMenu';
+import AdminLoginGate from './AdminLoginGate'; // <-- NUEVO
 // Productos
 import Productos from './Productos';
 
@@ -29,7 +30,8 @@ root.render(
       <Route path="/cambiar-password-3" element={<CambiarPassword3 />} />
       <Route path="/cambiar-password-4" element={<CambiarPassword4 />} />
       <Route path="/productos" element={<Productos />} />
-      <Route path="/adminmenu" element={<AdminMenu />} />
+      {/* CAMBIO: AdminMenu ahora va envuelto en el login de admin */}
+      <Route path="/adminmenu" element={<AdminLoginGate><AdminMenu /></AdminLoginGate>} />
     </Routes>
   </BrowserRouter>
 );

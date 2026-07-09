@@ -235,9 +235,9 @@ const Productos = ({ setPage }) => {
 
   // NUEVO: set de IDs de productos marcados como favoritos
   const [favoritos, setFavoritos] = useState(() => {
-    // Inicializar desde localStorage para persistencia entre páginas
+    // Inicializar desde sessionStorage para persistencia entre páginas
     try {
-      const saved = localStorage.getItem('favoritos_ids');
+      const saved = sessionStorage.getItem('favoritos_ids');
       return saved ? new Set(JSON.parse(saved)) : new Set();
     } catch {
       return new Set();
@@ -314,7 +314,7 @@ const Productos = ({ setPage }) => {
 
   const handleComprar = async (producto) => {
     const cantidad = obtenerCantidad(producto.id);
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     if (!token) {
       alert('Debes iniciar sesión para agregar productos al carrito.');
@@ -345,7 +345,7 @@ const Productos = ({ setPage }) => {
 
   // NUEVO: Toggle favorito — llama al backend y actualiza estado local
   const toggleFavorito = async (producto) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) {
       alert('Debes iniciar sesión para guardar favoritos.');
       return;
@@ -358,7 +358,7 @@ const Productos = ({ setPage }) => {
       if (esFavorito) nuevo.delete(producto.id);
       else nuevo.add(producto.id);
       
-      localStorage.setItem('favoritos_ids', JSON.stringify([...nuevo]));
+      sessionStorage.setItem('favoritos_ids', JSON.stringify([...nuevo]));
       // Notificar a Perfil5.js para que recargue la lista al instante
       window.dispatchEvent(new Event('favoritosUpdated'));
       return nuevo;
@@ -388,7 +388,7 @@ const Productos = ({ setPage }) => {
         const revertido = new Set(prev);
         if (esFavorito) revertido.add(producto.id);
         else revertido.delete(producto.id);
-        localStorage.setItem('favoritos_ids', JSON.stringify([...revertido]));
+        sessionStorage.setItem('favoritos_ids', JSON.stringify([...revertido]));
         return revertido;
       });
     }

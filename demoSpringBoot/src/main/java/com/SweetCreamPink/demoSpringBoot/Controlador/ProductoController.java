@@ -37,27 +37,26 @@ public class ProductoController {
     // ── PÚBLICOS ─────────────────────────────────────────────────────────────
     @GetMapping
     public ResponseEntity<List<Producto>> listar() {
-        // Google Guava: Lists.newArrayList para mayor legibilidad
-        List<Producto> productos = Lists.newArrayList(productoRepo.findAll());
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoRepo.findByActivoTrue());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> detalle(@PathVariable Integer id) {
         return productoRepo.findById(id)
+                .filter(Producto::isActivo)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/buscar")
     public ResponseEntity<List<Producto>> buscar(@RequestParam String q) {
-        List<Producto> resultados = productoRepo.findByNombreContainingIgnoreCase(q.trim());
+        List<Producto> resultados = productoRepo.findByNombreContainingIgnoreCaseAndActivoTrue(q.trim());
         return ResponseEntity.ok(resultados);
     }
 
     @GetMapping("/categoria/{catId}")
     public ResponseEntity<List<Producto>> porCategoria(@PathVariable Integer catId) {
-        return ResponseEntity.ok(productoRepo.findByCategoriaId(catId));
+        return ResponseEntity.ok(productoRepo.findByCategoriaIdAndActivoTrue(catId));
     }
 
     // ── ADMIN ─────────────────────────────────────────────────────────────────

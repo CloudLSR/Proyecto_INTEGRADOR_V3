@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
-// Lee los IDs guardados en localStorage por Productos.js
+// Lee los IDs guardados en sessionStorage por Productos.js
 const leerIdsDesdeStorage = () => {
   try {
-    const raw = localStorage.getItem('favoritos_ids');
+    const raw = sessionStorage.getItem('favoritos_ids');
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -17,7 +17,7 @@ const Perfil5 = () => {
   const [cargando, setCargando]       = useState(true);
   const [hoveredCard, setHoveredCard] = useState(null);
 
-  // Carga los productos completos a partir de los IDs en localStorage
+  // Carga los productos completos a partir de los IDs en sessionStorage
   const cargarFavoritos = useCallback(async () => {
     setCargando(true);
     const ids = leerIdsDesdeStorage();
@@ -28,7 +28,7 @@ const Perfil5 = () => {
       return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const resultados = [];
 
     // Por cada ID guardado, pedir el producto al backend
@@ -69,12 +69,12 @@ const Perfil5 = () => {
     // 1. Quitar del estado visual
     setFavoritos(prev => prev.filter(p => p.id !== productoId));
 
-    // 2. Actualizar localStorage
+    // 2. Actualizar sessionStorage
     const ids = leerIdsDesdeStorage().filter(id => id !== productoId);
-    localStorage.setItem('favoritos_ids', JSON.stringify(ids));
+    sessionStorage.setItem('favoritos_ids', JSON.stringify(ids));
 
     // 3. Notificar al backend (sin esperar respuesta)
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       fetch(`${API_BASE}/api/favoritos/${productoId}`, {
         method: 'DELETE',
@@ -90,11 +90,11 @@ const Perfil5 = () => {
     // 1. Limpiar estado visual
     setFavoritos([]);
 
-    // 2. Limpiar localStorage
-    localStorage.removeItem('favoritos_ids');
+    // 2. Limpiar sessionStorage
+    sessionStorage.removeItem('favoritos_ids');
 
     // 3. Notificar al backend
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       fetch(`${API_BASE}/api/favoritos`, {
         method: 'DELETE',
@@ -105,7 +105,7 @@ const Perfil5 = () => {
 
   // Añadir al carrito desde favoritos
   const añadirAlCarrito = async (producto) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) {
       alert('Debes iniciar sesión para agregar productos al carrito.');
       return;

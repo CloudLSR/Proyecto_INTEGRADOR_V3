@@ -33,8 +33,26 @@ public class OrdenController {
     public ResponseEntity<?> crearOrden(@PathVariable Integer usuarioId,
                                         @RequestBody Map<String, Object> body) {
         try {
-            MetodoPagoOrden metodoPago = MetodoPagoOrden.valueOf(
-                    (String) body.get("metodoPago"));
+            String metodoPagoRaw = body.get("metodoPago") != null ? body.get("metodoPago").toString() : null;
+            String tipoEntregaRaw = body.get("tipoEntrega") != null ? body.get("tipoEntrega").toString() : null;
+
+            // Metodo de pago: debe ser uno válido — si no, devolvemos 400
+            MetodoPagoOrden metodoPago;
+            try {
+                metodoPago = metodoPagoRaw != null ? MetodoPagoOrden.valueOf(metodoPagoRaw) : null;
+            } catch (IllegalArgumentException ex) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Método de pago inválido. Use: Efectivo, Transferencia, Tarjeta o Yape"));
+            }
+
+            // Tipo de entrega: aceptamos valores inválidos y aplicamos default 'Recojo'
+            Orden.TipoEntrega tipoEntrega = Orden.TipoEntrega.Recojo;
+            if (tipoEntregaRaw != null) {
+                try {
+                    tipoEntrega = Orden.TipoEntrega.valueOf(tipoEntregaRaw);
+                } catch (IllegalArgumentException ignored) {
+                    tipoEntrega = Orden.TipoEntrega.Recojo;
+                }
+            }
 
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> detalles =
@@ -44,16 +62,14 @@ public class OrdenController {
                     usuarioId,
                     (String) body.get("direccionEntrega"),
                     metodoPago,
+                    tipoEntrega,
                     detalles
             );
             return ResponseEntity.ok(orden);
 
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error",
-                            "Método de pago inválido. Use: Efectivo, Transferencia, Tarjeta o Yape"));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            log.error("Error creando orden para usuarioId={}: {}", usuarioId, e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(Map.of("error", "Ocurrió un error al crear la orden. Revisa los logs del servidor."));
         }
     }
 

@@ -12,6 +12,7 @@ public interface OrdenService {
     /** Crea una nueva orden con sus detalles */
     Orden crearOrden(Integer usuarioId, String direccionEntrega,
                      MetodoPagoOrden metodoPago,
+                     Orden.TipoEntrega tipoEntrega,
                      List<Map<String, Object>> detalles);
 
     /** Historial completo del cliente */
