@@ -19,7 +19,7 @@ function CambiarPassword2() {
   const [reenviando, setReenviando] = useState(false);
   const [mensajeReenvio, setMensajeReenvio] = useState('');
 
-  const correo = localStorage.getItem('correo_recuperacion') || 'tu correo';
+  const correo = sessionStorage.getItem('correo_recuperacion') || 'tu correo';
 
   // ── Temporizador regresivo ──
   useEffect(() => {

@@ -43,6 +43,7 @@ public class OrdenServiceImpl implements OrdenService {
     @Override
     public Orden crearOrden(Integer usuarioId, String direccionEntrega,
                             MetodoPagoOrden metodoPago,
+                            Orden.TipoEntrega tipoEntrega,
                             List<Map<String, Object>> detalles) {
 
         Preconditions.checkNotNull(usuarioId, "El ID de usuario es requerido");
@@ -56,6 +57,7 @@ public class OrdenServiceImpl implements OrdenService {
         orden.setUsuario(usuario);
         orden.setDireccionEntrega(direccionEntrega);
         orden.setMetodoPago(metodoPago);
+        orden.setTipoEntrega(tipoEntrega != null ? tipoEntrega : Orden.TipoEntrega.Recojo);
 
         List<DetalleOrden> lineas = new ArrayList<>();
         double totalOrden = 0.0;

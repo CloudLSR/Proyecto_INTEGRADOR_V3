@@ -37,13 +37,20 @@ function Carrito({ setPage, onCartUpdate }) {
   // ── Modal de pago ────────────────────────────────────────────────────────
   const [mostrarModal, setMostrarModal]     = useState(false);
   const [metodoPago, setMetodoPago]         = useState('Tarjeta');
+  const [tipoEntrega, setTipoEntrega]       = useState('Recojo');
   const [pagando, setPagando]               = useState(false);
   const [pagoConfirmado, setPagoConfirmado] = useState(false);
   const [ordenConfirmada, setOrdenConfirmada] = useState(null); // guarda el resumen
 
+  const TIPOS_ENTREGA = [
+    { valor: 'Delivery', icono: '🛵', etiqueta: 'Envío a domicilio' },
+    { valor: 'Recojo', icono: '🏪', etiqueta: 'Recoger en tienda' },
+    { valor: 'ConsumoLocal', icono: '🍰', etiqueta: 'Consumir en el local' },
+  ];
+
   // ── Cargar carrito del backend al montar ─────────────────────────────────
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) {
       setCargando(false);
       return;
@@ -72,7 +79,7 @@ function Carrito({ setPage, onCartUpdate }) {
 
   // ── Cambiar cantidad ──────────────────────────────────────────────────────
   const cambiarCantidad = (id, delta) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     setItems(prev => prev.map(item => {
       if (item.id !== id) return item;
       const nueva = item.cantidad + delta;
@@ -89,7 +96,7 @@ function Carrito({ setPage, onCartUpdate }) {
 
   // ── Eliminar item ─────────────────────────────────────────────────────────
   const eliminar = (id) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       fetch(`${API_BASE}/api/carrito/eliminar/${id}`, {
         method: 'DELETE',
@@ -108,8 +115,8 @@ function Carrito({ setPage, onCartUpdate }) {
 
   // ── Confirmar pago ────────────────────────────────────────────────────────
   const confirmarPago = async () => {
-    const token      = localStorage.getItem('token');
-    const usuarioStr = localStorage.getItem('usuario');
+    const token      = sessionStorage.getItem('token');
+    const usuarioStr = sessionStorage.getItem('usuario');
     if (!token) {
       alert('Debes iniciar sesión para pagar.');
       if (setPage) setPage('perfil');
@@ -129,7 +136,7 @@ function Carrito({ setPage, onCartUpdate }) {
         try { usuarioId = JSON.parse(usuarioStr)?.id; } catch (_) {}
       }
 
-      // Si no tenemos el id en localStorage, lo pedimos al backend
+      // Si no tenemos el id en sessionStorage, lo pedimos al backend
       if (!usuarioId) {
         const resPerfil = await fetch(`${API_BASE}/api/usuarios/perfil`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -138,7 +145,7 @@ function Carrito({ setPage, onCartUpdate }) {
           const perfil = await resPerfil.json();
           usuarioId = perfil.id;
           // Guardar para futuros usos
-          localStorage.setItem('usuario', JSON.stringify(perfil));
+          sessionStorage.setItem('usuario', JSON.stringify(perfil));
         }
       }
 
@@ -153,7 +160,8 @@ function Carrito({ setPage, onCartUpdate }) {
         },
         body: JSON.stringify({
           metodoPago:       metodoPago,
-          direccionEntrega: 'Dirección registrada',
+          tipoEntrega:      tipoEntrega,
+          direccionEntrega: tipoEntrega === 'Delivery' ? 'Dirección registrada' : 'Recojo/Consumo en tienda',
           detalles:         detalles,
         }),
       });
@@ -177,6 +185,7 @@ function Carrito({ setPage, onCartUpdate }) {
         fecha:      ahora.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }),
         hora:       ahora.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
         metodoPago: metodoPago,
+        tipoEntrega,
         items:      [...items],
         subtotal,
         envio:      ENVIO,
@@ -229,6 +238,9 @@ function Carrito({ setPage, onCartUpdate }) {
               <div style={{ marginTop: '4px' }}>
                 {ordenConfirmada.metodoPago === 'Tarjeta' ? '💳' : '📱'}{' '}
                 Pagado con <strong>{ordenConfirmada.metodoPago === 'Tarjeta' ? 'Tarjeta de banco' : 'Yape'}</strong>
+              </div>
+              <div style={{ marginTop: '4px' }}>
+                📍 Entrega: <strong>{ordenConfirmada.tipoEntrega === 'Delivery' ? 'Envío a domicilio' : ordenConfirmada.tipoEntrega === 'ConsumoLocal' ? 'Consumir en el local' : 'Recoger en tienda'}</strong>
               </div>
             </div>
 
@@ -303,7 +315,7 @@ function Carrito({ setPage, onCartUpdate }) {
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER PRINCIPAL DEL CARRITO
   // ─────────────────────────────────────────────────────────────────────────
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   return (
     <div style={{ backgroundColor: '#FFF0F2', fontFamily: "'Segoe UI', sans-serif", color: '#4A3E3F', minHeight: '100vh' }}>
@@ -512,6 +524,33 @@ function Carrito({ setPage, onCartUpdate }) {
             <p style={{ color: '#888', fontSize: '0.88rem', margin: '0 0 22px' }}>
               Elige cómo quieres realizar tu pago
             </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+              <p style={{ margin: 0, fontWeight: 600, color: '#5A3E41', fontSize: '0.9rem' }}>
+                ¿Cómo quieres tu pedido?
+              </p>
+              {TIPOS_ENTREGA.map(te => (
+                <label key={te.valor} style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  border: `2px solid ${tipoEntrega === te.valor ? '#C3666D' : '#EAAFB8'}`,
+                  borderRadius: 12, padding: '12px 16px', cursor: 'pointer',
+                  background: tipoEntrega === te.valor ? '#FFF0F2' : 'white',
+                }}>
+                  <input
+                    type="radio"
+                    name="tipoEntrega"
+                    value={te.valor}
+                    checked={tipoEntrega === te.valor}
+                    onChange={() => setTipoEntrega(te.valor)}
+                    style={{ accentColor: '#C3666D', width: 16, height: 16 }}
+                  />
+                  <span style={{ fontSize: '1.3rem' }}>{te.icono}</span>
+                  <span style={{ fontWeight: 500, color: '#4A3E3F', fontSize: '0.9rem' }}>
+                    {te.etiqueta}
+                  </span>
+                </label>
+              ))}
+            </div>
 
             {/* Opciones de pago: solo Tarjeta y Yape */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>

@@ -11,6 +11,7 @@ import Nosotros from './Nosotros';
 import Perfil from './Perfil';
 // ✅ CORRECCIÓN: Importar Carrito para la ruta de pago
 import Carrito from './Carrito';
+import './Stylee.css';
 
 import TerminosCondiciones from './TerminosCondiciones';
 import PreguntasFrecuentes from './PreguntasFrecuentes';

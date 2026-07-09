@@ -17,4 +17,7 @@ public interface OrdenRepository extends JpaRepository<Orden, Integer> {
 
     //* usado por OrdenServiceImpl para el historial del cliente
     List<Orden> findByUsuario_IdOrderByFechaDesc(Integer usuarioId);
+
+    //* usado por AdminDashboardController para "Pedidos recientes"
+    List<Orden> findTop5ByOrderByFechaDesc();
 }

@@ -32,7 +32,7 @@ function CambiarPassword1() {
       // FIX: el backend SIEMPRE responde 200 OK por seguridad (no revela si el correo existe)
       // Por eso siempre avanzamos al paso 2 si la respuesta fue ok
       if (res.ok) {
-        localStorage.setItem('correo_recuperacion', correo);
+        sessionStorage.setItem('correo_recuperacion', correo);
         navigate('/cambiar-password-2');
       } else {
         const data = await res.json();

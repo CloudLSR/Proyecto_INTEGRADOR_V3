@@ -29,6 +29,20 @@ public class AdminAuthController {
     @Value("${admin.pin:SweetCream2024!}")
     private String adminPin;
 
+    // ── Helper: determina si un usuario es administrador ──────────────────
+    // ANTES se comparaba contra el id (getId() != 1), pero en la tabla `rol`
+    // el id 1 corresponde a "Cliente" y el id 2 a "Admin" (ver reposteria_bd.sql).
+    // Esa comparación invertida hacía que:
+    //   - un Cliente (rol_id=1) pasara la validación de "eres administrador"
+    //   - un Admin real (rol_id=2) fuera rechazado
+    // Se resuelve comparando por la DESCRIPCIÓN del rol (insensible a
+    // mayúsculas), que es más robusto que depender del id numérico.
+    private boolean esAdmin(Usuario u) {
+        return u.getRol() != null
+                && u.getRol().getDescripcion() != null
+                && u.getRol().getDescripcion().equalsIgnoreCase("Admin");
+    }
+
     @PostMapping("/verificar-admin")
     public ResponseEntity<?> verificarAdmin(@RequestBody Map<String, String> body) {
         String correo = body.get("correo");
@@ -43,7 +57,7 @@ public class AdminAuthController {
         if (!passwordEncoder.matches(contrasena, u.getContrasena()))
             return ResponseEntity.status(401).body(Map.of("mensaje", "Credenciales incorrectas"));
 
-        if (u.getRol() == null || u.getRol().getId() != 1)
+        if (!esAdmin(u))
             return ResponseEntity.status(403).body(Map.of("mensaje", "Acceso denegado: no eres administrador"));
 
         return ResponseEntity.ok(Map.of(
@@ -63,7 +77,7 @@ public class AdminAuthController {
 
         Usuario u = usuOpt.get();
 
-        if (u.getRol() == null || u.getRol().getId() != 1)
+        if (!esAdmin(u))
             return ResponseEntity.status(403).body(Map.of("mensaje", "Acceso denegado"));
 
         if (!adminPin.equals(pin))

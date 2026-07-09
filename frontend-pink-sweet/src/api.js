@@ -7,7 +7,7 @@
 export const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8081';
 
 // ── Token / sesión ───────────────────────────────────────────
-export const getToken = () => localStorage.getItem('token');
+export const getToken = () => sessionStorage.getItem('token');
 
 export const authHeaders = (json = true) => {
   const h = {};
@@ -19,14 +19,14 @@ export const authHeaders = (json = true) => {
 
 // Devuelve el id del usuario logueado leyéndolo del JWT (claim id/uid/sub)
 export const getUsuarioId = () => {
-  const guardado = localStorage.getItem('usuarioId');
+  const guardado = sessionStorage.getItem('usuarioId');
   if (guardado) return guardado;
   const t = getToken();
   if (!t) return null;
   try {
     const payload = JSON.parse(atob(t.split('.')[1]));
     const id = payload.id || payload.uid || payload.usuarioId || null;
-    if (id) localStorage.setItem('usuarioId', id);
+    if (id) sessionStorage.setItem('usuarioId', id);
     return id;
   } catch {
     return null;
@@ -34,7 +34,7 @@ export const getUsuarioId = () => {
 };
 
 export const getRol = () => {
-  const r = localStorage.getItem('rol');
+  const r = sessionStorage.getItem('rol');
   if (r) return r;
   const t = getToken();
   if (!t) return null;
@@ -68,6 +68,21 @@ export async function apiSend(path, method, body) {
   return data;
 }
 
+export async function apiUpload(path, file) {
+  const formData = new FormData();
+  formData.append('archivo', file);
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: authHeaders(false),
+    body: formData,
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error((data && (data.error || data.mensaje)) || `POST ${path} -> ${res.status}`);
+  }
+  return data;
+}
+
 export const apiPost   = (p, b) => apiSend(p, 'POST', b);
 export const apiPut    = (p, b) => apiSend(p, 'PUT', b);
 export const apiDelete = (p)    => apiSend(p, 'DELETE');
@@ -75,7 +90,7 @@ export const apiDelete = (p)    => apiSend(p, 'DELETE');
 // ── Favoritos (no hay tabla en el backend → se guardan localmente) ──
 const FAV_KEY = 'favoritos';
 export const getFavoritos = () => {
-  try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
+  try { return JSON.parse(sessionStorage.getItem(FAV_KEY)) || []; }
   catch { return []; }
 };
 export const isFavorito = (id) => getFavoritos().some(f => String(f.id) === String(id));
@@ -84,7 +99,7 @@ export const toggleFavorito = (producto) => {
   const idx = favs.findIndex(f => String(f.id) === String(producto.id));
   if (idx >= 0) favs.splice(idx, 1);
   else favs.push(producto);
-  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+  sessionStorage.setItem(FAV_KEY, JSON.stringify(favs));
   window.dispatchEvent(new Event('favoritosUpdated'));
   return idx < 0; // true si quedó como favorito
 };

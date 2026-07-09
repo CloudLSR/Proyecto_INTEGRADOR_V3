@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { API_BASE, apiGet, apiPost, apiPut, apiDelete } from './api';
+import { API_BASE, apiGet, apiPost, apiPut, apiDelete, apiUpload } from './api';
 import logoPrincipal from './assets/logo.png'; 
 
 // IMÁGENES DE PRODUCTOS (Fallbacks visuales)
@@ -56,16 +56,21 @@ const AdminMenu3 = () => {
   };
 
   const guardar = async (form) => {
-    const body = {
-      nombre: form.nombre,
-      descripcion: form.descripcion,
-      precio: form.precio === "" ? null : Number(form.precio),
-      imagenUrl: form.imagenUrl || null,
-      categoria: form.categoriaId ? { id: Number(form.categoriaId) } : null,
-      stock: form.stock || 0,
-      activo: form.activo ?? true
-    };
     try {
+      let imagenUrl = form.imagenUrl || null;
+      if (form.archivo) {
+        const subida = await apiUpload('/api/admin/productos/subir-imagen', form.archivo);
+        imagenUrl = subida.imagenUrl;
+      }
+      const body = {
+        nombre: form.nombre,
+        descripcion: form.descripcion,
+        precio: form.precio === "" ? null : Number(form.precio),
+        imagenUrl,
+        categoria: form.categoriaId ? { id: Number(form.categoriaId) } : null,
+        stock: form.stock || 0,
+        activo: form.activo ?? true
+      };
       if (productoAEditar) await apiPut(`/api/admin/productos/${productoAEditar.id}`, body);
       else await apiPost('/api/admin/productos', body);
       setModalAbierto(false); setProductoAEditar(null);
@@ -321,13 +326,27 @@ function ModalProducto({ producto, categorias, onCancelar, onGuardar }) {
     stock: producto?.stock || "",
     activo: producto?.activo ?? true,
   });
+  const [archivo, setArchivo] = useState(null);
+  const [preview, setPreview] = useState(producto?.imagenUrl ? `${API_BASE}${producto.imagenUrl}` : null);
   
+  const MAX_MB = 10;
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const onFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > MAX_MB * 1024 * 1024) {
+      alert(`La imagen pesa ${(file.size / 1024 / 1024).toFixed(1)} MB. El máximo permitido es ${MAX_MB} MB.`);
+      e.target.value = "";
+      return;
+    }
+    setArchivo(file);
+    setPreview(URL.createObjectURL(file));
+  };
   const input = { width: '100%', padding: '12px', margin: '8px 0', borderRadius: '8px', border: '1px solid #D9D9D9', boxSizing: 'border-box', fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#5A3E41', outline: 'none' };
 
   const submit = () => {
     if (!form.nombre.trim()) { alert('El nombre es obligatorio.'); return; }
-    onGuardar(form);
+    onGuardar({ ...form, archivo });
   };
 
   return (
@@ -345,7 +364,12 @@ function ModalProducto({ producto, categorias, onCancelar, onGuardar }) {
         </div>
 
         <textarea value={form.descripcion} onChange={e => set('descripcion', e.target.value)} placeholder="Descripción corta" rows={2} style={{ ...input, resize: 'none' }} />
-        <input type="text" value={form.imagenUrl} onChange={e => set('imagenUrl', e.target.value)} placeholder="URL de la imagen (Opcional)" style={input} />
+
+        <label style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41', display: 'block', marginTop: '6px' }}>Imagen del producto</label>
+        <input type="file" accept="image/*" onChange={onFileChange} style={input} />
+        {preview && (
+          <img src={preview} alt="Vista previa" style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '10px', margin: '4px 0 8px' }} />
+        )}
         
         <select value={form.categoriaId} onChange={e => set('categoriaId', e.target.value)} style={input}>
           <option value="">— Sin categoría —</option>

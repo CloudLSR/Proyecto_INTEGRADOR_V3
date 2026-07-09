@@ -50,8 +50,11 @@ const AdminMenu8 = () => {
   ];
 
   // GRÁFICO DE LÍNEAS DINÁMICO
-  const chartDays = ['1', '2', '3', '4', '5', '6', '7']; // El backend debería enviar etiquetas reales
-  const chartValues = dataGanancias?.gananciasPorDia || [0, 0, 0, 0, 0, 0, 0];
+  // El backend devuelve "ventasPorDia" (ingresos brutos por día);
+  // le aplicamos el margen estimado para graficar la ganancia neta.
+  const ventasPorDiaRaw = dataGanancias?.ventasPorDia || [0, 0, 0, 0, 0, 0, 0];
+  const chartValues = ventasPorDiaRaw.map(v => Number(v) * MARGEN_ESTIMADO);
+  const chartDays = chartValues.map((_, i) => String(i + 1));
   const maxGrafico = 1200; // Ajustar según volumen real de ventas
   
   const puntosSVG = chartValues.map((val, i) => {

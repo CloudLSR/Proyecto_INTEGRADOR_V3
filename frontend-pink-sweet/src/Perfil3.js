@@ -45,21 +45,21 @@ const Perfil3 = () => {
   /* confirmación eliminar */
   const [confirmId,    setConfirmId]    = useState(null);
 
-  const getToken = () => localStorage.getItem("token");
+  const getToken = () => sessionStorage.getItem("token");
 
-  /* Paso 1: obtener usuarioId (primero localStorage, sino llama al perfil) */
+  /* Paso 1: obtener usuarioId (primero sessionStorage, sino llama al perfil) */
   useEffect(() => {
     const token = getToken();
     if (!token) { setCargando(false); return; }
 
-    // Intentar desde localStorage primero
+    // Intentar desde sessionStorage primero
     try {
-      const str = localStorage.getItem("usuario");
+      const str = sessionStorage.getItem("usuario");
       const id  = JSON.parse(str)?.id;
       if (id) { setUsuarioId(id); return; }
     } catch (_) {}
 
-    // Si no está en localStorage, obtenerlo del backend
+    // Si no está en sessionStorage, obtenerlo del backend
     fetch(`${API_USUARIOS}/api/usuarios/perfil`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -68,7 +68,7 @@ const Perfil3 = () => {
         if (data?.id) {
           setUsuarioId(data.id);
           // Guardarlo para próximas veces
-          localStorage.setItem("usuario", JSON.stringify(data));
+          sessionStorage.setItem("usuario", JSON.stringify(data));
         } else {
           setCargando(false);
           setError("No se pudo identificar al usuario.");

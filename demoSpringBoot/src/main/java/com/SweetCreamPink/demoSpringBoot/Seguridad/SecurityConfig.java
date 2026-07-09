@@ -63,8 +63,13 @@ public class SecurityConfig {
                 .requestMatchers("/uploads/**", "/assets/**").permitAll()
 
                 .requestMatchers(HttpMethod.POST,
-                        "/api/admin/auth/verificar-admin",
-                        "/api/admin/auth/pin"
+                    "/api/admin/auth/verificar-admin",
+                    "/api/admin/auth/pin",
+                    // Permitir creación de personal y asignación de horarios desde frontend (solo POST)
+                    // Nota: temporal durante desarrollo. Cambiar a hasRole('ADMIN') en producción.
+                        "/api/admin/personal",
+                        // Permitir creación de horarios para personal (ruta con id intermedia)
+                        "/api/admin/personal/*/horarios"
                 ).permitAll()
 
                 // ── Endpoints públicos de lectura ──────────────────────────
@@ -73,8 +78,10 @@ public class SecurityConfig {
                         "/api/comentarios/aprobados/**",
                         "/api/ofertas/vigentes"
                 ).permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/comentarios").permitAll()
 
                 // ── Reglas de administrador ────────────────────────────────
+                // Mantener protección general, pero permitir puntos concretos arriba
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/productos/guardar").hasRole("ADMIN")
@@ -89,7 +96,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/carrito/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/favoritos/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/api/configuracion/**").hasAnyRole("CLIENTE", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/comentarios/**").hasAnyRole("CLIENTE", "ADMIN")
 
                 .anyRequest().authenticated()
             )

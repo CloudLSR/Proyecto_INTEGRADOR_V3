@@ -2,6 +2,26 @@ import React, { useState, useEffect, useMemo } from "react";
 import { apiGet, apiPost } from "./api";
 import logoPrincipal from './assets/logo.png';
 
+const DIAS_SELECT = [
+  { value: "Lunes",     label: "Lunes" },
+  { value: "Martes",    label: "Martes" },
+  { value: "Miercoles", label: "Miércoles" },
+  { value: "Jueves",    label: "Jueves" },
+  { value: "Viernes",   label: "Viernes" },
+  { value: "Sabado",    label: "Sábado" },
+  { value: "Domingo",   label: "Domingo" },
+];
+const DIA_COLUMNA = { Lunes:"lun", Martes:"mar", Miercoles:"mie", Jueves:"jue", Viernes:"vie", Sabado:"sab", Domingo:"dom" };
+const ROLES_LABEL = { Administrador:"Administrador(a)", Repostero:"Repostero(a)", Repartidor:"Repartidor(a)", Atencion:"Atención al cliente", Caja:"Cajero(a)" };
+const labelRol = (v) => ROLES_LABEL[v] || "Sin cargo";
+const formatHora = (t) => t ? t.slice(0, 5) : null;
+const horasEntre = (entrada, salida) => {
+  if (!entrada || !salida) return 0;
+  const [he, me] = entrada.split(":").map(Number);
+  const [hs, ms] = salida.split(":").map(Number);
+  return Math.max(0, (hs * 60 + ms - (he * 60 + me)) / 60);
+};
+
 const AdminMenu6 = () => {
   // LÓGICA DE ESTADOS
   const [vistaActiva, setVistaActiva] = useState("Vista semanal");
@@ -17,14 +37,30 @@ const AdminMenu6 = () => {
   
   const [modalAbierto, setModalAbierto] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(null); // Estado para el menú de 3 puntos
+  const [horariosPorEmpleado, setHorariosPorEmpleado] = useState({});
 
   // LLAMADAS A LA API
-  const cargarPersonal = () => {
+  const cargarPersonal = async () => {
     setCargando(true);
-    apiGet("/api/admin/personal")
-      .then(d => { setPersonal(Array.isArray(d) ? d : []); setError(""); })
-      .catch(() => setError("No se pudo cargar el personal para los horarios."))
-      .finally(() => setCargando(false));
+    try {
+      const lista = await apiGet("/api/admin/personal");
+      const data = Array.isArray(lista) ? lista : [];
+      setPersonal(data);
+      setError("");
+
+      const entradas = await Promise.all(
+        data.map(p =>
+          apiGet(`/api/admin/personal/${p.perId}/horarios`)
+            .then(h => [p.perId, Array.isArray(h) ? h : []])
+            .catch(() => [p.perId, []])
+        )
+      );
+      setHorariosPorEmpleado(Object.fromEntries(entradas));
+    } catch {
+      setError("No se pudo cargar el personal para los horarios.");
+    } finally {
+      setCargando(false);
+    }
   };
 
   useEffect(() => { cargarPersonal(); }, []);
@@ -48,7 +84,7 @@ const AdminMenu6 = () => {
     const q = busqueda.toLowerCase();
     return personal.filter(p => 
       `${p.perNombre || ""} ${p.perApellido || ""}`.toLowerCase().includes(q) ||
-      (p.rol || "").toLowerCase().includes(q)
+      labelRol(p.perRol).toLowerCase().includes(q)
     );
   }, [personal, busqueda]);
 
@@ -59,31 +95,43 @@ const AdminMenu6 = () => {
   useEffect(() => { setPaginaActual(1); }, [busqueda]);
 
   // MAPEO DE DATOS PARA LA VISTA SEMANAL
-  const horarioSemanal = visibles.map(p => ({
-    id: p.perId || Math.random(),
-    nombre: `${p.perNombre || ""} ${p.perApellido || ""}`.trim() || "Sin Nombre",
-    cargo: p.rol || "Sin cargo",
-    lun: p.horarios?.lun || "Descanso", 
-    mar: p.horarios?.mar || "Descanso", 
-    mie: p.horarios?.mie || "Descanso", 
-    jue: p.horarios?.jue || "Descanso", 
-    vie: p.horarios?.vie || "Descanso", 
-    sab: p.horarios?.sab || "-", 
-    dom: p.horarios?.dom || "-"
-  }));
+  const horarioSemanal = visibles.map(p => {
+    const horas = horariosPorEmpleado[p.perId] || [];
+    const porDia = {};
+    horas.forEach(h => {
+      const col = DIA_COLUMNA[h.horDia];
+      if (col) porDia[col] = `${formatHora(h.horEntrada)} - ${formatHora(h.horSalida)}`;
+    });
+    return {
+      id: p.perId || Math.random(),
+      nombre: `${p.perNombre || ""} ${p.perApellido || ""}`.trim() || "Sin Nombre",
+      cargo: labelRol(p.perRol),
+      lun: porDia.lun || "Descanso",
+      mar: porDia.mar || "Descanso",
+      mie: porDia.mie || "Descanso",
+      jue: porDia.jue || "Descanso",
+      vie: porDia.vie || "Descanso",
+      sab: porDia.sab || "-",
+      dom: porDia.dom || "-"
+    };
+  });
 
   // MAPEO DE DATOS PARA TABLA INFERIOR
-  const horariosProgramados = visibles.map(p => ({
-    id: p.perId || Math.random(),
-    nombre: `${p.perNombre || ""} ${p.perApellido || ""}`.trim() || "Sin Nombre",
-    cargo: p.rol || "Sin cargo",
-    turnoLabel: p.turnoLabel || "Mañana", 
-    turnoHora: p.turnoHora || "00:00 am - 00:00 pm",
-    dias: p.diasProgramados || "Lun, Mar, Mié",
-    horas: p.totalHoras ? `${p.totalHoras}h` : "0h",
-    estado: p.perEstado || "Activo",
-    colorTurno: p.turnoLabel === "Tarde" ? "#F194B4" : "#C6676D"
-  }));
+  const horariosProgramados = visibles.map(p => {
+    const horas = horariosPorEmpleado[p.perId] || [];
+    const totalHoras = horas.reduce((acc, h) => acc + horasEntre(formatHora(h.horEntrada), formatHora(h.horSalida)), 0);
+    return {
+      id: p.perId || Math.random(),
+      nombre: `${p.perNombre || ""} ${p.perApellido || ""}`.trim() || "Sin Nombre",
+      cargo: labelRol(p.perRol),
+      turnoLabel: horas.length ? "Turno" : "Sin asignar",
+      turnoHora: horas[0] ? `${formatHora(horas[0].horEntrada)} - ${formatHora(horas[0].horSalida)}` : "—",
+      dias: horas.length ? horas.map(h => h.horDia).join(", ") : "Sin turnos",
+      horas: `${totalHoras}h`,
+      estado: p.perEstado || "Activo",
+      colorTurno: "#C6676D"
+    };
+  });
 
   // KPIs DINÁMICOS
   const kpis = [
@@ -410,7 +458,6 @@ const AdminMenu6 = () => {
 // Componente Modal
 function ModalAsignarHorario({ personal, onCancelar, onGuardar }) {
   const [form, setForm] = useState({ empleadoId: "", dia: "Lunes", entrada: "08:00", salida: "16:00" });
-  const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const inputStyle = { width: '100%', padding: '12px', margin: '8px 0', borderRadius: '8px', border: '1px solid #D9D9D9', boxSizing: 'border-box', fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#5A3E41', outline: 'none' };
 
@@ -429,7 +476,7 @@ function ModalAsignarHorario({ personal, onCancelar, onGuardar }) {
 
         <label style={{ fontFamily: 'Poppins-Medium', fontSize: '12px', color: '#777', marginTop: '10px', display: 'block' }}>Día de la semana</label>
         <select value={form.dia} onChange={e => set('dia', e.target.value)} style={inputStyle}>
-          {DIAS.map(d => <option key={d} value={d}>{d}</option>)}
+          {DIAS_SELECT.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
         </select>
 
         <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>

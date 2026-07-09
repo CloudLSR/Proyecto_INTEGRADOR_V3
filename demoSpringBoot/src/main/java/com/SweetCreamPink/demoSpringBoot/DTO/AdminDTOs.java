@@ -22,21 +22,30 @@ public class AdminDTOs {
     // ── Dashboard resumen ─────────────────────────────────────────────────────
     public static class DashboardResumen {
         private long totalOrdenesMes;
+        private long totalPedidos;
         private long ordenesPendientes;
         private long ordenesPreparando;
+        private long ordenesEnviadas;
         private long ordenesEntregadas;
         private long ordenesCanceladas;
         private BigDecimal ingresosMes;
         private long totalClientes;
         private long totalProductos;
         private long personalActivo;
+        private List<Double> ventasSemana;
+        private List<PedidoResumen> pedidosRecientes;
+        private List<ProductoVendidoResumen> productosVendidos;
 
         public long getTotalOrdenesMes() { return totalOrdenesMes; }
         public void setTotalOrdenesMes(long v) { this.totalOrdenesMes = v; }
+        public long getTotalPedidos() { return totalPedidos; }
+        public void setTotalPedidos(long v) { this.totalPedidos = v; }
         public long getOrdenesPendientes() { return ordenesPendientes; }
         public void setOrdenesPendientes(long v) { this.ordenesPendientes = v; }
         public long getOrdenesPreparando() { return ordenesPreparando; }
         public void setOrdenesPreparando(long v) { this.ordenesPreparando = v; }
+        public long getOrdenesEnviadas() { return ordenesEnviadas; }
+        public void setOrdenesEnviadas(long v) { this.ordenesEnviadas = v; }
         public long getOrdenesEntregadas() { return ordenesEntregadas; }
         public void setOrdenesEntregadas(long v) { this.ordenesEntregadas = v; }
         public long getOrdenesCanceladas() { return ordenesCanceladas; }
@@ -49,6 +58,54 @@ public class AdminDTOs {
         public void setTotalProductos(long v) { this.totalProductos = v; }
         public long getPersonalActivo() { return personalActivo; }
         public void setPersonalActivo(long v) { this.personalActivo = v; }
+        public List<Double> getVentasSemana() { return ventasSemana; }
+        public void setVentasSemana(List<Double> v) { this.ventasSemana = v; }
+        public List<PedidoResumen> getPedidosRecientes() { return pedidosRecientes; }
+        public void setPedidosRecientes(List<PedidoResumen> v) { this.pedidosRecientes = v; }
+        public List<ProductoVendidoResumen> getProductosVendidos() { return productosVendidos; }
+        public void setProductosVendidos(List<ProductoVendidoResumen> v) { this.productosVendidos = v; }
+    }
+
+    public static class PedidoResumen {
+        private String id;
+        private String nombre;
+        private String tiempo;
+        private String estado;
+        private String bgBadge;
+        private String colorBadge;
+
+        public PedidoResumen(String id, String nombre, String tiempo, String estado,
+                             String bgBadge, String colorBadge) {
+            this.id = id; this.nombre = nombre; this.tiempo = tiempo;
+            this.estado = estado; this.bgBadge = bgBadge; this.colorBadge = colorBadge;
+        }
+
+        public String getId() { return id; }
+        public String getNombre() { return nombre; }
+        public String getTiempo() { return tiempo; }
+        public String getEstado() { return estado; }
+        public String getBgBadge() { return bgBadge; }
+        public String getColorBadge() { return colorBadge; }
+    }
+
+    public static class ProductoVendidoResumen {
+        private int rank;
+        private String imagenUrl;
+        private String nombre;
+        private String unidades;
+        private String precio;
+
+        public ProductoVendidoResumen(int rank, String imagenUrl, String nombre,
+                                      String unidades, String precio) {
+            this.rank = rank; this.imagenUrl = imagenUrl; this.nombre = nombre;
+            this.unidades = unidades; this.precio = precio;
+        }
+
+        public int getRank() { return rank; }
+        public String getImagenUrl() { return imagenUrl; }
+        public String getNombre() { return nombre; }
+        public String getUnidades() { return unidades; }
+        public String getPrecio() { return precio; }
     }
 
     // ── Reporte de ventas por período ─────────────────────────────────────────

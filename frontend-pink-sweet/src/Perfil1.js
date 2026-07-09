@@ -1,26 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import iconShop from './assets/icon-shop.png';
+import { getFavoritos, toggleFavorito } from './api';
 
-import imgTcTripleChocolate from './assets/products/tc-triple-chocolate.png';
-import imgCArandano from './assets/products/c-arandano.png';
-import imgAClasico from './assets/products/a-clasico.png';
-import imgTFresa from './assets/products/t-fresa.png';
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8081';
 
-const PEDIDOS_RECIENTES = [
-  { id: "#000125", nombre: "Torta Triple Chocolate", fecha: "12 de mayo, 2026",  estado: "Entregado", imagen: imgTcTripleChocolate },
-  { id: "#000124", nombre: "Cupcakes de Arándano",   fecha: "05 de mayo, 2026",  estado: "Entregado", imagen: imgCArandano },
-  { id: "#000123", nombre: "Alfajor Clásico",        fecha: "28 de abril, 2026", estado: "Entregado", imagen: imgAClasico }
-];
-
-const PRODUCTOS_FAVORITOS = [
-  { id: 1, nombre: "Torta Triple Chocolate", descripcion: "Delicioso bizcocho de chocolate con relleno y cobertura de ganache.", precio: "80.00", imagen: imgTcTripleChocolate },
-  { id: 2, nombre: "Trufas de Fresa",        descripcion: "Chocolate negro relleno de una suave crema de fresa natural.",      precio: "45.00", imagen: imgTFresa },
-  { id: 3, nombre: "Alfajor Clásico",        descripcion: "Delicadas tapitas con dulce de leche y azúcar en polvo.",            precio: "28.00", imagen: imgAClasico },
-  { id: 4, nombre: "Cupcakes de Arándano",   descripcion: "Suave pastelito de miga fina ideal para decorar con crema batida.", precio: "42.00", imagen: imgCArandano }
-];
+const formatearFechaCorta = (f) => {
+  if (!f) return '';
+  try {
+    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const d = new Date(f);
+    return `${d.getDate()} de ${meses[d.getMonth()]}, ${d.getFullYear()}`;
+  } catch { return ''; }
+};
 
 const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
-  const [wishlist, setWishlist] = useState([1, 2, 3, 4]);
+  // ── PEDIDOS REALES (antes era un arreglo hardcodeado) ────────────────────
+  const [pedidos, setPedidos] = useState([]);
+  const [cargandoPedidos, setCargandoPedidos] = useState(true);
+
+  // ── FAVORITOS REALES (se guardan en sessionStorage vía api.js) ─────────────
+  const [favoritos, setFavoritos] = useState([]);
+
   const [editando,  setEditando]  = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [form, setForm] = useState({
@@ -31,7 +31,50 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
     genero:          usuario?.genero          || ''
   });
 
-  const toggleWish = i => setWishlist(w => w.includes(i) ? w.filter(x => x !== i) : [...w, i]);
+  // Cargar pedidos reales del usuario logueado
+  useEffect(() => {
+    const token      = sessionStorage.getItem('token');
+    const usuarioStr = sessionStorage.getItem('usuario');
+    if (!token) { setCargandoPedidos(false); return; }
+
+    let usuarioId = null;
+    try { usuarioId = JSON.parse(usuarioStr)?.id; } catch (_) {}
+
+    const cargarPedidos = (id) => {
+      fetch(`${API_BASE}/api/ordenes/usuario/${id}/historial`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(res => res.ok ? res.json() : [])
+        .then(data => {
+          const lista = Array.isArray(data) ? data : [];
+          // más reciente primero
+          lista.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+          setPedidos(lista);
+        })
+        .catch(() => setPedidos([]))
+        .finally(() => setCargandoPedidos(false));
+    };
+
+    if (usuarioId) {
+      cargarPedidos(usuarioId);
+    } else {
+      // fallback: obtener el id desde el perfil si no está en sessionStorage
+      fetch(`${API_BASE}/api/usuarios/perfil`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => { if (data?.id) cargarPedidos(data.id); else setCargandoPedidos(false); })
+        .catch(() => setCargandoPedidos(false));
+    }
+  }, []);
+
+  // Cargar favoritos reales (sessionStorage) y mantenerlos sincronizados
+  useEffect(() => {
+    const cargarFavs = () => setFavoritos(getFavoritos());
+    cargarFavs();
+    window.addEventListener('favoritosUpdated', cargarFavs);
+    return () => window.removeEventListener('favoritosUpdated', cargarFavs);
+  }, []);
+
+  const quitarFavorito = (producto) => toggleFavorito(producto);
 
   // Funcionalidad añadida para los botones
   const agregarAlCarrito = (producto) => {
@@ -69,7 +112,7 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
       alert('El apellido debe comenzar con mayúscula'); return;
     }
     setGuardando(true);
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     try {
       const res  = await fetch('http://localhost:8081/api/usuarios/perfil', {
         method: 'PUT',
@@ -84,6 +127,13 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
     }
     setGuardando(false);
   };
+
+  // ── Datos derivados de "MI ACTIVIDAD" (antes hardcodeados en 0) ──────────
+  const totalPedidos  = pedidos.length;
+  const ultimoPedido  = pedidos.length > 0 ? formatearFechaRegistro(pedidos[0].fecha) : '—';
+  const totalGastado  = pedidos
+    .filter(p => (p.estado || '').toUpperCase() !== 'CANCELADO')
+    .reduce((acc, p) => acc + (p.total || 0), 0);
 
   return (
     <>
@@ -166,9 +216,9 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
           {[
-            { label: "Total de pedidos realizados", value: "0 pedidos", icon: "fa-solid fa-bag-shopping" },
-            { label: "Último pedido",               value: "—",         icon: "fa-regular fa-clock" },
-            { label: "Total gastado",               value: "S/. 0.00",  icon: "fa-solid fa-money-bill" }
+            { label: "Total de pedidos realizados", value: `${totalPedidos} pedidos`,                icon: "fa-solid fa-bag-shopping" },
+            { label: "Último pedido",               value: ultimoPedido,                              icon: "fa-regular fa-clock" },
+            { label: "Total gastado",               value: `S/. ${totalGastado.toFixed(2)}`,          icon: "fa-solid fa-money-bill" }
           ].map((row, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', fontFamily: 'Poppins-Medium', fontSize: '14px' }}>
               <div style={{ width: '250px', color: '#5A3E41', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -193,26 +243,49 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
           <span onClick={() => setActiveTab("pedidos")} style={{ color: '#C6676D', fontFamily: 'Poppins-Medium', fontSize: '14px', cursor: 'pointer' }}>Ver todos →</span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          {PEDIDOS_RECIENTES.map((pedido, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #EAAFB8', borderRadius: '15px', padding: '15px 25px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <img src={pedido.imagen} alt={pedido.nombre} style={{ width: '120px', height: '90px', objectFit: 'cover', borderRadius: '20px' }} />
-                <div>
-                  <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '16px', color: '#5A3E41', margin: '0 0 5px 0' }}>Pedido {pedido.id}</h4>
-                  <p style={{ fontFamily: 'Poppins-Regular', fontSize: '15px', color: '#5A3E41', margin: '0 0 2px 0' }}>{pedido.nombre}</p>
-                  <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777', margin: '0' }}>{pedido.fecha}</p>
+        {cargandoPedidos ? (
+          <p style={{ fontFamily: 'Poppins-Regular', color: '#999', textAlign: 'center', padding: '20px 0' }}>Cargando pedidos...</p>
+        ) : pedidos.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '30px 0', color: '#999' }}>
+            <i className="fa-regular fa-bag-shopping" style={{ fontSize: '28px', color: '#EAAFB8', marginBottom: '10px', display: 'block' }}></i>
+            <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', margin: 0 }}>Aún no tienes pedidos. ¡Anímate a probar algo delicioso!</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            {pedidos.slice(0, 3).map((pedido) => {
+              const primerProducto = pedido.detalles && pedido.detalles.length > 0 ? pedido.detalles[0].producto : null;
+              const nombreResumen = primerProducto
+                ? (pedido.detalles.length > 1 ? `${primerProducto.nombre} y ${pedido.detalles.length - 1} más` : primerProducto.nombre)
+                : 'Pedido sin detalle';
+              const imagenUrl = primerProducto?.imagenUrl ? `${API_BASE}${primerProducto.imagenUrl}` : null;
+
+              return (
+                <div key={pedido.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #EAAFB8', borderRadius: '15px', padding: '15px 25px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    {imagenUrl ? (
+                      <img src={imagenUrl} alt={nombreResumen} style={{ width: '120px', height: '90px', objectFit: 'cover', borderRadius: '20px' }} />
+                    ) : (
+                      <div style={{ width: '120px', height: '90px', borderRadius: '20px', backgroundColor: '#FDF2F3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="fa-solid fa-cake-candles" style={{ color: '#EAAFB8', fontSize: '28px' }}></i>
+                      </div>
+                    )}
+                    <div>
+                      <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '16px', color: '#5A3E41', margin: '0 0 5px 0' }}>Pedido #{String(pedido.id).padStart(6, '0')}</h4>
+                      <p style={{ fontFamily: 'Poppins-Regular', fontSize: '15px', color: '#5A3E41', margin: '0 0 2px 0' }}>{nombreResumen}</p>
+                      <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#777', margin: '0' }}>{formatearFechaCorta(pedido.fecha)}</p>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ backgroundColor: '#FADADD', color: '#C6676D', padding: '6px 16px', borderRadius: '20px', fontFamily: 'Poppins-Medium', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <i className="fa-regular fa-circle-check"></i> {pedido.estado}
+                    </div>
+                    <i className="fa-solid fa-chevron-right" style={{ color: '#5A3E41', fontSize: '16px', cursor: 'pointer' }} onClick={() => setActiveTab("pedidos")}></i>
+                  </div>
                 </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <div style={{ backgroundColor: '#FADADD', color: '#C6676D', padding: '6px 16px', borderRadius: '20px', fontFamily: 'Poppins-Medium', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <i className="fa-regular fa-circle-check"></i> {pedido.estado}
-                </div>
-                <i className="fa-solid fa-chevron-right" style={{ color: '#5A3E41', fontSize: '16px', cursor: 'pointer' }}></i>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* PRODUCTOS FAVORITOS */}
@@ -225,26 +298,42 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
           <span onClick={() => setActiveTab("favoritos")} style={{ color: '#C6676D', fontFamily: 'Poppins-Medium', fontSize: '14px', cursor: 'pointer' }}>Ver todos →</span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
-          {PRODUCTOS_FAVORITOS.map((p) => (
-            <div key={p.id} style={{ border: '2px solid #EAAFB8', borderRadius: '20px', overflow: 'hidden', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ position: 'relative', height: '120px' }}>
-                <img src={p.imagen} alt={p.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div onClick={() => toggleWish(p.id)} style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: 'rgba(255,255,255,0.9)', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
-                  <i className={wishlist.includes(p.id) ? "fa-solid fa-heart" : "fa-regular fa-heart"} style={{ color: '#C6676D', fontSize: '14px', marginTop: '1px' }}></i>
+        {favoritos.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '30px 0', color: '#999' }}>
+            <i className="fa-regular fa-heart" style={{ fontSize: '28px', color: '#EAAFB8', marginBottom: '10px', display: 'block' }}></i>
+            <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', margin: 0 }}>Aún no agregaste productos a favoritos.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
+            {favoritos.slice(0, 4).map((p) => {
+              const imagenUrl = p.imagenUrl ? (p.imagenUrl.startsWith('http') ? p.imagenUrl : `${API_BASE}${p.imagenUrl}`) : null;
+              return (
+                <div key={p.id} style={{ border: '2px solid #EAAFB8', borderRadius: '20px', overflow: 'hidden', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ position: 'relative', height: '120px' }}>
+                    {imagenUrl ? (
+                      <img src={imagenUrl} alt={p.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', backgroundColor: '#FDF2F3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="fa-solid fa-cake-candles" style={{ color: '#EAAFB8', fontSize: '24px' }}></i>
+                      </div>
+                    )}
+                    <div onClick={() => quitarFavorito(p)} style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: 'rgba(255,255,255,0.9)', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+                      <i className="fa-solid fa-heart" style={{ color: '#C6676D', fontSize: '14px', marginTop: '1px' }}></i>
+                    </div>
+                  </div>
+                  <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                    <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '12px', color: '#5A3E41', margin: '0 0 5px 0' }}>{p.nombre}</h3>
+                    <p style={{ fontFamily: 'Poppins-Medium', fontSize: '10px', color: '#644444', margin: '0 0 10px 0', lineHeight: '1.4', flexGrow: 1 }}>{p.descripcion}</p>
+                    <div style={{ fontFamily: 'Poltawski-Nowy', fontSize: '16px', color: '#644444', marginBottom: '10px' }}>S/. {Number(p.precio).toFixed(2)}</div>
+                    <button onClick={() => agregarAlCarrito(p)} style={{ backgroundColor: '#C6676D', color: '#FFFFFF', border: 'none', padding: '8px', borderRadius: '8px', fontFamily: 'Poppins-Medium', fontSize: '11px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', width: '100%' }}>
+                      <i className="fa-solid fa-cart-shopping"></i> AÑADIR AL CARRITO
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '12px', color: '#5A3E41', margin: '0 0 5px 0' }}>{p.nombre}</h3>
-                <p style={{ fontFamily: 'Poppins-Medium', fontSize: '10px', color: '#644444', margin: '0 0 10px 0', lineHeight: '1.4', flexGrow: 1 }}>{p.descripcion}</p>
-                <div style={{ fontFamily: 'Poltawski-Nowy', fontSize: '16px', color: '#644444', marginBottom: '10px' }}>S/. {p.precio}</div>
-                <button onClick={() => agregarAlCarrito(p)} style={{ backgroundColor: '#C6676D', color: '#FFFFFF', border: 'none', padding: '8px', borderRadius: '8px', fontFamily: 'Poppins-Medium', fontSize: '11px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', width: '100%' }}>
-                  <i className="fa-solid fa-cart-shopping"></i> AÑADIR AL CARRITO
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* BANNER CONTACTO */}

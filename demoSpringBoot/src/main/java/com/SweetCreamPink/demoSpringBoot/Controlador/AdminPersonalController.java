@@ -19,7 +19,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/admin/personal")
 @CrossOrigin(origins = "${cors.allowed-origins}")
-@PreAuthorize("hasRole('ADMIN')")
 public class AdminPersonalController {
 
     @Autowired private PersonalRepository        personalRepository;
@@ -63,6 +62,7 @@ public class AdminPersonalController {
         return ResponseEntity.ok(Map.of("mensaje", "Empleado registrado correctamente", "personal", guardado));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> editar(@PathVariable Integer id, @RequestBody Personal datos) {
         Optional<Personal> opt = personalRepository.findById(id);
@@ -87,6 +87,7 @@ public class AdminPersonalController {
         return ResponseEntity.ok(Map.of("mensaje", "Empleado actualizado", "personal", guardado));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/estado")
     public ResponseEntity<?> cambiarEstado(@PathVariable Integer id,
                                            @RequestBody Map<String, String> body) {
@@ -105,6 +106,7 @@ public class AdminPersonalController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> eliminar(@PathVariable Integer id) {
@@ -133,6 +135,7 @@ public class AdminPersonalController {
         return ResponseEntity.ok(Map.of("mensaje", "Horario agregado", "horario", guardado));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/horarios/{horId}")
     public ResponseEntity<?> editarHorario(@PathVariable Integer horId,
                                            @RequestBody HorarioPersonal datos) {
@@ -147,6 +150,7 @@ public class AdminPersonalController {
         return ResponseEntity.ok(Map.of("mensaje", "Horario actualizado", "horario", horarioRepository.save(h)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/horarios/{horId}")
     public ResponseEntity<?> eliminarHorario(@PathVariable Integer horId) {
         if (!horarioRepository.existsById(horId)) return ResponseEntity.notFound().build();

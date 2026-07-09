@@ -314,7 +314,7 @@ function AuthModal({ onClose }) {
   const [recLoading, setRecLoading] = useState(false);
   const [segundos, setSegundos] = useState(0);
   const [reenvioMsg, setReenvioMsg] = useState('');
-  const correoGuardado = recCorreo || localStorage.getItem('correo_recuperacion') || '';
+  const correoGuardado = recCorreo || sessionStorage.getItem('correo_recuperacion') || '';
  
   useEffect(() => {
     if (segundos <= 0) return;
@@ -341,12 +341,12 @@ function AuthModal({ onClose }) {
       });
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem('token', data.token);
+        sessionStorage.setItem('token', data.token);
         try {
           const payload = JSON.parse(atob(data.token.split('.')[1]));
-          localStorage.setItem('correo', payload.sub || loginCorreo);
-          localStorage.setItem('rol', payload.rol || '');
-          localStorage.setItem('nombre', payload.nombre || '');
+          sessionStorage.setItem('correo', payload.sub || loginCorreo);
+          sessionStorage.setItem('rol', payload.rol || '');
+          sessionStorage.setItem('nombre', payload.nombre || '');
         } catch (_) {}
         onClose(true);
       } else {
@@ -413,7 +413,7 @@ function AuthModal({ onClose }) {
         body: JSON.stringify({ correo: recCorreo }),
       });
       if (res.ok) {
-        localStorage.setItem('correo_recuperacion', recCorreo);
+        sessionStorage.setItem('correo_recuperacion', recCorreo);
         setPantalla('enviado');
         setSegundos(60);
       } else {
@@ -639,7 +639,7 @@ function CartDrawer({ onClose, setPage }) {
   const [items, setItems] = useState([]);
  
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return;
     fetch(`${API_BASE_CART}/api/carrito`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -672,13 +672,13 @@ function CartDrawer({ onClose, setPage }) {
   // y actualiza el badge del carrito. El ítem desaparece del drawer
   // y si se vuelve a abrir el carrito tampoco aparece (porque ya no está en BD).
   const onDel = (id) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     // Eliminar del estado local inmediatamente (UX rápido)
     setItems(prev => {
       const nuevos = prev.filter(it => it.id !== id);
       // Actualizar badge
       const totalItems = nuevos.reduce((acc, it) => acc + it.cantidad, 0);
-      localStorage.setItem('cartCount', String(totalItems));
+      sessionStorage.setItem('cartCount', String(totalItems));
       window.dispatchEvent(new Event('cartUpdated'));
       return nuevos;
     });
@@ -698,7 +698,7 @@ function CartDrawer({ onClose, setPage }) {
 
   // ✅ CORRECCIÓN: Ir a pagar cierra el drawer y navega a la página Carrito
   const handleIrAPagar = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) {
       alert('Debes iniciar sesión para pagar.');
       onClose();
@@ -756,22 +756,22 @@ function CartDrawer({ onClose, setPage }) {
 const Header = ({ page, setPage }) => {
   const [showAuth, setShowAuth] = useState(false);
   const [showCart, setShowCart] = useState(false);
-  const [usuario, setUsuario] = useState(() => localStorage.getItem('correo') || null);
+  const [usuario, setUsuario] = useState(() => sessionStorage.getItem('correo') || null);
  
   const handleAuthClose = (loggedIn) => {
     setShowAuth(false);
     if (loggedIn) {
-      setUsuario(localStorage.getItem('correo') || 'Usuario');
+      setUsuario(sessionStorage.getItem('correo') || 'Usuario');
       setPage('perfil');
     }
   };
  
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('correo');
-    localStorage.removeItem('rol');
-    localStorage.removeItem('nombre');
-    localStorage.removeItem('cartCount');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('correo');
+    sessionStorage.removeItem('rol');
+    sessionStorage.removeItem('nombre');
+    sessionStorage.removeItem('cartCount');
     setUsuario(null);
     setCartCount(0);
   };
@@ -787,8 +787,8 @@ const Header = ({ page, setPage }) => {
   });
  
   const [cartCount, setCartCount] = useState(() => {
-    if (!localStorage.getItem('token')) return 0;
-    const saved = localStorage.getItem('cartCount');
+    if (!sessionStorage.getItem('token')) return 0;
+    const saved = sessionStorage.getItem('cartCount');
     return saved ? parseInt(saved, 10) : 0;
   });
 
@@ -817,7 +817,7 @@ const Header = ({ page, setPage }) => {
  
   useEffect(() => {
     const onUpdate = () => {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) { setCartCount(0); return; }
       fetch((process.env.REACT_APP_API_URL || 'http://localhost:8081') + '/api/carrito', {
         headers: { Authorization: `Bearer ${token}` },
@@ -826,7 +826,7 @@ const Header = ({ page, setPage }) => {
         .then(data => {
           const n = Array.isArray(data) ? data.reduce((a, ci) => a + (ci.cantidad || 1), 0) : 0;
           setCartCount(n);
-          localStorage.setItem('cartCount', String(n));
+          sessionStorage.setItem('cartCount', String(n));
         })
         .catch(() => {});
     };
@@ -951,7 +951,7 @@ const Header = ({ page, setPage }) => {
               alt="Carrito"
               style={{ width: '32px', height: '32px', objectFit: 'contain' }}
               />
-              {cartCount > 0 && (
+              {usuario && cartCount > 0 && (
                 <div style={{
                   position: 'absolute', top: '-4px', right: '-4px',
                   backgroundColor: 'white', color: '#C6676D',

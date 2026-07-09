@@ -23,7 +23,7 @@ const Perfil = ({ setPage }) => {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return;
     fetch('http://localhost:8081/api/usuarios/perfil', {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -112,10 +112,10 @@ const Perfil = ({ setPage }) => {
             {/* CERRAR SESIÓN */}
             <button 
               onClick={() => {
-                localStorage.removeItem('token');
-                localStorage.removeItem('correo');
-                localStorage.removeItem('rol');
-                localStorage.removeItem('nombre');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('correo');
+                sessionStorage.removeItem('rol');
+                sessionStorage.removeItem('nombre');
                 window.location.href = "/";
               }}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '15px', backgroundColor: 'transparent', border: 'none', padding: '14px 20px', fontFamily: 'Poppins-Medium', fontSize: '14px', color: '#C6676D', textAlign: 'left', cursor: 'pointer', borderRadius: '10px' }}

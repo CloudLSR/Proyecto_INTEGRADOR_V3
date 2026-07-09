@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { apiGet, apiPost, getUsuarioId } from './api';
 import logoPrincipal from './assets/logo.png';
 import dividerTitle from "./assets/divider-title.png";
 
@@ -36,10 +37,14 @@ const testimonials = [
 ];
 
 const Inicio = ({ setPage }) => {
+  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8081';
   const [currentSlide, setCurrentSlide] = useState(0);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState(testimonials);
+  const [productosDB, setProductosDB] = useState([]);
+  const [enviandoComentario, setEnviandoComentario] = useState(false);
+  const [mensajeComentario, setMensajeComentario] = useState("");
   const timerRef = useRef(null);
 
   const startSlider = () => {
@@ -51,18 +56,58 @@ const Inicio = ({ setPage }) => {
     startSlider(); 
     return () => clearInterval(timerRef.current); 
   }, []);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/productos`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => setProductosDB(Array.isArray(data) ? data : []))
+      .catch(() => setProductosDB([]));
+  }, [API_BASE]);
+
+  useEffect(() => {
+    apiGet('/api/comentarios/aprobados')
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapeados = data.map(c => ({ name: c.nombre || 'Anónimo', text: c.contenido }));
+          setComments(mapeados);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const productosDestacados = productosDB.length > 0
+    ? productosDB.slice(0, 6).map(p => ({
+        img: p.imagenUrl ? (p.imagenUrl.startsWith('http') ? p.imagenUrl : `${API_BASE}${p.imagenUrl}`) : torta,
+        label: p.nombre,
+        id: p.id,
+      }))
+    : homeProducts;
   
   const goToSlide = i => { 
     setCurrentSlide(i); 
     startSlider(); 
   };
 
-  const handleComment = e => {
+  const handleComment = async (e) => {
     e.preventDefault();
     if (!commentName.trim() || !commentText.trim()) return;
-    setComments([{ name: commentName, text: commentText }, ...comments]);
-    setCommentName(""); 
-    setCommentText("");
+
+    setEnviandoComentario(true);
+    setMensajeComentario("");
+    try {
+      await apiPost('/api/comentarios', {
+        usuarioId: getUsuarioId(),
+        contenido: commentText.trim(),
+        nombre: commentName.trim(),
+      });
+      setMensajeComentario("¡Gracias! Tu comentario fue enviado y se publicará cuando el administrador lo apruebe.");
+      setCommentName("");
+      setCommentText("");
+    } catch (err) {
+      setMensajeComentario("No se pudo enviar tu comentario. Intenta de nuevo.");
+    } finally {
+      setEnviandoComentario(false);
+    }
   };
 
   return (
@@ -106,8 +151,8 @@ const Inicio = ({ setPage }) => {
         <h2 style={{ fontFamily: 'Poppins-SemiBold', fontSize: '26px', textAlign: 'center', color: '#5A3E41', marginBottom: '30px' }}>LO MÁS COMPRADO</h2>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-          {homeProducts.map((p, i) => (
-            <div key={i} onClick={() => setPage("productos")} style={{ position: 'relative', height: '280px', cursor: 'pointer', overflow: 'hidden' }}>
+          {productosDestacados.map((p, i) => (
+            <div key={p.id ?? i} onClick={() => setPage("productos")} style={{ position: 'relative', height: '280px', cursor: 'pointer', overflow: 'hidden' }}>
               <img src={p.img} alt={p.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               <div style={{ position: 'absolute', bottom: '0', width: '100%', backgroundColor: 'rgba(231, 199, 200, 0.8)', padding: '20px 0', textAlign: 'center' }}>
                 <span style={{ fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#5A3E41' }}>{p.label}</span>
@@ -201,9 +246,14 @@ const Inicio = ({ setPage }) => {
 
           {/* FILA 3: Botón */}
           <div style={{ textAlign: 'right' }}>
-            <button type="submit" style={{ backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '10px 40px', fontFamily: 'Poppins-SemiBold', fontSize: '14px', cursor: 'pointer' }}>
-              COMENTAR
+            <button type="submit" disabled={enviandoComentario} style={{ backgroundColor: '#C6676D', color: 'white', border: 'none', padding: '10px 40px', fontFamily: 'Poppins-SemiBold', fontSize: '14px', cursor: 'pointer' }}>
+              {enviandoComentario ? 'ENVIANDO...' : 'COMENTAR'}
             </button>
+            {mensajeComentario && (
+              <p style={{ marginTop: '10px', fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#5A3E41' }}>
+                {mensajeComentario}
+              </p>
+            )}
           </div>
         </form>
 

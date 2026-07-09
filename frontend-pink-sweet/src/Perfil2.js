@@ -41,8 +41,8 @@ const Perfil2 = () => {
 
   // Cargar pedidos reales del backend
   useEffect(() => {
-    const token      = localStorage.getItem('token');
-    const usuarioStr = localStorage.getItem('usuario');
+    const token      = sessionStorage.getItem('token');
+    const usuarioStr = sessionStorage.getItem('usuario');
     if (!token) {
       setCargando(false);
       return;
@@ -52,7 +52,7 @@ const Perfil2 = () => {
     try { usuarioId = JSON.parse(usuarioStr)?.id; } catch (_) {}
 
     if (!usuarioId) {
-      // Intentar obtenerlo del perfil si no está guardado en localStorage
+      // Intentar obtenerlo del perfil si no está guardado en sessionStorage
       fetch(`${API_BASE}/api/usuarios/perfil`, {
         headers: { Authorization: `Bearer ${token}` },
       })
