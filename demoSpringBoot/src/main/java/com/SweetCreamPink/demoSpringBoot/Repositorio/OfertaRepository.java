@@ -25,4 +25,11 @@ public interface OfertaRepository extends JpaRepository<Oferta, Integer> {
     //* Por eso la query usa "o.producto.id", no "o.producto.proId"
     @Query("SELECT o FROM Oferta o WHERE o.producto.id = :proId")
     List<Oferta> findByProductoId(@Param("proId") Integer proId);
+
+    @Query("SELECT o FROM Oferta o WHERE o.oferActiva = true AND o.oferFechaFin < :hoy")
+    List<Oferta> findExpiradas(@Param("hoy") LocalDate hoy);
+
+    @Query("SELECT o FROM Oferta o WHERE o.oferActiva = false " +
+           "AND o.oferFechaInicio <= :hoy AND o.oferFechaFin >= :hoy")
+    List<Oferta> findParaActivar(@Param("hoy") LocalDate hoy);
 }

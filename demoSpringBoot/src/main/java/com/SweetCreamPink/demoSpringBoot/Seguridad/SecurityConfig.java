@@ -1,5 +1,6 @@
 package com.SweetCreamPink.demoSpringBoot.Seguridad;
 
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,6 +62,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/", "/login", "/registro", "/error").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/uploads/**", "/assets/**").permitAll()
+                .requestMatchers(EndpointRequest.to("health", "prometheus", "info")).permitAll()
 
                 .requestMatchers(HttpMethod.POST,
                     "/api/admin/auth/verificar-admin",

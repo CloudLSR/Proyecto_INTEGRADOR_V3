@@ -11,16 +11,24 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${uploads.directory}")
     private String directorioUploads;
 
+    @Value("${catalog.assets.directory:}")
+    private String catalogAssetsDirectory;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Imágenes subidas por el admin (carpeta C:/uploads/productos/)
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + directorioUploads);
+        String uploadsPath = directorioUploads.endsWith("/")
+                ? directorioUploads
+                : directorioUploads + "/";
 
-        // Imágenes estáticas del catálogo inicial (carpeta del frontend)
-        registry.addResourceHandler("/uploads/productos/**")
-                .addResourceLocations(
-                        "file:C:/Users/User/OneDrive/Desktop/Proyecto_INTEGRADOR_V3/frontend-pink-sweet/src/assets/products/"
-                );
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + uploadsPath);
+
+        if (catalogAssetsDirectory != null && !catalogAssetsDirectory.isBlank()) {
+            String catalogPath = catalogAssetsDirectory.endsWith("/")
+                    ? catalogAssetsDirectory
+                    : catalogAssetsDirectory + "/";
+            registry.addResourceHandler("/uploads/productos/**")
+                    .addResourceLocations("file:" + catalogPath);
+        }
     }
 }
