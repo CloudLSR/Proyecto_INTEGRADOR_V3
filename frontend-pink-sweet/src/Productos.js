@@ -4,6 +4,7 @@ import iconShop from './assets/icon-shop.png';
 import dividerTitle from './assets/divider-title.png';
 import dividerSub from './assets/divider-subtitle.png';
 import dividerProduct from './assets/divider-product.png';
+import iconOferta from './assets/icon-oferta.png';
 
 // ICONOS
 import iconEntremets from './assets/icon-entremets.png';
@@ -230,6 +231,9 @@ const Productos = ({ setPage }) => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
+  // NUEVO: mapa productoId -> % descuento, a partir de /api/ofertas/vigentes
+  const [ofertasPorProducto, setOfertasPorProducto] = useState({});
+
   // cantidades por producto (id -> cantidad)
   const [cantidades, setCantidades] = useState({});
 
@@ -283,6 +287,22 @@ const Productos = ({ setPage }) => {
     };
 
     cargarProductos();
+  }, []);
+
+  // NUEVO: carga las ofertas vigentes y arma un mapa rápido productoId -> % descuento
+  useEffect(() => {
+    fetch(`${API_BASE}/api/ofertas/vigentes`)
+      .then(resp => resp.ok ? resp.json() : [])
+      .then(data => {
+        const mapa = {};
+        (Array.isArray(data) ? data : []).forEach(oferta => {
+          if (oferta?.producto?.id != null && oferta?.oferDescuento != null) {
+            mapa[oferta.producto.id] = Number(oferta.oferDescuento);
+          }
+        });
+        setOfertasPorProducto(mapa);
+      })
+      .catch(() => setOfertasPorProducto({}));
   }, []);
 
   const obtenerCantidad = (productoId) => cantidades[productoId] ?? 1;
@@ -477,6 +497,10 @@ const Productos = ({ setPage }) => {
           const isEven = index % 2 === 0;
           const imagenSrc = resolverImagen(prod, categoriaActiva, index);
           const cantidad = obtenerCantidad(prod.id);
+          const descuentoPct = ofertasPorProducto[prod.id];
+          const tieneOferta = descuentoPct != null;
+          const precioOriginal = Number(prod.precio);
+          const precioConDescuento = tieneOferta ? precioOriginal * (1 - descuentoPct / 100) : precioOriginal;
 
           return (
             <div key={prod.id} style={{
@@ -486,11 +510,34 @@ const Productos = ({ setPage }) => {
               backgroundColor: '#FFEFEF', border: '2px solid #C3666D', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
             }}>
 
-              <div style={{ flex: '1.3' }}>
+              <div style={{ flex: '1.3', position: 'relative' }}>
                 {imagenSrc ? (
                   <img src={imagenSrc} alt={prod.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <div style={{ width: '100%', height: '100%', backgroundColor: '#EAAFB8' }} />
+                )}
+
+                {tieneOferta && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '8px',
+                    left: isEven ? '8px' : 'auto',
+                    right: isEven ? 'auto' : '8px',
+                    width: '88px',
+                    height: '88px',
+                    backgroundImage: `url(${iconOferta})`,
+                    backgroundSize: 'contain',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    color: 'white',
+                    fontFamily: 'Poppins-Bold',
+                    fontSize: '20px',
+                  }}>
+                    -{descuentoPct}%
+                  </div>
                 )}
               </div>
 
@@ -519,7 +566,14 @@ const Productos = ({ setPage }) => {
                 </p>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: isEven ? 'flex-start' : 'flex-end' }}>
-                  <span style={{ fontSize: '24px', color: '#5A3E41', fontFamily: 'Poltawski-Nowy' }}>S/. {Number(prod.precio).toFixed(2)}</span>
+                  {tieneOferta ? (
+                    <>
+                      <span style={{ fontSize: '18px', color: '#999', fontFamily: 'Poltawski-Nowy', textDecoration: 'line-through' }}>S/. {precioOriginal.toFixed(2)}</span>
+                      <span style={{ fontSize: '24px', color: '#C3666D', fontFamily: 'Poltawski-Nowy', fontWeight: 'bold' }}>S/. {precioConDescuento.toFixed(2)}</span>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: '24px', color: '#5A3E41', fontFamily: 'Poltawski-Nowy' }}>S/. {precioOriginal.toFixed(2)}</span>
+                  )}
                   <span style={{ fontSize: '14px', color: '#59423CBA', fontFamily: 'Poppins-Medium' }}>por unidad</span>
                 </div>
 

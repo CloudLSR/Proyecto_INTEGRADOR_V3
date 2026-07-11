@@ -64,6 +64,12 @@ const Ofertas = ({ setPage }) => {
       }))
     : offerProducts.map(p => ({ ...p, prodId: null }));
 
+  // NUEVO: descuento más alto entre las ofertas reales vigentes (para el banner "Hasta X% DSCTO").
+  // Si no hay ofertas reales todavía, se queda en 25 (el valor de boceto de siempre).
+  const descuentoMaximo = ofertasReales.length > 0
+    ? Math.max(...ofertasReales.map(o => Number(o.oferDescuento) || 0))
+    : 25;
+
   return (
     <div style={{ backgroundColor: '#FFEFEF', fontFamily: 'sans-serif', minHeight: '100vh', paddingBottom: '80px' }}>
       
@@ -112,7 +118,7 @@ const Ofertas = ({ setPage }) => {
             transform: 'rotate(-5deg)'
           }}>
             <span style={{ fontFamily: 'Poppins-Medium', fontSize: '15px', marginTop: '-5px' }}>Hasta</span>
-            <span style={{ fontFamily: 'Poppins-Bold', fontSize: '38px', lineHeight: '1' }}>25%</span>
+            <span style={{ fontFamily: 'Poppins-Bold', fontSize: '38px', lineHeight: '1' }}>{descuentoMaximo}%</span>
             <span style={{ fontFamily: 'Poppins-Medium', fontSize: '13px' }}>DSCTO.</span>
           </div>
 

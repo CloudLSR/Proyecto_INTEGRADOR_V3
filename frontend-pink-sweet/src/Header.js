@@ -277,7 +277,14 @@ function CartItem({ item, onQty, onDel }) {
       />
       <div className="scr-cart-item-info">
         <div className="scr-cart-item-name">{item.nombre}</div>
-        <div className="scr-cart-item-price">S/ {item.precio.toFixed(2)}</div>
+        {item.precioOriginal != null ? (
+          <div className="scr-cart-item-price" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '13px' }}>S/ {item.precioOriginal.toFixed(2)}</span>
+            <span style={{ color: '#C3666D', fontWeight: 'bold' }}>S/ {item.precio.toFixed(2)}</span>
+          </div>
+        ) : (
+          <div className="scr-cart-item-price">S/ {item.precio.toFixed(2)}</div>
+        )}
         <div className="scr-qty-row">
           <button className="scr-qty-btn" onClick={() => onQty(item.id, -1)}>−</button>
           <span className="scr-qty-val">{item.cantidad}</span>
@@ -653,6 +660,8 @@ function CartDrawer({ onClose, setPage }) {
                       : '/assets/products/logo.png',
           nombre:   ci.producto?.nombre || 'Producto',
           precio:   Number(ci.producto?.precio || 0),
+          precioOriginal: ci.precioOriginal != null ? Number(ci.precioOriginal) : null,
+          descuentoAplicado: ci.descuentoAplicado != null ? Number(ci.descuentoAplicado) : null,
           cantidad: ci.cantidad || 1,
         }));
         setItems(mapeados);
