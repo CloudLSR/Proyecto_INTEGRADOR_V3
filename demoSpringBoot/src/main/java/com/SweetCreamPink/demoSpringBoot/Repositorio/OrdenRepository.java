@@ -20,4 +20,6 @@ public interface OrdenRepository extends JpaRepository<Orden, Integer> {
 
     //* usado por AdminDashboardController para "Pedidos recientes"
     List<Orden> findTop5ByOrderByFechaDesc();
+
+    List<Orden> findByEstadoAndFechaBefore(Orden.EstadoOrden estado, LocalDateTime fecha);
 }

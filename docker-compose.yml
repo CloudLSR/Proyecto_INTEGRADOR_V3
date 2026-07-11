@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: sweetcream-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: reposteria
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./Reposteria.sql:/docker-entrypoint-initdb.d/01-reposteria.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p1234"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - sweetcream-net
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+
+  backend:
+    build:
+      context: ./demoSpringBoot
+      dockerfile: Dockerfile
+    container_name: sweetcream-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/reposteria?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+      CORS_ALLOWED_ORIGINS: http://localhost:3000
+      UPLOADS_DIRECTORY: /app/uploads/
+      APP_FRONTEND_URL: http://localhost:3000
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
+    ports:
+      - "8081:8081"
+    volumes:
+      - backend-uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - sweetcream-net
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+
+  frontend:
+    build:
+      context: ./frontend-pink-sweet
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:8081
+    container_name: sweetcream-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    networks:
+      - sweetcream-net
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: sweetcream-prometheus
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    networks:
+      - sweetcream-net
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: sweetcream-grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - sweetcream-net
+
+volumes:
+  mysql-data:
+  backend-uploads:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  sweetcream-net:
+    driver: bridge

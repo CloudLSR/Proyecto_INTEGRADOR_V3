@@ -2,6 +2,7 @@ package com.SweetCreamPink.demoSpringBoot.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,17 +28,25 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil           jwtUtil;
     private final UsuarioRepository usuarioRepository;
     private final RolRepository     rolRepository;
+    // NUEVO: servicio de correo para enviar el enlace de recuperación real
+    private final EmailService      emailService;
+
+    // NUEVO: URL base del frontend, configurable por ambiente (dev/prod)
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     public AuthServiceImpl(UsuarioDAO usuarioDAO,
                            PasswordEncoder passwordEncoder,
                            JwtUtil jwtUtil,
                            UsuarioRepository usuarioRepository,
-                           RolRepository rolRepository) {
+                           RolRepository rolRepository,
+                           EmailService emailService) {
         this.usuarioDAO        = usuarioDAO;
         this.passwordEncoder   = passwordEncoder;
         this.jwtUtil           = jwtUtil;
         this.usuarioRepository = usuarioRepository;
         this.rolRepository     = rolRepository;
+        this.emailService      = emailService;
     }
 
     @Override
@@ -113,6 +122,8 @@ public class AuthServiceImpl implements AuthService {
     public void solicitarRecuperacion(String correo) {
         Optional<Usuario> opt = usuarioDAO.buscarPorCorreo(correo);
         if (opt.isEmpty()) {
+            // Validación de existencia del correo: si no existe, no hacemos nada,
+            // pero tampoco lo informamos al frontend (previene enumeración de usuarios).
             log.info("Solicitud de recuperación para correo inexistente: {}", correo);
             return;
         }
@@ -121,7 +132,12 @@ public class AuthServiceImpl implements AuthService {
         u.setResetToken(token);
         u.setResetTokenExpiry(LocalDateTime.now().plusMinutes(15));
         usuarioDAO.guardar(u);
-        log.info("Token de recuperación para {}: {}", correo, token);
+
+        // NUEVO: construir el enlace real y enviarlo por correo (antes solo se logueaba)
+        String enlace = frontendUrl + "/cambiar-password-3?token=" + token;
+        emailService.enviarCorreoRecuperacion(u.getCorreo(), enlace);
+
+        log.info("Solicitud de recuperación procesada para: {}", correo);
     }
 
     @Override
@@ -131,12 +147,14 @@ public class AuthServiceImpl implements AuthService {
         if (nuevaContrasena == null || nuevaContrasena.length() < 6)
             throw new RuntimeException("La nueva contraseña debe tener al menos 6 caracteres");
 
+        // Verificación del token (equivalente a la "verificación del código enviado al correo")
         Usuario u = usuarioRepository.findByResetToken(token)
                 .orElseThrow(() -> new RuntimeException("Token inválido o expirado"));
 
         if (u.getResetTokenExpiry() == null || u.getResetTokenExpiry().isBefore(LocalDateTime.now()))
             throw new RuntimeException("El token ha expirado. Solicita uno nuevo.");
 
+        // Restablecimiento + confirmación de que la nueva contraseña queda actualizada en BD
         u.setContrasena(passwordEncoder.encode(nuevaContrasena));
         u.setResetToken(null);
         u.setResetTokenExpiry(null);
