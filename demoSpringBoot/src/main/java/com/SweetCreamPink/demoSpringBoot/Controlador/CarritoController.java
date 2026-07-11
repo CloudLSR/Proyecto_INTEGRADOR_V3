@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.SweetCreamPink.demoSpringBoot.Modelo.CarritoItem;
 import com.SweetCreamPink.demoSpringBoot.Modelo.Producto;
+import com.SweetCreamPink.demoSpringBoot.Repositorio.OfertaRepository;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.ProductoRepository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,10 @@ public class CarritoController {
 
     @Autowired
     private ProductoRepository productoRepository; 
+
+    @Autowired
+    private OfertaRepository ofertaRepository;
+
     private static List<CarritoItem> listaCarrito = new ArrayList<>();
 
     @GetMapping
@@ -63,6 +69,20 @@ public class CarritoController {
             }
 
             Producto producto = productoOpt.get();
+            Double precioOriginalProducto = producto.getPrecio();
+            Double descuentoAplicado = null;
+
+            // Si el producto tiene una oferta vigente, aplicamos el descuento al precio
+            // (solo en este objeto en memoria; nunca se guarda de vuelta en la BD,
+            // por eso Productos.js sigue mostrando el precio normal de lista)
+            Optional<com.SweetCreamPink.demoSpringBoot.Modelo.Oferta> ofertaOpt =
+                    ofertaRepository.findVigentePorProducto(productoId, LocalDate.now());
+            if (ofertaOpt.isPresent()) {
+                double descuentoPct = ofertaOpt.get().getOferDescuento().doubleValue();
+                double precioConDescuento = producto.getPrecio() * (1 - descuentoPct / 100.0);
+                producto.setPrecio(precioConDescuento);
+                descuentoAplicado = descuentoPct;
+            }
 
             // Si ya existe en el carrito, incrementar cantidad
             for (CarritoItem item : listaCarrito) {
@@ -72,8 +92,13 @@ public class CarritoController {
                 }
             }
 
-            // Si no existe, agregar nuevo item
-            listaCarrito.add(new CarritoItem(producto, cantidad));
+            // Si no existe, agregar nuevo item (ya con el precio con descuento si aplicaba)
+            CarritoItem nuevoItem = new CarritoItem(producto, cantidad);
+            if (descuentoAplicado != null) {
+                nuevoItem.setPrecioOriginal(precioOriginalProducto);
+                nuevoItem.setDescuentoAplicado(descuentoAplicado);
+            }
+            listaCarrito.add(nuevoItem);
             return ResponseEntity.ok(listaCarrito);
 
         } catch (Exception e) {

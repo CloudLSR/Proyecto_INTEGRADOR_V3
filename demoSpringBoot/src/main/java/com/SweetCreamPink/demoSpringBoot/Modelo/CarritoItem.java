@@ -29,6 +29,14 @@ public class CarritoItem {
     private Integer cantidad;
     private Double subtotal;
 
+    //* NUEVO: campos solo para mostrar en el frontend (no se guardan en la BD).
+    //* Permiten que el carrito muestre "precio tachado" + precio con descuento
+    //* cuando el producto tenía una oferta vigente al agregarlo.
+    @Transient
+    private Double precioOriginal;
+    @Transient
+    private Double descuentoAplicado;
+
     public CarritoItem() {}
 
     //* Constructor usado por CarritoController al agregar ítems en memoria
@@ -70,4 +78,10 @@ public class CarritoItem {
 
     public Double getSubtotal() { return subtotal; }
     public void setSubtotal(Double subtotal) { this.subtotal = subtotal; }
+
+    public Double getPrecioOriginal() { return precioOriginal; }
+    public void setPrecioOriginal(Double precioOriginal) { this.precioOriginal = precioOriginal; }
+
+    public Double getDescuentoAplicado() { return descuentoAplicado; }
+    public void setDescuentoAplicado(Double descuentoAplicado) { this.descuentoAplicado = descuentoAplicado; }
 }
