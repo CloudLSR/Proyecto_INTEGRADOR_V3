@@ -2,6 +2,7 @@ package com.SweetCreamPink.demoSpringBoot.Controlador;
 
 import com.SweetCreamPink.demoSpringBoot.Modelo.Producto;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.ProductoRepository;
+import com.SweetCreamPink.demoSpringBoot.service.OfertaService;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +16,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -26,37 +29,81 @@ public class ProductoController {
     private static final Logger log = LoggerFactory.getLogger(ProductoController.class);
 
     private final ProductoRepository productoRepo;
+    private final OfertaService      ofertaService;
 
     @Value("${uploads.directory}")
     private String directorioUploads;
 
-    public ProductoController(ProductoRepository productoRepo) {
-        this.productoRepo = productoRepo;
+    public ProductoController(ProductoRepository productoRepo, OfertaService ofertaService) {
+        this.productoRepo  = productoRepo;
+        this.ofertaService = ofertaService;
     }
 
     // ── PÚBLICOS ─────────────────────────────────────────────────────────────
+
+    /**
+     * Convierte un Producto en un Map que además trae el precio con
+     * descuento (si tiene una oferta vigente). Se mantienen todos los
+     * campos que ya usaba el frontend (id, nombre, descripcion, precio,
+     * imagenUrl, activo, categoria) y se agregan:
+     *   - precioConDescuento: precio final si hay oferta, o null si no hay
+     *   - tieneOferta: true/false
+     */
+    private Map<String, Object> enriquecerConDescuento(Producto p) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", p.getId());
+        map.put("nombre", p.getNombre());
+        map.put("descripcion", p.getDescripcion());
+        map.put("precio", p.getPrecio());
+        map.put("imagenUrl", p.getImagenUrl());
+        map.put("activo", p.isActivo());
+        if (p.getCategoria() != null) {
+            Map<String, Object> cat = new HashMap<>();
+            cat.put("id", p.getCategoria().getId());
+            cat.put("descripcion", p.getCategoria().getDescripcion());
+            map.put("categoria", cat);
+        } else {
+            map.put("categoria", null);
+        }
+
+        Double precioConDescuento = ofertaService.calcularPrecioConDescuento(p.getPrecio(), p.getId());
+        map.put("precioConDescuento", precioConDescuento);
+        map.put("tieneOferta", precioConDescuento != null);
+
+        return map;
+    }
+
     @GetMapping
-    public ResponseEntity<List<Producto>> listar() {
-        return ResponseEntity.ok(productoRepo.findByActivoTrue());
+    public ResponseEntity<List<Map<String, Object>>> listar() {
+        List<Map<String, Object>> resultado = productoRepo.findByActivoTrue().stream()
+                .map(this::enriquecerConDescuento)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(resultado);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> detalle(@PathVariable Integer id) {
         return productoRepo.findById(id)
                 .filter(Producto::isActivo)
-                .map(ResponseEntity::ok)
+                .map(p -> ResponseEntity.ok(enriquecerConDescuento(p)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<Producto>> buscar(@RequestParam String q) {
-        List<Producto> resultados = productoRepo.findByNombreContainingIgnoreCaseAndActivoTrue(q.trim());
-        return ResponseEntity.ok(resultados);
+    public ResponseEntity<List<Map<String, Object>>> buscar(@RequestParam String q) {
+        List<Map<String, Object>> resultado = productoRepo
+                .findByNombreContainingIgnoreCaseAndActivoTrue(q.trim()).stream()
+                .map(this::enriquecerConDescuento)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(resultado);
     }
 
     @GetMapping("/categoria/{catId}")
-    public ResponseEntity<List<Producto>> porCategoria(@PathVariable Integer catId) {
-        return ResponseEntity.ok(productoRepo.findByCategoriaIdAndActivoTrue(catId));
+    public ResponseEntity<List<Map<String, Object>>> porCategoria(@PathVariable Integer catId) {
+        List<Map<String, Object>> resultado = productoRepo.findByCategoriaIdAndActivoTrue(catId).stream()
+                .map(this::enriquecerConDescuento)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(resultado);
     }
 
     // ── ADMIN ─────────────────────────────────────────────────────────────────

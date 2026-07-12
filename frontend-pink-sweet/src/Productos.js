@@ -518,8 +518,27 @@ const Productos = ({ setPage }) => {
                   {prod.descripcion}
                 </p>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: isEven ? 'flex-start' : 'flex-end' }}>
-                  <span style={{ fontSize: '24px', color: '#5A3E41', fontFamily: 'Poltawski-Nowy' }}>S/. {Number(prod.precio).toFixed(2)}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: isEven ? 'flex-start' : 'flex-end', flexWrap: 'wrap' }}>
+                  {prod.tieneOferta && prod.precioConDescuento != null ? (
+                    <>
+                      <span style={{ fontSize: '16px', color: '#999', fontFamily: 'Poppins-Medium', textDecoration: 'line-through' }}>
+                        S/. {Number(prod.precio).toFixed(2)}
+                      </span>
+                      <span style={{ fontSize: '24px', color: '#C3666D', fontFamily: 'Poltawski-Nowy' }}>
+                        S/. {Number(prod.precioConDescuento).toFixed(2)}
+                      </span>
+                      <span style={{
+                        fontSize: '12px', fontFamily: 'Poppins-Bold', color: 'white',
+                        backgroundColor: '#27AE60', padding: '3px 10px', borderRadius: '20px',
+                      }}>
+                        ¡En oferta!
+                      </span>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: '24px', color: '#5A3E41', fontFamily: 'Poltawski-Nowy' }}>
+                      S/. {Number(prod.precio).toFixed(2)}
+                    </span>
+                  )}
                   <span style={{ fontSize: '14px', color: '#59423CBA', fontFamily: 'Poppins-Medium' }}>por unidad</span>
                 </div>
 

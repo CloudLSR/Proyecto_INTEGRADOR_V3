@@ -6,6 +6,7 @@ import com.SweetCreamPink.demoSpringBoot.Modelo.*;
 import com.SweetCreamPink.demoSpringBoot.Modelo.Orden.MetodoPagoOrden;
 import com.SweetCreamPink.demoSpringBoot.Repositorio.ProductoRepository;
 import com.SweetCreamPink.demoSpringBoot.service.OrdenService;
+import com.SweetCreamPink.demoSpringBoot.service.OfertaService;
 import com.google.common.base.Preconditions;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -30,13 +31,16 @@ public class OrdenServiceImpl implements OrdenService {
     private final OrdenDAO          ordenDAO;
     private final UsuarioDAO        usuarioDAO;
     private final ProductoRepository productoRepo;
+    private final OfertaService     ofertaService;
 
     public OrdenServiceImpl(OrdenDAO ordenDAO,
                             UsuarioDAO usuarioDAO,
-                            ProductoRepository productoRepo) {
-        this.ordenDAO    = ordenDAO;
-        this.usuarioDAO  = usuarioDAO;
-        this.productoRepo = productoRepo;
+                            ProductoRepository productoRepo,
+                            OfertaService ofertaService) {
+        this.ordenDAO      = ordenDAO;
+        this.usuarioDAO    = usuarioDAO;
+        this.productoRepo  = productoRepo;
+        this.ofertaService = ofertaService;
     }
 
     // ── CREAR ORDEN ──────────────────────────────────────────────────────────
@@ -63,20 +67,33 @@ public class OrdenServiceImpl implements OrdenService {
         double totalOrden = 0.0;
 
         for (Map<String, Object> item : detalles) {
-            Integer productoId  = (Integer) item.get("productoId");
-            Integer cantidad    = (Integer) item.get("cantidad");
-            Double  precio      = Double.parseDouble(item.get("precio").toString());
+            Integer productoId = (Integer) item.get("productoId");
+            Integer cantidad   = (Integer) item.get("cantidad");
+
+            if (productoId == null) {
+                throw new RuntimeException("Cada línea del pedido debe indicar un productoId");
+            }
+
+            // ── SEGURIDAD: el producto y su precio se leen SIEMPRE de la base de
+            // datos, nunca del cuerpo de la petición. Así evitamos que alguien
+            // modifique el precio desde el navegador antes de pagar.
+            Producto producto = productoRepo.findById(productoId)
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productoId));
+
+            Double precioBase = producto.getPrecio();
+
+            // Si el producto tiene una oferta vigente (específica o general de
+            // toda la tienda), se cobra el precio con descuento. Si no, el precio
+            // normal. Este es el ÚNICO lugar que decide cuánto se cobra.
+            Double precioConDescuento = ofertaService.calcularPrecioConDescuento(precioBase, productoId);
+            Double precioFinal = precioConDescuento != null ? precioConDescuento : precioBase;
 
             DetalleOrden detalle = new DetalleOrden();
             detalle.setOrden(orden);
             detalle.setCantidad(cantidad);
-            detalle.setPrecio(precio);
+            detalle.setPrecio(precioFinal);
+            detalle.setProducto(producto);
             detalle.calcularSubtotal(); // llama @PrePersist manualmente
-
-            // Asociar producto si viene el ID
-            if (productoId != null) {
-                productoRepo.findById(productoId).ifPresent(detalle::setProducto);
-            }
 
             totalOrden += detalle.getSubTotal() != null ? detalle.getSubTotal() : 0;
             lineas.add(detalle);

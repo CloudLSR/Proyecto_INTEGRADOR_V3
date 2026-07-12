@@ -54,8 +54,8 @@ const AdminMenu8 = () => {
   // le aplicamos el margen estimado para graficar la ganancia neta.
   const ventasPorDiaRaw = dataGanancias?.ventasPorDia || [0, 0, 0, 0, 0, 0, 0];
   const chartValues = ventasPorDiaRaw.map(v => Number(v) * MARGEN_ESTIMADO);
-  const chartDays = chartValues.map((_, i) => String(i + 1));
-  const maxGrafico = 1200; // Ajustar según volumen real de ventas
+  const chartDays = dataGanancias?.ventasPorDiaLabels || chartValues.map((_, i) => String(i + 1));
+  const maxGrafico = Math.max(...chartValues, 1200); // Ajustar según volumen real de ventas
   
   const puntosSVG = chartValues.map((val, i) => {
     const x = 90 + (i * 95);
