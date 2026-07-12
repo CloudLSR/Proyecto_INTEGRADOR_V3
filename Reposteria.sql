@@ -189,7 +189,7 @@ CREATE TABLE `oferta` (
   PRIMARY KEY (`ofer_id`),
   KEY `FKb5f2w92s6kt05pwypi12snyml` (`pro_id_fk`),
   CONSTRAINT `FKb5f2w92s6kt05pwypi12snyml` FOREIGN KEY (`pro_id_fk`) REFERENCES `producto` (`pro_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -198,6 +198,7 @@ CREATE TABLE `oferta` (
 
 LOCK TABLES `oferta` WRITE;
 /*!40000 ALTER TABLE `oferta` DISABLE KEYS */;
+INSERT INTO `oferta` VALUES (_binary '',20.00,'2026-08-31','2026-07-01',1,7,'Torta Triple Chocolate en oferta','Delicioso bizcocho de chocolate con relleno y cobertura de ganache, decorado con crema de chocolate.'),(_binary '',15.00,'2026-08-31','2026-07-01',2,20,'Tequeños Clásicos en oferta','La receta tradicional que nunca falla. Rellenos de queso blanco llanero, crujientes por fuera y derretidos por dentro.'),(_binary '',25.00,'2026-08-31','2026-07-01',3,44,'Trufas de Fresa en oferta','Chocolate negro relleno de una suave crema de fresa natural. Dulces, frutales y absolutamente irresistibles.'),(_binary '',15.00,'2026-08-31','2026-07-01',4,32,'Mini Empanadas de Queso en oferta','Deliciosas empanadas rellenas de queso fundido, cremosas por dentro y doradas por fuera.'),(_binary '',20.00,'2026-08-31','2026-07-01',5,37,'Alfajor Clásico en oferta','Delicadas tapitas artesanales con un suave relleno de dulce de leche y un toque de azúcar en polvo.'),(_binary '',10.00,'2026-08-31','2026-07-01',6,60,'Cupcakes de Arándano en oferta','Delicioso y suave pastelito de miga fina con un toque de dulzor a chocolate.');
 /*!40000 ALTER TABLE `oferta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -425,7 +426,7 @@ CREATE TABLE `usuario` (
   UNIQUE KEY `UK8kqitavudrjll3kpaisfvx3dc` (`usu_correo`),
   KEY `FKejbksny8rr466jadbmtcdh7g7` (`rol_id_fk`),
   CONSTRAINT `FKejbksny8rr466jadbmtcdh7g7` FOREIGN KEY (`rol_id_fk`) REFERENCES `rol` (`rol_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -434,7 +435,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,5,NULL,'234890654','Nieves','Maria','maria@gmail.com',NULL,'$2a$10$7jIvbWPB0fPH44efEuXTxO9YSfOeFQvevWkFCxeA0Y2UXDx6f.3HK','2004-04-09','2026-06-14 01:15:13.424708','Femenino'),(1,6,NULL,NULL,'Acuña','Oscar','oscar123@gmail.com',NULL,'$2a$10$MeyxIHyAxkEdSGw3JT81R./YJMg4kpQqJTom5vWmm19hlf09E5vIC',NULL,'2026-06-14 06:25:03.158479',NULL);
+INSERT INTO `usuario` VALUES (1,5,NULL,'234890654','Nieves','Maria','maria@gmail.com',NULL,'$2a$10$7jIvbWPB0fPH44efEuXTxO9YSfOeFQvevWkFCxeA0Y2UXDx6f.3HK','2004-04-09','2026-06-14 01:15:13.424708','Femenino'),(1,6,NULL,NULL,'Acuña','Oscar','oscar123@gmail.com',NULL,'$2a$10$MeyxIHyAxkEdSGw3JT81R./YJMg4kpQqJTom5vWmm19hlf09E5vIC',NULL,'2026-06-14 06:25:03.158479',NULL),(2,7,NULL,NULL,'Sistema','Admin','admin@gmail.com',NULL,'$2a$10$kQXmwJ3qkhotpk7L1b4He.8arNcokPzlUDzaGGc8rul.FYv4Xcye6',NULL,'2026-07-11 23:38:52.273729',NULL);
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -546,4 +547,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-06-14  1:56:04
+-- Dump completed on 2026-07-11  19:16:00

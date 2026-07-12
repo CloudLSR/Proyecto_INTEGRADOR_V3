@@ -9,6 +9,7 @@ import com.SweetCreamPink.demoSpringBoot.Modelo.Oferta;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OfertaRepository extends JpaRepository<Oferta, Integer> {
@@ -25,6 +26,12 @@ public interface OfertaRepository extends JpaRepository<Oferta, Integer> {
     //* Por eso la query usa "o.producto.id", no "o.producto.proId"
     @Query("SELECT o FROM Oferta o WHERE o.producto.id = :proId")
     List<Oferta> findByProductoId(@Param("proId") Integer proId);
+
+    //* NUEVO: busca si un producto puntual tiene una oferta vigente ahora mismo.
+    //* Usado en CarritoController para aplicar el descuento automáticamente al agregar al carrito.
+    @Query("SELECT o FROM Oferta o WHERE o.producto.id = :proId AND o.oferActiva = true " +
+           "AND o.oferFechaInicio <= :hoy AND o.oferFechaFin >= :hoy")
+    Optional<Oferta> findVigentePorProducto(@Param("proId") Integer proId, @Param("hoy") LocalDate hoy);
 
     @Query("SELECT o FROM Oferta o WHERE o.oferActiva = true AND o.oferFechaFin < :hoy")
     List<Oferta> findExpiradas(@Param("hoy") LocalDate hoy);
