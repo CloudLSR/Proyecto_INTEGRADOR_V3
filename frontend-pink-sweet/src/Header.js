@@ -286,6 +286,9 @@ function CartItem({ item, onQty, onDel }) {
               <span style={{ color: '#C3666D', fontWeight: 'bold' }}>
                 S/ {item.precioConDescuento.toFixed(2)}
               </span>
+              <span style={{ fontFamily: 'Poppins-Bold', fontSize: '10px', color: 'white', backgroundColor: '#7DCEA0', padding: '2px 7px', borderRadius: '20px', marginLeft: '6px' }}>
+                Ahorras S/ {(item.precio - item.precioConDescuento).toFixed(2)}
+              </span>
             </>
           ) : (
             <>S/ {item.precio.toFixed(2)}</>

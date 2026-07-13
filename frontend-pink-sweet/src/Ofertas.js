@@ -179,8 +179,18 @@ const Ofertas = ({ setPage }) => {
     }
   };
 
-  // Mapear ofertas reales (sin fallback a datos inventados)
-  const listaMostrar = ofertasReales.map((o, i) => {
+  // Catálogo boceto de respaldo (se muestra SOLO si el backend aún no tiene ofertas reales)
+  const offerProducts = [
+    { id: 0, img: imgTcChocolate, name: "Torta Triple Chocolate", desc: "Delicioso bizcocho de chocolate con relleno y cobertura de ganache, decorado con crema de chocolate.", oldPrice: "80.00", newPrice: "64.00", discount: 20 },
+    { id: 1, img: imgTvClasicos, name: "Tequeños Clásicos", desc: "La receta tradicional que nunca falla. Rellenos de queso blanco llanero, crujientes por fuera y derretidos por dentro.", oldPrice: "38.00", newPrice: "32.30", discount: 15 },
+    { id: 2, img: imgTFresa, name: "Trufas de Fresa", desc: "Chocolate negro relleno de una suave crema de fresa natural. Dulces, frutales y absolutamente irresistibles.", oldPrice: "45.00", newPrice: "33.75", discount: 25 },
+    { id: 3, img: imgMeQueso, name: "Mini Empanadas de Queso", desc: "Deliciosas empanadas rellenas de queso fundido, cremosas por dentro y doradas por fuera.", oldPrice: "36.00", newPrice: "30.60", discount: 15 },
+    { id: 4, img: imgAClasico, name: "Alfajor Clásico", desc: "Delicadas tapitas artesanales con un suave relleno de dulce de leche y un toque de azúcar en polvo.", oldPrice: "28.00", newPrice: "22.40", discount: 20 },
+    { id: 5, img: imgCArandano, name: "Cupcakes de Arándano", desc: "Delicioso y suave pastelito de miga fina con un toque de dulzor a chocolate, es ideal para decorar con crema batida y/o fondant.", oldPrice: "42.00", newPrice: "37.80", discount: 10 },
+  ];
+
+  // Mapear ofertas reales; si el backend todavía no tiene ninguna, cae al boceto de respaldo
+  const listaMostrar = ofertasReales.length > 0 ? ofertasReales.map((o, i) => {
     const prod = o.producto;
     const prodId = prod?.id ?? null;
     const precio = prod?.precio != null ? Number(prod.precio) : 0;
@@ -212,9 +222,9 @@ const Ofertas = ({ setPage }) => {
       endDate: o.oferFechaFin || null,
       diasRestantes: o.diasRestantes ?? null,
     };
-  });
+  }) : offerProducts.map(p => ({ ...p, prodId: null, endDate: null, diasRestantes: null }));
 
-  // Calcular descuento máximo para el hero banner
+  // Calcular descuento máximo para el hero banner (si es el boceto, ya sale 25 solo porque ahí está el mayor)
   const maxDiscount = listaMostrar.reduce((max, p) => Math.max(max, p.discount || 0), 0);
 
   return (
@@ -428,25 +438,15 @@ const Ofertas = ({ setPage }) => {
               {/* CONTENIDO */}
               <div style={{ padding: '25px', display: 'flex', flexDirection: 'column', flexGrow: '1' }}>
                 <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#644444', margin: '0 0 8px 0' }}>{p.name}</h3>
-                <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#644444', margin: '0 0 12px 0', lineHeight: '1.5', flexGrow: 1 }}>{p.desc}</p>
-                
-                {/* TIEMPO RESTANTE */}
-                {p.endDate && (
-                  <div style={{ marginBottom: '12px', padding: '8px 12px', backgroundColor: 'rgba(198, 103, 109, 0.08)', borderRadius: '8px' }}>
+
+                {/* En el espacio de la descripción: si es oferta real (tiene fecha de vencimiento),
+                    mostramos el contador regresivo en su lugar; si es boceto, mostramos la descripción */}
+                {p.endDate ? (
+                  <div style={{ marginBottom: '12px', padding: '8px 12px', backgroundColor: 'rgba(198, 103, 109, 0.08)', borderRadius: '8px', flexGrow: 1, display: 'flex', alignItems: 'center' }}>
                     <CountdownTimer endDate={p.endDate} small={false} />
                   </div>
-                )}
-
-                {/* DÍAS RESTANTES (desde el backend) */}
-                {!p.endDate && p.diasRestantes != null && (
-                  <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <i className="fa-regular fa-calendar-check" style={{ color: p.diasRestantes <= 2 ? '#E74C3C' : '#C6676D', fontSize: '14px' }}></i>
-                    <span style={{ fontFamily: 'Poppins-Medium', fontSize: '12px', color: p.diasRestantes <= 2 ? '#E74C3C' : '#777' }}>
-                      {p.diasRestantes === 0 ? '⚠️ Último día!' : 
-                       p.diasRestantes === 1 ? '🔥 Queda 1 día' : 
-                       `⏳ Quedan ${p.diasRestantes} días`}
-                    </span>
-                  </div>
+                ) : (
+                  <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#644444', margin: '0 0 12px 0', lineHeight: '1.5', flexGrow: 1 }}>{p.desc}</p>
                 )}
                 
                 {/* PRECIOS */}
@@ -456,9 +456,6 @@ const Ofertas = ({ setPage }) => {
                   </span>
                   <span style={{ fontFamily: 'Poltawski-Nowy', fontSize: '22px', color: '#C6676D', fontWeight: 'bold' }}>
                     S/. {p.newPrice}
-                  </span>
-                  <span style={{ fontFamily: 'Poppins-Bold', fontSize: '11px', color: 'white', backgroundColor: '#27AE60', padding: '2px 8px', borderRadius: '20px' }}>
-                    Ahorras S/. {(parseFloat(p.oldPrice) - parseFloat(p.newPrice)).toFixed(2)}
                   </span>
                 </div>
 
