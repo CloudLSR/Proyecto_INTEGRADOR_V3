@@ -79,10 +79,19 @@ const AdminMenu7 = () => {
   };
 
   const guardar = async (form) => {
+    // Validaciones mejoradas
+    if (!form.titulo.trim()) { alert("El título de la oferta es obligatorio."); return; }
+    if (form.descuento === "" || form.descuento == null) { alert("El descuento es obligatorio."); return; }
+    const dcto = Number(form.descuento);
+    if (isNaN(dcto) || dcto <= 0 || dcto > 100) { alert("El descuento debe ser un número entre 1 y 100."); return; }
+    if (!form.fechaInicio) { alert("La fecha de inicio es obligatoria."); return; }
+    if (!form.fechaFin) { alert("La fecha de fin es obligatoria."); return; }
+    if (form.fechaFin < form.fechaInicio) { alert("La fecha de fin no puede ser anterior a la de inicio."); return; }
+
     const body = {
       oferTitulo: form.titulo,
       oferDescripcion: form.descripcion,
-      oferDescuento: form.descuento === "" ? null : Number(form.descuento),
+      oferDescuento: dcto,
       tipo: form.tipo,
       oferFechaInicio: form.fechaInicio || null,
       oferFechaFin: form.fechaFin || null,

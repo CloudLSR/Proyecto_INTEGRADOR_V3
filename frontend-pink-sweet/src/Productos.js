@@ -231,9 +231,6 @@ const Productos = ({ setPage }) => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
-  // NUEVO: mapa productoId -> % descuento, a partir de /api/ofertas/vigentes
-  const [ofertasPorProducto, setOfertasPorProducto] = useState({});
-
   // cantidades por producto (id -> cantidad)
   const [cantidades, setCantidades] = useState({});
 
@@ -287,22 +284,6 @@ const Productos = ({ setPage }) => {
     };
 
     cargarProductos();
-  }, []);
-
-  // NUEVO: carga las ofertas vigentes y arma un mapa rápido productoId -> % descuento
-  useEffect(() => {
-    fetch(`${API_BASE}/api/ofertas/vigentes`)
-      .then(resp => resp.ok ? resp.json() : [])
-      .then(data => {
-        const mapa = {};
-        (Array.isArray(data) ? data : []).forEach(oferta => {
-          if (oferta?.producto?.id != null && oferta?.oferDescuento != null) {
-            mapa[oferta.producto.id] = Number(oferta.oferDescuento);
-          }
-        });
-        setOfertasPorProducto(mapa);
-      })
-      .catch(() => setOfertasPorProducto({}));
   }, []);
 
   const obtenerCantidad = (productoId) => cantidades[productoId] ?? 1;
@@ -497,10 +478,11 @@ const Productos = ({ setPage }) => {
           const isEven = index % 2 === 0;
           const imagenSrc = resolverImagen(prod, categoriaActiva, index);
           const cantidad = obtenerCantidad(prod.id);
-          const descuentoPct = ofertasPorProducto[prod.id];
-          const tieneOferta = descuentoPct != null;
           const precioOriginal = Number(prod.precio);
-          const precioConDescuento = tieneOferta ? precioOriginal * (1 - descuentoPct / 100) : precioOriginal;
+          // Estos dos campos ya vienen calculados desde el backend (ProductoController → OfertaService)
+          const tieneOferta = prod.tieneOferta === true && prod.precioConDescuento != null;
+          const precioConDescuento = tieneOferta ? Number(prod.precioConDescuento) : precioOriginal;
+          const descuentoPct = tieneOferta ? Math.round((1 - precioConDescuento / precioOriginal) * 100) : 0;
 
           return (
             <div key={prod.id} style={{
