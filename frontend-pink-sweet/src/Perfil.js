@@ -129,7 +129,7 @@ const Perfil = ({ setPage }) => {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '25px', minWidth: '300px' }}>
           
           {activeTab === "info" && <Perfil1 setActiveTab={setActiveTab} usuario={usuario} setUsuario={setUsuario} />}
-          {activeTab === "pedidos" && <Perfil2 />}
+          {activeTab === "pedidos" && <Perfil2 setPage={setPage} />}
           {activeTab === "direcciones" && <Perfil3 />}
           {activeTab === "pagos" && <Perfil4 />}
           {activeTab === "favoritos" && <Perfil5 />}

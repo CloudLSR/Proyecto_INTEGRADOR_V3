@@ -1,3 +1,5 @@
+// Carrito.js — Página de CARRITO / PROCEDIMIENTO DE PAGO
+
 import React, { useState, useEffect } from 'react';
 import { getUsuarioId } from './api';
 import logoPrincipal from './assets/logo.png';
@@ -20,10 +22,6 @@ const METODOS_PAGO_FALLBACK = [
 
 // Un método guardado (VISA/BANCO/YAPE) se traduce al enum que acepta el backend
 const metodoOrdenDesde = (tipo) => (tipo === 'YAPE' ? 'Yape' : 'Tarjeta');
-
-const ESTADOS_TIMELINE = ['Pendiente', 'Preparando', 'Enviado', 'Entregado'];
-const ESTADO_LABEL = { Pendiente: 'Confirmado', Preparando: 'En preparación', Enviado: 'En camino', Entregado: 'Entregado' };
-const ESTADO_ICONO = { Pendiente: 'fa-check', Preparando: 'fa-kitchen-set', Enviado: 'fa-motorcycle', Entregado: 'fa-box' };
 
 function Carrito({ setPage, onCartUpdate }) {
   // ── Carrito ────────────────────────────────────────────────────────────
@@ -57,11 +55,8 @@ function Carrito({ setPage, onCartUpdate }) {
   const [metodoPagoTemp, setMetodoPagoTemp]           = useState(null);
 
   // ── Navegación interna del checkout ───────────────────────────────────
-  const [vista, setVista]         = useState('carrito'); // carrito | confirmar | exito | seguimiento
+  const [vista, setVista]         = useState('carrito'); // carrito | confirmar
   const [pagando, setPagando]     = useState(false);
-  const [ordenConfirmada, setOrdenConfirmada] = useState(null);
-  const [ordenSeguimiento, setOrdenSeguimiento] = useState(null);
-  const [cargandoSeguimiento, setCargandoSeguimiento] = useState(false);
 
   const token = sessionStorage.getItem('token');
 
@@ -190,7 +185,6 @@ function Carrito({ setPage, onCartUpdate }) {
         ? `${direccionSeleccionada.direccion}, ${direccionSeleccionada.distrito}, ${direccionSeleccionada.ciudad}` +
           (direccionSeleccionada.referencia ? ` (Ref: ${direccionSeleccionada.referencia})` : '')
         : 'Recojo / Consumo en tienda';
-      const envioTexto = opcionEnvio ? ` | Envío: ${opcionEnvio.etiqueta} (S/ ${opcionEnvio.costo.toFixed(2)})` : '';
       const comentarioTexto = comentario.trim() ? ` | Comentario: ${comentario.trim()}` : '';
 
       const resOrden = await fetch(`${API_BASE}/api/ordenes/usuario/${usuId}`, {
@@ -199,7 +193,8 @@ function Carrito({ setPage, onCartUpdate }) {
         body: JSON.stringify({
           metodoPago:       metodoOrdenDesde(metodoPagoSeleccionado.tipo),
           tipoEntrega:      opcionEnvio.tipo === 'Recojo' ? 'Recojo' : 'Delivery',
-          direccionEntrega: direccionTexto + envioTexto + comentarioTexto,
+          direccionEntrega: direccionTexto + comentarioTexto,
+          costoEnvio:       opcionEnvio.costo,
           detalles,
         }),
       });
@@ -212,48 +207,17 @@ function Carrito({ setPage, onCartUpdate }) {
         body: JSON.stringify({ metodoPago: metodoOrdenDesde(metodoPagoSeleccionado.tipo) }),
       });
 
-      const ahora = new Date();
-      const anio  = ahora.getFullYear();
-      const codigo = `SRC-${anio}-${String(ordenData?.id ?? 0).padStart(4, '0')}`;
-
-      setOrdenConfirmada({
-        id: ordenData?.id || '—',
-        codigo,
-        fecha: ahora.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }),
-        hora:  ahora.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
-        items: [...items],
-        subtotal, envio, igv, total,
-        direccion: direccionSeleccionada,
-        opcionEnvio,
-        comprobante, nombreComprobante, dniComprobante, razonSocial, ruc, direccionFiscal,
-        metodoPago: metodoPagoSeleccionado,
-        estado: 'Pendiente',
-      });
-
+      // El comprobante final (con el código de seguimiento, resumen, envío, método de pago, etc.) se arma en Recibo.js leyendo directo del backend — así funciona igual sin importar si se llega recién pagando o después desde "Mis pedidos".
+      sessionStorage.setItem('pedidoSeleccionado', ordenData.id);
       setItems([]);
-      setVista('exito');
       if (onCartUpdate) onCartUpdate();
+      if (setPage) setPage('recibo');
     } catch (err) {
       alert('Ocurrió un error al procesar el pago. Intenta de nuevo.');
       console.error(err);
     } finally {
       setPagando(false);
     }
-  };
-
-  // ── Ver seguimiento (consulta el estado real de la orden en el backend) ──
-  const verSeguimiento = async () => {
-    setVista('seguimiento');
-    if (!ordenConfirmada || ordenConfirmada.id === '—') return;
-    setCargandoSeguimiento(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/ordenes/${ordenConfirmada.id}`, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) {
-        const data = await res.json();
-        setOrdenSeguimiento(data);
-      }
-    } catch (_) { /* se usa el estado local como respaldo */ }
-    finally { setCargandoSeguimiento(false); }
   };
 
   // ─────────────────────────────────────────────────────────────────────
@@ -291,152 +255,6 @@ function Carrito({ setPage, onCartUpdate }) {
   );
 
   // ═══════════════════════════════════════════════════════════════════
-  // VISTA: SEGUIMIENTO DEL PEDIDO
-  // ═══════════════════════════════════════════════════════════════════
-  if (vista === 'seguimiento' && ordenConfirmada) {
-    const estadoActual = ordenSeguimiento?.estado || ordenConfirmada.estado || 'Pendiente';
-    const pasoActual = Math.max(0, ESTADOS_TIMELINE.indexOf(estadoActual));
-    const primerItem = ordenConfirmada.items[0];
-
-    return (
-      <div style={{ backgroundColor: COLORS.bg, fontFamily: 'sans-serif', minHeight: '100vh', paddingBottom: '80px' }}>
-        <section style={{ maxWidth: '900px', margin: '0 auto', padding: '30px 20px 0 20px' }}>
-          <button onClick={() => setVista('exito')} style={{ background: 'none', border: 'none', color: COLORS.brown, fontSize: '18px', cursor: 'pointer' }}>
-            <i className="fa-solid fa-arrow-left"></i>
-          </button>
-        </section>
-        {headerBlock('SEGUIMIENTO DEL PEDIDO')}
-
-        <section style={sectionBoxStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-              {primerItem && (
-                <div style={{ width: '90px', height: '90px', borderRadius: '14px', overflow: 'hidden', backgroundColor: COLORS.softPink }}>
-                  <img src={primerItem.img} alt={primerItem.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-              )}
-              <div>
-                <div style={{ fontFamily: 'Poppins-Bold', color: COLORS.brown, fontSize: '16px' }}>Pedido #{ordenConfirmada.id}</div>
-                {primerItem && <div style={{ fontFamily: 'Poppins-SemiBold', color: COLORS.brownBody, fontSize: '14px', marginTop: '4px' }}>{primerItem.nombre}{ordenConfirmada.items.length > 1 ? ` y ${ordenConfirmada.items.length - 1} producto(s) más` : ''}</div>}
-                <div style={{ fontFamily: 'Poppins-Regular', color: COLORS.muted, fontSize: '12px', marginTop: '6px' }}>Fecha de pedido: {ordenConfirmada.fecha} - {ordenConfirmada.hora}</div>
-              </div>
-            </div>
-            <span style={{ backgroundColor: COLORS.lightest, color: COLORS.primary, fontFamily: 'Poppins-Bold', fontSize: '13px', padding: '8px 18px', borderRadius: '20px' }}>
-              <i className={`fa-solid ${ESTADO_ICONO[estadoActual] || 'fa-clock'}`} style={{ marginRight: '8px' }}></i>
-              {(ESTADO_LABEL[estadoActual] || estadoActual).toUpperCase()}
-            </span>
-          </div>
-        </section>
-
-        <section style={sectionBoxStyle}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-            {ESTADOS_TIMELINE.map((paso, i) => (
-              <div key={paso} style={{ flex: 1, textAlign: 'center', position: 'relative', zIndex: 1 }}>
-                <div style={{
-                  width: '54px', height: '54px', borderRadius: '50%', margin: '0 auto 10px auto',
-                  backgroundColor: i <= pasoActual ? COLORS.primary : '#F0DEE1',
-                  color: i <= pasoActual ? 'white' : COLORS.muted,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px',
-                }}>
-                  <i className={`fa-solid ${ESTADO_ICONO[paso]}`}></i>
-                </div>
-                <div style={{ fontFamily: 'Poppins-Bold', fontSize: '13px', color: i <= pasoActual ? COLORS.brown : COLORS.muted }}>{ESTADO_LABEL[paso]}</div>
-              </div>
-            ))}
-            <div style={{ position: 'absolute', top: '27px', left: '10%', right: '10%', height: '3px', backgroundColor: '#F0DEE1', zIndex: 0 }} />
-            <div style={{ position: 'absolute', top: '27px', left: '10%', width: `${(pasoActual / (ESTADOS_TIMELINE.length - 1)) * 80}%`, height: '3px', backgroundColor: COLORS.primary, zIndex: 0 }} />
-          </div>
-          {cargandoSeguimiento && <p style={{ textAlign: 'center', color: COLORS.muted, fontFamily: 'Poppins-Regular', fontSize: '13px', marginTop: '18px' }}>Actualizando estado…</p>}
-        </section>
-
-        <section style={sectionBoxStyle}>
-          <h3 style={boxTitleStyle}><i className="fa-solid fa-location-dot"></i> Entrega</h3>
-          <p style={{ fontFamily: 'Poppins-Medium', color: COLORS.brownBody, fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
-            {ordenConfirmada.direccion ? `${ordenConfirmada.direccion.direccion}, ${ordenConfirmada.direccion.distrito}, ${ordenConfirmada.direccion.ciudad}` : 'Recojo en tienda'}<br />
-            {ordenConfirmada.opcionEnvio?.etiqueta} · Tiempo estimado: {ordenConfirmada.opcionEnvio?.tiempo}
-          </p>
-          <p style={{ fontFamily: 'Poppins-Regular', color: COLORS.muted, fontSize: '12px', marginTop: '14px' }}>
-            <i className="fa-solid fa-circle-info" style={{ marginRight: '6px' }}></i>
-            El estado se actualiza cuando el administrador lo cambia desde el panel de pedidos.
-          </p>
-        </section>
-
-        <div style={{ textAlign: 'center' }}>
-          <button onClick={() => setPage && setPage('perfil')} style={primaryBtnStyle}>Ver mis pedidos</button>
-        </div>
-      </div>
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════════════
-  // VISTA: CONFIRMACIÓN DE PEDIDO (éxito)
-  // ═══════════════════════════════════════════════════════════════════
-  if (vista === 'exito' && ordenConfirmada) {
-    return (
-      <div style={{ backgroundColor: COLORS.bg, fontFamily: 'sans-serif', minHeight: '100vh', paddingBottom: '80px' }}>
-        {headerBlock('¡PEDIDO CONFIRMADO!')}
-
-        <section style={{ maxWidth: '650px', margin: '10px auto 40px auto', textAlign: 'center', padding: '0 20px' }}>
-          <div style={{ width: '90px', height: '90px', borderRadius: '50%', backgroundColor: COLORS.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', boxShadow: '0 6px 18px rgba(198,103,109,0.35)' }}>
-            <i className="fa-solid fa-check" style={{ color: 'white', fontSize: '38px' }}></i>
-          </div>
-          <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '24px', color: COLORS.brown, margin: '0 0 10px 0' }}>¡Gracias por tu compra!</h2>
-          <p style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: COLORS.brownBody, lineHeight: '1.6', margin: 0 }}>
-            Hemos recibido tu pedido correctamente y está <strong>pendiente de preparación</strong>.
-          </p>
-        </section>
-
-        <section style={{ maxWidth: '900px', margin: '0 auto 28px auto', padding: '0 20px', boxSizing: 'border-box' }}>
-          <div style={{ backgroundColor: COLORS.softPink, borderRadius: '18px', padding: '22px 28px', display: 'flex', alignItems: 'center', gap: '18px' }}>
-            <div style={{ width: '54px', height: '54px', minWidth: '54px', borderRadius: '50%', backgroundColor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="fa-solid fa-clipboard-check" style={{ color: COLORS.primary, fontSize: '22px' }}></i>
-            </div>
-            <div>
-              <div style={{ fontFamily: 'Poppins-SemiBold', color: COLORS.brownBody, fontSize: '13px' }}>NÚMERO DE PEDIDO</div>
-              <div style={{ fontFamily: 'Poppins-Bold', color: COLORS.brown, fontSize: '24px', letterSpacing: '1px' }}>#{ordenConfirmada.codigo}</div>
-              <div style={{ fontFamily: 'Poppins-Regular', color: COLORS.muted, fontSize: '12px', marginTop: '4px' }}>{ordenConfirmada.fecha} - {ordenConfirmada.hora}</div>
-            </div>
-          </div>
-        </section>
-
-        <section style={sectionBoxStyle}>
-          <h3 style={boxTitleStyle}><i className="fa-solid fa-receipt"></i> RESUMEN DEL PEDIDO</h3>
-          <div style={{ fontFamily: 'Poppins-Medium', fontSize: '14px', color: COLORS.brownBody }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0' }}><span>Subtotal ({ordenConfirmada.items.reduce((a, i) => a + i.cantidad, 0)} productos)</span><span>S/ {ordenConfirmada.subtotal.toFixed(2)}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0' }}><span>Envío ({ordenConfirmada.opcionEnvio?.etiqueta})</span><span>S/ {ordenConfirmada.envio.toFixed(2)}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0' }}><span>IGV (18%)</span><span>S/ {ordenConfirmada.igv.toFixed(2)}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 0 0 0', marginTop: '8px', borderTop: `2px solid ${COLORS.softPink}`, fontFamily: 'Poppins-Bold', fontSize: '18px' }}>
-              <span style={{ color: COLORS.brown }}>TOTAL PAGADO</span><span style={{ color: COLORS.primary }}>S/ {ordenConfirmada.total.toFixed(2)}</span>
-            </div>
-          </div>
-        </section>
-
-        <section style={sectionBoxStyle}>
-          <h3 style={boxTitleStyle}><i className="fa-solid fa-location-dot"></i> DETALLES DE ENTREGA</h3>
-          <p style={{ fontFamily: 'Poppins-Medium', color: COLORS.brownBody, fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
-            {ordenConfirmada.direccion ? `${ordenConfirmada.direccion.direccion}, ${ordenConfirmada.direccion.distrito}, ${ordenConfirmada.direccion.ciudad}` : 'Recojo en tienda'}<br />
-            Método de envío: {ordenConfirmada.opcionEnvio?.etiqueta}
-          </p>
-        </section>
-
-        <section style={sectionBoxStyle}>
-          <h3 style={boxTitleStyle}><i className="fa-solid fa-file-invoice"></i> COMPROBANTE Y PAGO</h3>
-          <div style={{ fontFamily: 'Poppins-Medium', color: COLORS.brownBody, fontSize: '14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <span>Tipo de comprobante: <strong>{ordenConfirmada.comprobante === 'factura' ? 'Factura (para empresa)' : 'Boleta (para persona natural)'}</strong></span>
-            <span>Método de pago: <strong>{ordenConfirmada.metodoPago.alias}</strong></span>
-          </div>
-        </section>
-
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button onClick={() => setPage && setPage('perfil')} style={primaryBtnStyle}>Ver mis pedidos</button>
-          <button onClick={verSeguimiento} style={outlineBtnStyle}>Ver seguimiento</button>
-          <button onClick={() => setPage && setPage('inicio')} style={{ ...outlineBtnStyle, border: `2px solid ${COLORS.border}`, color: COLORS.brown }}>Ir al inicio</button>
-        </div>
-      </div>
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════════════
   // VISTA: CONFIRMA TU PEDIDO (resumen final antes de pagar)
   // ═══════════════════════════════════════════════════════════════════
   if (vista === 'confirmar') {
@@ -447,7 +265,7 @@ function Carrito({ setPage, onCartUpdate }) {
 
         <section style={sectionBoxStyle}>
           <h3 style={boxTitleStyle}><i className="fa-solid fa-receipt"></i> 1. Resumen del pedido</h3>
-          {ordenConfirmada?.items?.length ? null : items.map(item => (
+          {items.map(item => (
             <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontFamily: 'Poppins-Medium', color: COLORS.brownBody, fontSize: '14px' }}>
               <span>{item.nombre} <span style={{ color: COLORS.muted }}>x{item.cantidad}</span></span>
               <span>S/ {(getPrecioEfectivo(item) * item.cantidad).toFixed(2)}</span>

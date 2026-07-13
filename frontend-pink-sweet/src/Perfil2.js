@@ -33,7 +33,7 @@ const formatearHora = (fechaStr) => {
   }
 };
 
-const Perfil2 = () => {
+const Perfil2 = ({ setPage }) => {
   const [pedidos, setPedidos]   = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError]       = useState(null);
@@ -219,7 +219,7 @@ const Perfil2 = () => {
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
                   <div>
                     <h4 style={{ fontFamily: 'Poppins-Bold', fontSize: '16px', color: '#5A3E41', margin: "0 0 5px 0" }}>
-                      Pedido #{pedido.id}
+                      Pedido #{pedido.codigoSeguimiento || pedido.id}
                     </h4>
                     <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', color: '#5A3E41', margin: "0 0 5px 0" }}>
                       {formatearFecha(pedido.fechaOrden)} · {formatearHora(pedido.fechaOrden)}
@@ -274,6 +274,10 @@ const Perfil2 = () => {
 
                   {/* Botón Ver Detalles */}
                   <button
+                    onClick={() => {
+                      sessionStorage.setItem('pedidoSeleccionado', pedido.id);
+                      if (setPage) setPage('recibo');
+                    }}
                     style={{ backgroundColor: "#C6676D", color: "white", border: "none", borderRadius: "8px", fontFamily: "Poppins-Medium", fontSize: "13px", padding: "8px 20px", cursor: "pointer", width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: "5px" }}
                   >
                     Ver detalles <span style={{ fontSize: '16px' }}>→</span>

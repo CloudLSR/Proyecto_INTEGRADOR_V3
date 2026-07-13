@@ -11,6 +11,7 @@ import Nosotros from './Nosotros';
 import Perfil from './Perfil';
 
 import Carrito from './Carrito';
+import Recibo from './Recibo';
 import './style.css'; // de momento no se usa, pero se está dejando el archivo vacio para futuras implmementaciones
 
 import TerminosCondiciones from './TerminosCondiciones';
@@ -97,6 +98,7 @@ export default function App() {
       )}
 
       {page === "preguntasFrecuentes"   && <PreguntasFrecuentes   setPage={navigateTo} />}
+      {page === "recibo"                && <Recibo setPage={navigateTo} />}
       {page === "politicasEnvio"        && <PoliticasEnvio        setPage={navigateTo} />}
       {page === "terminosCondiciones"   && <TerminosCondiciones   setPage={navigateTo} />}
       {page === "politicasPrivacidad"   && <PoliticasPrivacidad   setPage={navigateTo} />}
