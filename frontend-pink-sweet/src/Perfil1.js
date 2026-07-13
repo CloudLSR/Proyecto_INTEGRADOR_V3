@@ -1,6 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import iconShop from './assets/icon-shop.png';
-import { getFavoritos, toggleFavorito } from './api';
+
+// Lee los IDs guardados en sessionStorage por Productos.js / Ofertas.js
+const leerFavoritoIds = () => {
+  try {
+    const raw = sessionStorage.getItem('favoritos_ids');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8081';
 
@@ -18,8 +27,9 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
   const [pedidos, setPedidos] = useState([]);
   const [cargandoPedidos, setCargandoPedidos] = useState(true);
 
-  // ── FAVORITOS REALES (se guardan en sessionStorage vía api.js) ─────────────
+  // ── FAVORITOS REALES (IDs en sessionStorage → detalle vía backend) ────────
   const [favoritos, setFavoritos] = useState([]);
+  const [cargandoFavoritos, setCargandoFavoritos] = useState(true);
 
   const [editando,  setEditando]  = useState(false);
   const [guardando, setGuardando] = useState(false);
@@ -66,19 +76,81 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
     }
   }, []);
 
-  // Cargar favoritos reales (sessionStorage) y mantenerlos sincronizados
-  useEffect(() => {
-    const cargarFavs = () => setFavoritos(getFavoritos());
-    cargarFavs();
-    window.addEventListener('favoritosUpdated', cargarFavs);
-    return () => window.removeEventListener('favoritosUpdated', cargarFavs);
+  // Cargar favoritos reales: mismos IDs (favoritos_ids) que usan Productos.js y Ofertas.js, pidiendo el detalle de cada producto al backend — igual que Perfil5.js
+  const cargarFavoritos = useCallback(async () => {
+    setCargandoFavoritos(true);
+    const ids = leerFavoritoIds();
+
+    if (ids.length === 0) {
+      setFavoritos([]);
+      setCargandoFavoritos(false);
+      return;
+    }
+
+    const token = sessionStorage.getItem('token');
+    const resultados = [];
+
+    await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const res = await fetch(`${API_BASE}/api/productos/${id}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+          if (res.ok) resultados.push(await res.json());
+        } catch {
+          // si falla un producto puntual, se ignora y se sigue con el resto
+        }
+      })
+    );
+
+    setFavoritos(resultados);
+    setCargandoFavoritos(false);
   }, []);
 
-  const quitarFavorito = (producto) => toggleFavorito(producto);
+  useEffect(() => { cargarFavoritos(); }, [cargarFavoritos]);
 
-  // Funcionalidad añadida para los botones
-  const agregarAlCarrito = (producto) => {
-    alert(`${producto.nombre} ha sido añadido al carrito.`);
+  // Escuchar el mismo evento que disparan Productos.js / Ofertas.js al marcar ♥
+  useEffect(() => {
+    const onUpdate = () => cargarFavoritos();
+    window.addEventListener('favoritosUpdated', onUpdate);
+    return () => window.removeEventListener('favoritosUpdated', onUpdate);
+  }, [cargarFavoritos]);
+
+  // Quitar favorito desde la vista previa (misma mecánica que Perfil5.js)
+  const quitarFavorito = (producto) => {
+    setFavoritos(prev => prev.filter(p => p.id !== producto.id));
+
+    const ids = leerFavoritoIds().filter(id => id !== producto.id);
+    sessionStorage.setItem('favoritos_ids', JSON.stringify(ids));
+
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      fetch(`${API_BASE}/api/favoritos/${producto.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+  };
+
+  // Añadir al carrito desde la vista previa (misma llamada que usa Perfil5.js)
+  const agregarAlCarrito = async (producto) => {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      alert('Debes iniciar sesión para agregar productos al carrito.');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/api/carrito/agregar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productoId: producto.id, cantidad: 1 }),
+      });
+      if (!res.ok) throw new Error();
+      alert(`"${producto.nombre}" añadido al carrito.`);
+      window.dispatchEvent(new Event('cartUpdated'));
+    } catch {
+      alert('No se pudo añadir al carrito. Inténtalo de nuevo.');
+    }
   };
 
   const handleContacto = () => {
@@ -298,7 +370,9 @@ const Perfil1 = ({ setActiveTab, usuario, setUsuario }) => {
           <span onClick={() => setActiveTab("favoritos")} style={{ color: '#C6676D', fontFamily: 'Poppins-Medium', fontSize: '14px', cursor: 'pointer' }}>Ver todos →</span>
         </div>
 
-        {favoritos.length === 0 ? (
+        {cargandoFavoritos ? (
+          <p style={{ fontFamily: 'Poppins-Regular', color: '#999', textAlign: 'center', padding: '20px 0' }}>Cargando favoritos...</p>
+        ) : favoritos.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '30px 0', color: '#999' }}>
             <i className="fa-regular fa-heart" style={{ fontSize: '28px', color: '#EAAFB8', marginBottom: '10px', display: 'block' }}></i>
             <p style={{ fontFamily: 'Poppins-Regular', fontSize: '14px', margin: 0 }}>Aún no agregaste productos a favoritos.</p>

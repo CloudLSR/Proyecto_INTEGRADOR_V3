@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { API_BASE, apiGet, authHeaders, getToken, notificarCarrito } from './api';
 
 import logoPrincipal from './assets/logo.png';
@@ -116,18 +116,60 @@ function OfferSkeleton() {
 
 // ─── Main Component ───────────────────────────────────────────
 const Ofertas = ({ setPage }) => {
-  const [wishlist, setWishlist] = useState(() => {
-    try { return JSON.parse(sessionStorage.getItem('wishlist-ofertas')) || []; }
-    catch { return []; }
+  // Favoritos: mismo sistema que Productos.js — se guardan bajo la MISMA llave 'favoritos_ids' en sessionStorage, así el corazón sale marcado igual en ambas páginas y en Perfil → Favoritos sin importar desde dónde se haya agregado.
+  const [favoritos, setFavoritos] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('favoritos_ids');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
   });
 
-  const toggleWish = useCallback((id) => {
-    setWishlist(w => {
-      const next = w.includes(id) ? w.filter(x => x !== id) : [...w, id];
-      sessionStorage.setItem('wishlist-ofertas', JSON.stringify(next));
-      return next;
+  const toggleFavorito = async (p) => {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      alert('Debes iniciar sesión para guardar favoritos.');
+      return;
+    }
+    // Las ofertas de boceto (sin producto real, prodId null) no se pueden guardar como favorito — solo pasa si el backend aún no tiene ofertas.
+    if (!p.prodId) return;
+
+    const esFavorito = favoritos.has(p.prodId);
+
+    setFavoritos(prev => {
+      const nuevo = new Set(prev);
+      if (esFavorito) nuevo.delete(p.prodId);
+      else nuevo.add(p.prodId);
+      sessionStorage.setItem('favoritos_ids', JSON.stringify([...nuevo]));
+      window.dispatchEvent(new Event('favoritosUpdated'));
+      return nuevo;
     });
-  }, []);
+
+    try {
+      if (esFavorito) {
+        await fetch(`${API_BASE}/api/favoritos/${p.prodId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else {
+        await fetch(`${API_BASE}/api/favoritos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ productoId: p.prodId }),
+        });
+      }
+    } catch {
+      // Si falla el backend, revertimos el cambio local
+      setFavoritos(prev => {
+        const revertido = new Set(prev);
+        if (esFavorito) revertido.add(p.prodId);
+        else revertido.delete(p.prodId);
+        sessionStorage.setItem('favoritos_ids', JSON.stringify([...revertido]));
+        return revertido;
+      });
+    }
+  };
 
   const [ofertasReales, setOfertasReales] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -411,42 +453,29 @@ const Ofertas = ({ setPage }) => {
                 </div>
                 
                 {/* FAVORITOS */}
-                <div onClick={() => toggleWish(p.id)} style={{ 
+                <div onClick={() => toggleFavorito(p)} title={p.prodId ? (favoritos.has(p.prodId) ? 'Quitar de favoritos' : 'Agregar a favoritos') : ''} style={{ 
                   position: 'absolute', top: '15px', right: '15px', 
                   backgroundColor: 'rgba(255,255,255,0.9)', width: '38px', height: '38px', 
                   borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', 
                   cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
                   transition: 'all 0.2s',
                 }}>
-                  <i className={wishlist.includes(p.id) ? "fa-solid fa-heart" : "fa-regular fa-heart"} 
+                  <i className={p.prodId && favoritos.has(p.prodId) ? "fa-solid fa-heart" : "fa-regular fa-heart"} 
                      style={{ color: '#C6676D', fontSize: '18px', marginTop: '1px' }}></i>
                 </div>
 
-                {/* COUNTDOWN EN IMAGEN */}
-                {p.endDate && (
-                  <div style={{
-                    position: 'absolute', bottom: '10px', left: '10px', right: '10px',
-                    backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
-                    borderRadius: '8px', padding: '6px 10px',
-                    display: 'flex', justifyContent: 'center',
-                  }}>
-                    <CountdownTimer endDate={p.endDate} small />
-                  </div>
-                )}
               </div>
 
               {/* CONTENIDO */}
               <div style={{ padding: '25px', display: 'flex', flexDirection: 'column', flexGrow: '1' }}>
                 <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '18px', color: '#644444', margin: '0 0 8px 0' }}>{p.name}</h3>
 
-                {/* En el espacio de la descripción: si es oferta real (tiene fecha de vencimiento),
-                    mostramos el contador regresivo en su lugar; si es boceto, mostramos la descripción */}
-                {p.endDate ? (
-                  <div style={{ marginBottom: '12px', padding: '8px 12px', backgroundColor: 'rgba(198, 103, 109, 0.08)', borderRadius: '8px', flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#644444', margin: '0 0 12px 0', lineHeight: '1.5', flexGrow: 1 }}>{p.desc}</p>
+
+                {p.endDate && (
+                  <div style={{ marginBottom: '12px', padding: '8px 12px', backgroundColor: 'rgba(198, 103, 109, 0.08)', borderRadius: '8px', display: 'flex', alignItems: 'center' }}>
                     <CountdownTimer endDate={p.endDate} small={false} />
                   </div>
-                ) : (
-                  <p style={{ fontFamily: 'Poppins-Medium', fontSize: '13px', color: '#644444', margin: '0 0 12px 0', lineHeight: '1.5', flexGrow: 1 }}>{p.desc}</p>
                 )}
                 
                 {/* PRECIOS */}
@@ -457,6 +486,7 @@ const Ofertas = ({ setPage }) => {
                   <span style={{ fontFamily: 'Poltawski-Nowy', fontSize: '22px', color: '#C6676D', fontWeight: 'bold' }}>
                     S/. {p.newPrice}
                   </span>
+                  <span style={{ fontSize: '14px', color: '#59423CBA', fontFamily: 'Poppins-Medium' }}>por unidad</span>
                 </div>
 
                 <button 
