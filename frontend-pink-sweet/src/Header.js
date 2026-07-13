@@ -277,14 +277,20 @@ function CartItem({ item, onQty, onDel }) {
       />
       <div className="scr-cart-item-info">
         <div className="scr-cart-item-name">{item.nombre}</div>
-        {item.precioOriginal != null ? (
-          <div className="scr-cart-item-price" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '13px' }}>S/ {item.precioOriginal.toFixed(2)}</span>
-            <span style={{ color: '#C3666D', fontWeight: 'bold' }}>S/ {item.precio.toFixed(2)}</span>
-          </div>
-        ) : (
-          <div className="scr-cart-item-price">S/ {item.precio.toFixed(2)}</div>
-        )}
+        <div className="scr-cart-item-price">
+          {item.tieneOferta && item.precioConDescuento != null ? (
+            <>
+              <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '12px', marginRight: '6px' }}>
+                S/ {item.precio.toFixed(2)}
+              </span>
+              <span style={{ color: '#C3666D', fontWeight: 'bold' }}>
+                S/ {item.precioConDescuento.toFixed(2)}
+              </span>
+            </>
+          ) : (
+            <>S/ {item.precio.toFixed(2)}</>
+          )}
+        </div>
         <div className="scr-qty-row">
           <button className="scr-qty-btn" onClick={() => onQty(item.id, -1)}>−</button>
           <span className="scr-qty-val">{item.cantidad}</span>
@@ -654,15 +660,15 @@ function CartDrawer({ onClose, setPage }) {
       .then(res => (res.ok ? res.json() : []))
       .then(data => {
         const mapeados = (Array.isArray(data) ? data : []).map(ci => ({
-          id:       ci.producto?.id,
-          img:      ci.producto?.imagenUrl
-                      ? `${API_BASE_CART}${ci.producto.imagenUrl}`
-                      : '/assets/products/logo.png',
-          nombre:   ci.producto?.nombre || 'Producto',
-          precio:   Number(ci.producto?.precio || 0),
-          precioOriginal: ci.precioOriginal != null ? Number(ci.precioOriginal) : null,
-          descuentoAplicado: ci.descuentoAplicado != null ? Number(ci.descuentoAplicado) : null,
-          cantidad: ci.cantidad || 1,
+          id:                 ci.producto?.id,
+          img:                ci.producto?.imagenUrl
+                                ? `${API_BASE_CART}${ci.producto.imagenUrl}`
+                                : '/assets/products/logo.png',
+          nombre:             ci.producto?.nombre || 'Producto',
+          precio:             Number(ci.producto?.precio || 0),
+          tieneOferta:        ci.tieneOferta || false,
+          precioConDescuento: ci.precioConDescuento != null ? Number(ci.precioConDescuento) : null,
+          cantidad:           ci.cantidad || 1,
         }));
         setItems(mapeados);
       })
@@ -700,7 +706,8 @@ function CartDrawer({ onClose, setPage }) {
     }
   };
  
-  const subtotal = items.reduce((acc, it) => acc + it.precio * it.cantidad, 0);
+  const getPrecioEfectivo = (it) => (it.tieneOferta && it.precioConDescuento != null) ? it.precioConDescuento : it.precio;
+  const subtotal = items.reduce((acc, it) => acc + getPrecioEfectivo(it) * it.cantidad, 0);
   const envio = items.length > 0 ? 8.00 : 0;
   const igv = subtotal * 0.18;
   const total = subtotal + envio + igv;

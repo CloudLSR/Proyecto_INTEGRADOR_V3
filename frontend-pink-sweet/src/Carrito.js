@@ -62,14 +62,16 @@ function Carrito({ setPage, onCartUpdate }) {
       .then(res => (res.ok ? res.json() : []))
       .then(data => {
         const mapeados = (Array.isArray(data) ? data : []).map(ci => ({
-          id:       ci.producto?.id,
-          img:      ci.producto?.imagenUrl
-                      ? `${API_BASE}${ci.producto.imagenUrl}`
-                      : '/assets/products/logo.png',
-          nombre:   ci.producto?.nombre || 'Producto',
-          desc:     ci.producto?.descripcion || '',
-          precio:   Number(ci.producto?.precio || 0),
-          cantidad: ci.cantidad || 1,
+          id:         ci.producto?.id,
+          img:        ci.producto?.imagenUrl
+                        ? `${API_BASE}${ci.producto.imagenUrl}`
+                        : '/assets/products/logo.png',
+          nombre:     ci.producto?.nombre || 'Producto',
+          desc:       ci.producto?.descripcion || '',
+          precio:     Number(ci.producto?.precio || 0),
+          cantidad:   ci.cantidad || 1,
+          tieneOferta: ci.tieneOferta || false,
+          precioConDescuento: ci.precioConDescuento || null,
         }));
         setItems(mapeados);
       })
@@ -107,8 +109,15 @@ function Carrito({ setPage, onCartUpdate }) {
     if (onCartUpdate) onCartUpdate();
   };
 
-  // ── Totales ───────────────────────────────────────────────────────────────
-  const subtotal       = items.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+  // ── Totales (con descuentos aplicados) ────────────────────────────────────
+  const getPrecioEfectivo = (item) => item.tieneOferta && item.precioConDescuento ? item.precioConDescuento : item.precio;
+  const subtotal       = items.reduce((acc, item) => acc + getPrecioEfectivo(item) * item.cantidad, 0);
+  const ahorroTotal    = items.reduce((acc, item) => {
+    if (item.tieneOferta && item.precioConDescuento) {
+      return acc + (item.precio - item.precioConDescuento) * item.cantidad;
+    }
+    return acc;
+  }, 0);
   const igv            = subtotal * 0.18;
   const total          = subtotal + ENVIO + igv;
   const totalProductos = items.reduce((acc, item) => acc + item.cantidad, 0);

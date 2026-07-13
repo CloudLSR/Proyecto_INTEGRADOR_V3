@@ -81,9 +81,9 @@ const AdminMenu4 = () => {
 
   // LÓGICA DINÁMICA DE GRÁFICOS PREPARADA PARA EL BACKEND
   // Gráfico de líneas (Y max: 800 -> cy: 20, Y min: 0 -> cy: 220)
-  const chartDays = ['12 may.', '13 may.', '14 may.', '15 may.', '16 may.', '17 may.', '18 may.', '19 may.'];
+  const chartDays = dataKPIs?.ventasPorDiaLabels || ['12 may.', '13 may.', '14 may.', '15 may.', '16 may.', '17 may.', '18 may.', '19 may.'];
   const chartValues = dataKPIs?.ventasPorDia || [0, 0, 0, 0, 0, 0, 0, 0]; // Backend valores aquí
-  const maxGrafico = 800;
+  const maxGrafico = Math.max(...chartValues, 800);
   
   const puntosSVG = chartValues.map((val, i) => {
     const x = 80 + (i * 85);

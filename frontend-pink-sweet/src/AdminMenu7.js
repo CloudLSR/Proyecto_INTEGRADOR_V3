@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { apiGet, apiPost, apiPut, apiDelete, API_BASE } from "./api";
+import { apiGet, apiPost, apiPut, apiDelete } from "./api";
 import logoPrincipal from './assets/logo.png'; 
 
 // IMÁGENES DE PRODUCTOS (Fallbacks visuales)
@@ -8,13 +8,6 @@ import imgAClasico from './assets/products/a-clasico.png';
 import imgCArandano from './assets/products/c-arandano.png';
 import imgTFresa from './assets/products/t-fresa.png';
 import imgTvClasicos from './assets/products/tv-clasicos.png';
-
-// Resuelve la foto REAL del producto ligado a la oferta (viene anidada en o.producto.imagenUrl)
-const resolverImagenOferta = (o) => {
-  const url = o?.producto?.imagenUrl;
-  if (!url) return null;
-  return url.startsWith('http') ? url : `${API_BASE}${url}`;
-};
 
 // Lógica de estado
 const calcularEstadoOferta = (o) => {
@@ -79,11 +72,19 @@ const AdminMenu7 = () => {
   };
 
   const guardar = async (form) => {
+    // Validaciones mejoradas
+    if (!form.titulo.trim()) { alert("El título de la oferta es obligatorio."); return; }
+    if (form.descuento === "" || form.descuento == null) { alert("El descuento es obligatorio."); return; }
+    const dcto = Number(form.descuento);
+    if (isNaN(dcto) || dcto <= 0 || dcto > 100) { alert("El descuento debe ser un número entre 1 y 100."); return; }
+    if (!form.fechaInicio) { alert("La fecha de inicio es obligatoria."); return; }
+    if (!form.fechaFin) { alert("La fecha de fin es obligatoria."); return; }
+    if (form.fechaFin < form.fechaInicio) { alert("La fecha de fin no puede ser anterior a la de inicio."); return; }
+
     const body = {
       oferTitulo: form.titulo,
       oferDescripcion: form.descripcion,
-      oferDescuento: form.descuento === "" ? null : Number(form.descuento),
-      tipo: form.tipo,
+      oferDescuento: dcto,
       oferFechaInicio: form.fechaInicio || null,
       oferFechaFin: form.fechaFin || null,
       oferActiva: form.activa,
@@ -243,7 +244,7 @@ const AdminMenu7 = () => {
         )}
 
         <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
-          <img src={ofertaDestacada.vacia ? imgTcTripleChocolate : (resolverImagenOferta(ofertaDestacada) || imgTcTripleChocolate)} alt="Destacada" onError={(e) => { e.target.onerror = null; e.target.src = imgTcTripleChocolate; }} style={{ width: '220px', height: '140px', objectFit: 'cover', borderRadius: '12px' }} />
+          <img src={ofertaDestacada.vacia ? imgTcTripleChocolate : (ofertaDestacada.imgUrl || imgTcTripleChocolate)} alt="Destacada" style={{ width: '220px', height: '140px', objectFit: 'cover', borderRadius: '12px' }} />
           
           <div style={{ flex: 1 }}>
             <h2 style={{ fontFamily: 'Poppins-Bold', fontSize: '22px', color: '#5A3E41', margin: '0 0 8px 0' }}>{ofertaDestacada.oferTitulo}</h2>
@@ -310,7 +311,7 @@ const AdminMenu7 = () => {
                   <tr key={oferta.oferId} style={{ borderBottom: '1px solid #F5F5F5' }}>
                     <td style={{ padding: '15px 10px', verticalAlign: 'middle', width: '300px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <img src={resolverImagenOferta(oferta) || imgAClasico} alt="Oferta" onError={(e) => { e.target.onerror = null; e.target.src = imgTcTripleChocolate; }} style={{ width: '60px', height: '45px', borderRadius: '8px', objectFit: 'cover' }} />
+                        <img src={oferta.imgUrl || imgAClasico} alt="Oferta" onError={(e) => { e.target.onerror = null; e.target.src = imgTcTripleChocolate; }} style={{ width: '60px', height: '45px', borderRadius: '8px', objectFit: 'cover' }} />
                         <div>
                           <div style={{ fontFamily: 'Poppins-Bold', fontSize: '13px', color: '#5A3E41', margin: '0 0 2px 0' }}>{oferta.oferTitulo}</div>
                           <div style={{ fontFamily: 'Poppins-Regular', fontSize: '11px', color: '#777', maxWidth: '200px' }}>{oferta.oferDescripcion || "Sin descripción"}</div>
