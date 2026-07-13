@@ -711,9 +711,7 @@ function CartDrawer({ onClose, setPage }) {
  
   const getPrecioEfectivo = (it) => (it.tieneOferta && it.precioConDescuento != null) ? it.precioConDescuento : it.precio;
   const subtotal = items.reduce((acc, it) => acc + getPrecioEfectivo(it) * it.cantidad, 0);
-  const envio = items.length > 0 ? 8.00 : 0;
-  const igv = subtotal * 0.18;
-  const total = subtotal + envio + igv;
+  // El envío ya no se precarga aquí, se elige recién en la página Carrito.js (botón "Elegir opciones de envío"), así que el mini-carrito solo muestra el subtotal como referencia rápida
 
   // ✅ CORRECCIÓN: Ir a pagar cierra el drawer y navega a la página Carrito
   const handleIrAPagar = () => {
@@ -748,18 +746,12 @@ function CartDrawer({ onClose, setPage }) {
         </div>
         {items.length > 0 && (
           <div className="scr-cart-footer">
-            <div className="scr-cart-total-row">
+            <div className="scr-cart-total-row big">
               <span>Subtotal</span><span>S/ {subtotal.toFixed(2)}</span>
             </div>
-            <div className="scr-cart-total-row">
-              <span>Envío</span><span>S/ {envio.toFixed(2)}</span>
-            </div>
-            <div className="scr-cart-total-row">
-              <span>IGV (18%)</span><span>S/ {igv.toFixed(2)}</span>
-            </div>
-            <div className="scr-cart-total-row big">
-              <span>TOTAL</span><span>S/ {total.toFixed(2)}</span>
-            </div>
+            <p style={{ fontSize: '11px', color: '#8A7A7C', margin: '2px 0 8px 0' }}>
+              Envío e IGV se calculan en el siguiente paso.
+            </p>
             {/* ✅ CORRECCIÓN: botón ahora navega a la sección de pago */}
             <button className="scr-cart-pay-btn" onClick={handleIrAPagar}>
               IR A PAGAR →
