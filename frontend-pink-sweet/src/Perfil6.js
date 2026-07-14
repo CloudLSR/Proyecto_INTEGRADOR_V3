@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 
+const ToggleSwitch = ({ isOn, onClick }) => (
+  <div onClick={onClick} style={{ width: '46px', height: '24px', backgroundColor: isOn ? '#C6676D' : '#EAAFB8', borderRadius: '15px', position: 'relative', cursor: 'pointer', transition: 'background-color 0.3s ease', flexShrink: 0 }}>
+    <div style={{ width: '18px', height: '18px', backgroundColor: 'white', borderRadius: '50%', position: 'absolute', top: '3px', left: isOn ? '25px' : '3px', transition: 'left 0.3s ease', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} />
+  </div>
+);
+
 const Perfil6 = () => {
   const [toggles, setToggles] = useState({
     pedidos: true,
@@ -22,7 +28,7 @@ const Perfil6 = () => {
 
   // Funciones de acción
   const handleEditarPerfil = () => setShowEditModal(true);
-  
+
   const handleActualizarPass = () => {
     if(passValues.nueva !== passValues.confirmar) {
       alert("¡Error! Las contraseñas nuevas no coinciden.");
@@ -35,12 +41,6 @@ const Perfil6 = () => {
     setModalType(titulo);
     setShowSecurityModal(true);
   };
-
-  const ToggleSwitch = ({ isOn, onClick }) => (
-    <div onClick={onClick} style={{ width: '46px', height: '24px', backgroundColor: isOn ? '#C6676D' : '#EAAFB8', borderRadius: '15px', position: 'relative', cursor: 'pointer', transition: 'background-color 0.3s', flexShrink: 0 }}>
-      <div style={{ width: '18px', height: '18px', backgroundColor: 'white', borderRadius: '50%', position: 'absolute', top: '3px', left: isOn ? '25px' : '3px', transition: 'left 0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} />
-    </div>
-  );
 
   return (
     <>
