@@ -58,12 +58,20 @@ public class OrdenController {
             List<Map<String, Object>> detalles =
                     (List<Map<String, Object>>) body.get("detalles");
 
+            // Costo de envío elegido en el checkout (opcional, default 0.0)
+            Double costoEnvio = 0.0;
+            if (body.get("costoEnvio") != null) {
+                try { costoEnvio = Double.valueOf(body.get("costoEnvio").toString()); }
+                catch (NumberFormatException ignored) { costoEnvio = 0.0; }
+            }
+
             Orden orden = service.crearOrden(
                     usuarioId,
                     (String) body.get("direccionEntrega"),
                     metodoPago,
                     tipoEntrega,
-                    detalles
+                    detalles,
+                    costoEnvio
             );
             return ResponseEntity.ok(orden);
 

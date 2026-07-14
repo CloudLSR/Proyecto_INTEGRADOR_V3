@@ -1,11 +1,57 @@
 import React, { useState } from "react";
 
+/*
+ * Ya existe un endpoint funcional para métodos de pago en
+ * MetodoPagoController.java (com.SweetCreamPink.demoSpringBoot.Controlador):
+ *
+ *   GET    /api/metodos-pago/usuario/{usuarioId}            -> lista los métodos del usuario
+ *   POST   /api/metodos-pago/usuario/{usuarioId}             -> agrega uno nuevo
+ *          body: { tipo: "VISA" | "BANCO" | "YAPE", alias, ultimosDigitos, titular, banco, esPrincipal }
+ *   DELETE /api/metodos-pago/{id}/usuario/{usuarioId}        -> elimina uno
+ *
+ * El arreglo METODOS_PAGO de abajo es data de ejemplo (mock) mientras se
+ * conecta. Los nombres de campo (tipo, alias, ultimosDigitos, titular,
+ * banco, esPrincipal) ya están alineados con el modelo del backend a
+ * propósito, para que cuando se reemplace por un fetch real
+ * (mismo patrón que usa Perfil1.js / Perfil2.js con API_BASE + token)
+ * el mapeo sea casi directo. El backend solo soporta tipo VISA/BANCO/YAPE
+ * (Mastercard se muestra aquí como ejemplo visual, pero no es un tipo real
+ * en el modelo actual — habría que ampliarlo si se necesita distinguir
+ * marcas de tarjeta).
+ */
+
 const METODOS_PAGO = [
-  { id: 1, tipo: "Visa terminada en 1234", titular: "María Rodríguez", expiracion: "Vence 12/26", principal: true, logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" },
-  { id: 2, tipo: "Mastercard terminada en 5678", titular: "María Rodríguez", expiracion: "Vence 08/27", principal: false, logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" },
-  { id: 3, tipo: "Interbank terminada en 4567", titular: "María Rodríguez", expiracion: "Vence 03/26", principal: false, logoUrl: "https://yt3.googleusercontent.com/ytc/AIdro_mN-kE_zF41cEmsKIfk2-3KigQn95o5v8Yg4h-lVw=s900-c-k-c0x00ffffff-no-rj" },
-  { id: 4, tipo: "YAPE", titular: "+51 987654123", expiracion: "María Rodríguez", principal: false, logoUrl: "https://seeklogo.com/images/Y/yape-logo-3E473EE7E5-seeklogo.com.png" }
+  { id: 1, marca: "visa",       tipo: "Visa terminada en 1234",        titular: "María Rodríguez", expiracion: "Vence 12/26", principal: true },
+  { id: 2, marca: "mastercard", tipo: "Mastercard terminada en 5678",  titular: "María Rodríguez", expiracion: "Vence 08/27", principal: false },
+  { id: 3, marca: "interbank",  tipo: "Interbank terminada en 4567",   titular: "María Rodríguez", expiracion: "Vence 03/26", principal: false },
+  { id: 4, marca: "yape",       tipo: "YAPE",                          titular: "+51 987654123",   expiracion: "María Rodríguez", principal: false }
 ];
+
+// Badge de marca dibujado en CSS/FontAwesome — no depende de imágenes externas, así nunca se rompe por hotlink/CORS como pasaba con los logos de Wikipedia/seeklogo.
+const LogoMetodo = ({ marca }) => {
+  const estilos = {
+    visa:       { bg: '#1A1F71', label: 'VISA',  icon: null },
+    mastercard: { bg: '#F2F2F2', label: null,     icon: 'mastercard-circles' },
+    interbank:  { bg: '#00A14B', label: 'IB',     icon: null },
+    yape:       { bg: '#722282', label: null,     icon: 'fa-solid fa-mobile-screen-button' }
+  };
+  const s = estilos[marca] || { bg: '#5A3E41', label: '?', icon: null };
+
+  return (
+    <div style={{ width: '64px', height: '40px', borderRadius: '8px', backgroundColor: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      {s.icon === 'mastercard-circles' ? (
+        <div style={{ display: 'flex' }}>
+          <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#EB001B' }} />
+          <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#F79E1B', marginLeft: '-8px', mixBlendMode: 'multiply' }} />
+        </div>
+      ) : s.icon ? (
+        <i className={s.icon} style={{ color: 'white', fontSize: '18px' }}></i>
+      ) : (
+        <span style={{ color: 'white', fontFamily: 'Poppins-Bold', fontSize: '12px', letterSpacing: '0.5px' }}>{s.label}</span>
+      )}
+    </div>
+  );
+};
 
 const Perfil4 = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -82,7 +128,7 @@ const Perfil4 = () => {
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "30px" }}>
                   <div style={{ width: '80px', display: 'flex', justifyContent: 'center' }}>
-                    <img src={card.logoUrl} alt={card.tipo} style={{ width: '100%', maxHeight: '40px', objectFit: 'contain', borderRadius: card.id === 3 || card.id === 4 ? '8px' : '0' }} />
+                    <LogoMetodo marca={card.marca} />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>

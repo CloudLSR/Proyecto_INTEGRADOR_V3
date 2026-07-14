@@ -48,7 +48,8 @@ public class OrdenServiceImpl implements OrdenService {
     public Orden crearOrden(Integer usuarioId, String direccionEntrega,
                             MetodoPagoOrden metodoPago,
                             Orden.TipoEntrega tipoEntrega,
-                            List<Map<String, Object>> detalles) {
+                            List<Map<String, Object>> detalles,
+                            Double costoEnvio) {
 
         Preconditions.checkNotNull(usuarioId, "El ID de usuario es requerido");
         Preconditions.checkArgument(detalles != null && !detalles.isEmpty(),
@@ -101,9 +102,17 @@ public class OrdenServiceImpl implements OrdenService {
 
         orden.setDetalles(lineas);
         orden.setTotal(totalOrden);
+        orden.setCostoEnvio(costoEnvio != null ? costoEnvio : 0.0);
 
         Orden guardada = ordenDAO.guardar(orden);
-        log.info("Orden #{} creada para usuarioId: {} — Total: S/.{}", guardada.getId(), usuarioId, totalOrden);
+
+        // El código de seguimiento necesita el id ya generado, así que se arma y se guarda en un segundo paso
+        String codigo = String.format("SRC-%d-%04d", guardada.getFecha().getYear(), guardada.getId());
+        guardada.setCodigoSeguimiento(codigo);
+        guardada = ordenDAO.guardar(guardada);
+
+        log.info("Orden #{} creada para usuarioId: {} — Total: S/.{} — Envío: S/.{} — Código: {}",
+                guardada.getId(), usuarioId, totalOrden, guardada.getCostoEnvio(), codigo);
         return guardada;
     }
 

@@ -13,7 +13,8 @@ public interface OrdenService {
     Orden crearOrden(Integer usuarioId, String direccionEntrega,
                      MetodoPagoOrden metodoPago,
                      Orden.TipoEntrega tipoEntrega,
-                     List<Map<String, Object>> detalles);
+                     List<Map<String, Object>> detalles,
+                     Double costoEnvio);
 
     /** Historial completo del cliente */
     List<Orden> historial(Integer usuarioId);

@@ -5,6 +5,8 @@ import dividerTitle from "./assets/divider-title.png";
 const PoliticasEnvio = ({ setPage }) => {
     // Estado para manejar el efecto "hover" en cada fila
     const [hoveredId, setHoveredId] = useState(null);
+    // Estado para el efecto "hover" del botón volver
+    const [volverHover, setVolverHover] = useState(false);
 
     // Cambiamos 'descripcion' para que acepte nodos JSX y poder darle formato (colores, listas, saltos de línea)
     const politicasEnvioData = [
@@ -80,13 +82,29 @@ const PoliticasEnvio = ({ setPage }) => {
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
 
                 {/* Botón de retroceso */}
-                <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '20px' }}>
-                    <button 
-                        onClick={() => setPage('inicio')} 
-                        style={{ background: 'none', border: 'none', color: '#C6676D', fontSize: '24px', cursor: 'pointer' }}
-                        title="Volver"
+                <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '-10px', marginLeft: '-10px' }}>
+                    <button
+                        onClick={() => setPage('inicio')}
+                        onMouseEnter={() => setVolverHover(true)}
+                        onMouseLeave={() => setVolverHover(false)}
+                        style={{
+                            background: volverHover ? '#FDF2F3' : 'none',
+                            border: 'none',
+                            color: '#C6676D',
+                            fontSize: '36px',
+                            lineHeight: 0,
+                            width: '48px',
+                            height: '48px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s ease'
+                        }}
+                        title="Volver al inicio"
                     >
-                        <i className="fas fa-arrow-left"></i>
+                        <i className="fa-solid fa-circle-left"></i>
                     </button>
                 </div>
 
@@ -121,7 +139,7 @@ const PoliticasEnvio = ({ setPage }) => {
                                 gap: '35px', 
                                 padding: '35px 50px', 
                                 borderBottom: index === politicasEnvioData.length - 1 ? 'none' : '1px solid #EAAFB8',
-                                backgroundColor: hoveredId === item.id ? '#FDF2F3' : 'transparent',
+                                backgroundColor: hoveredId === item.id ? '#F9D7DD' : 'transparent',
                                 transition: 'background-color 0.3s ease'
                             }}
                         >

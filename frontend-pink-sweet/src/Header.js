@@ -32,7 +32,7 @@ const modalCSS = `
  
   /* ── Panel rosado izquierdo ── */
   .scr-panel-left {
-    background: linear-gradient(160deg, #c8506a 0%, #a83858 100%);
+    background: linear-gradient(160deg, #C6676D 0%, #a83858 100%);
     flex: 0 0 42%;
     display: flex; flex-direction: column;
     align-items: center; justify-content: space-between;
@@ -188,8 +188,8 @@ const modalCSS = `
     to   { transform: translateX(0);    opacity:1 }
   }
   .scr-cart-header {
-    background: #c8506a; color: #fff;
-    padding: 18px 20px 14px;
+    background: #C6676D; color: #fff;
+    padding: 20px 20px 14px;
     display: flex; align-items: center; justify-content: space-between;
     flex-shrink: 0;
   }
@@ -711,9 +711,7 @@ function CartDrawer({ onClose, setPage }) {
  
   const getPrecioEfectivo = (it) => (it.tieneOferta && it.precioConDescuento != null) ? it.precioConDescuento : it.precio;
   const subtotal = items.reduce((acc, it) => acc + getPrecioEfectivo(it) * it.cantidad, 0);
-  const envio = items.length > 0 ? 8.00 : 0;
-  const igv = subtotal * 0.18;
-  const total = subtotal + envio + igv;
+  // El envío ya no se precarga aquí, se elige recién en la página Carrito.js (botón "Elegir opciones de envío"), así que el mini-carrito solo muestra el subtotal como referencia rápida
 
   // ✅ CORRECCIÓN: Ir a pagar cierra el drawer y navega a la página Carrito
   const handleIrAPagar = () => {
@@ -748,18 +746,12 @@ function CartDrawer({ onClose, setPage }) {
         </div>
         {items.length > 0 && (
           <div className="scr-cart-footer">
-            <div className="scr-cart-total-row">
+            <div className="scr-cart-total-row big">
               <span>Subtotal</span><span>S/ {subtotal.toFixed(2)}</span>
             </div>
-            <div className="scr-cart-total-row">
-              <span>Envío</span><span>S/ {envio.toFixed(2)}</span>
-            </div>
-            <div className="scr-cart-total-row">
-              <span>IGV (18%)</span><span>S/ {igv.toFixed(2)}</span>
-            </div>
-            <div className="scr-cart-total-row big">
-              <span>TOTAL</span><span>S/ {total.toFixed(2)}</span>
-            </div>
+            <p style={{ fontSize: '11px', color: '#8A7A7C', margin: '2px 0 8px 0' }}>
+              Envío e IGV se calculan en el siguiente paso.
+            </p>
             {/* ✅ CORRECCIÓN: botón ahora navega a la sección de pago */}
             <button className="scr-cart-pay-btn" onClick={handleIrAPagar}>
               IR A PAGAR →

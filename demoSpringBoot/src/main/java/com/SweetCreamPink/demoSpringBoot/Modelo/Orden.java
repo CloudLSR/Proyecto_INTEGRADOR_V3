@@ -36,6 +36,14 @@ public class Orden {
     @Column(name = "ordTotal")
     private Double total = 0.0;  //? se recalcula en OrdenServiceImpl al crear la orden
 
+    // NUEVO (aditivo, no afecta el cálculo de "total" de arriba) Costo de envío elegido en el checkout (Carrito.js). Se guarda aparte porque "total" solo representa la suma de los productos.
+    @Column(name = "ordCostoEnvio")
+    private Double costoEnvio = 0.0;
+
+    // Código único para que el cliente haga seguimiento de su pedido (se genera automáticamente en OrdenServiceImpl.crearOrden, formato "SRC-{año}-{id con 4 dígitos}").
+    @Column(name = "ordCodigoSeguimiento", length = 40, unique = true)
+    private String codigoSeguimiento;
+
     @Column(name = "ordDireccionEntrega", columnDefinition = "TEXT")
     private String direccionEntrega;
 

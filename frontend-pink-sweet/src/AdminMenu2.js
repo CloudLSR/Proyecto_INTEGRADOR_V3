@@ -192,7 +192,7 @@ const AdminMenu2 = () => {
                   <i className="fa-solid fa-bag-shopping"></i>
                 </div>
                 <div>
-                  <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '16px', color: '#5A3E41', margin: '0 0 2px 0' }}>#{String(pedido.id).padStart(6, '0')}</h3>
+                  <h3 style={{ fontFamily: 'Poppins-Bold', fontSize: '16px', color: '#5A3E41', margin: '0 0 2px 0' }}>Pedido #{pedido.codigoSeguimiento || String(pedido.id).padStart(6, '0')}</h3>
                   <p style={{ fontFamily: 'Poppins-SemiBold', fontSize: '14px', color: '#5A3E41', margin: '0 0 2px 0' }}>{clienteNom}</p>
                   <p style={{ fontFamily: 'Poppins-Regular', fontSize: '13px', color: '#777', margin: '0 0 5px 0' }}>{numProductos} productos</p>
                   <p style={{ fontFamily: 'Poppins-Regular', fontSize: '12px', color: '#999', margin: 0, display: 'flex', alignItems: 'center', gap: '5px' }}>
