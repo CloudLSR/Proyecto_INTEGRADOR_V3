@@ -32,7 +32,7 @@ const modalCSS = `
  
   /* ── Panel rosado izquierdo ── */
   .scr-panel-left {
-    background: linear-gradient(160deg, #c8506a 0%, #a83858 100%);
+    background: linear-gradient(160deg, #C6676D 0%, #a83858 100%);
     flex: 0 0 42%;
     display: flex; flex-direction: column;
     align-items: center; justify-content: space-between;
@@ -188,8 +188,8 @@ const modalCSS = `
     to   { transform: translateX(0);    opacity:1 }
   }
   .scr-cart-header {
-    background: #c8506a; color: #fff;
-    padding: 18px 20px 14px;
+    background: #C6676D; color: #fff;
+    padding: 20px 20px 14px;
     display: flex; align-items: center; justify-content: space-between;
     flex-shrink: 0;
   }
